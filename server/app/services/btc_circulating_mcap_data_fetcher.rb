@@ -1,5 +1,5 @@
-class BtcCirculatingMcapDataFetcher < BaseService
+class BtcCirculatingMcapDataFetcher < MessariDataFetcher
   def initialize
-    super('btc_circ_mcap', 'BTC Circulating Mcap')
+    super(metric_key: 'btc_circ_mcap', metric_display_name: 'BTC Circulating Mcap')
   end
 end

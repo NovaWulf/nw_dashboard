@@ -1,5 +1,5 @@
-class BtcRealizedMcapDataFetcher < BaseService
+class BtcRealizedMcapDataFetcher < MessariDataFetcher
   def initialize
-    super('btc_realized_mcap', 'BTC Realized Mcap')
+    super(metric_key: 'btc_realized_mcap', metric_display_name: 'BTC Realized Mcap')
   end
 end

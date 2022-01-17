@@ -9,17 +9,17 @@ class Messari
   end
 
   def btc_price(start_date = DEFAULT_START_DATE)
-    self.class.get("/assets/bitcoin/metrics/price/time-series?start=#{start_date}&end=#{DateTime.now.to_date}&interval=1d",
+    self.class.get("/assets/bitcoin/metrics/price/time-series?start=#{start_date}&end=#{Date.today}&interval=1d",
                    @options)
   end
 
   def btc_circ_mcap(start_date = DEFAULT_START_DATE)
-    self.class.get("/assets/bitcoin/metrics/mcap-circ/time-series?start=#{start_date}&end=#{DateTime.now.to_date}&interval=1d",
+    self.class.get("/assets/bitcoin/metrics/mcap-circ/time-series?start=#{start_date}&end=#{Date.today}&interval=1d",
                    @options)
   end
 
   def btc_realized_mcap(start_date = DEFAULT_START_DATE)
-    self.class.get("/assets/bitcoin/metrics/mcap-realized/time-series?start=#{start_date}&end=#{DateTime.now.to_date}&interval=1d",
+    self.class.get("/assets/bitcoin/metrics/mcap-realized/time-series?start=#{start_date}&end=#{Date.today}&interval=1d",
                    @options)
   end
 end

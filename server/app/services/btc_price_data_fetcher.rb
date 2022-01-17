@@ -1,5 +1,5 @@
-class BtcPriceDataFetcher < BaseService
+class BtcPriceDataFetcher < MessariDataFetcher
   def initialize
-    super('btc_price', 'BTC Price')
+    super(metric_key: 'btc_price', metric_display_name: 'BTC Price')
   end
 end
