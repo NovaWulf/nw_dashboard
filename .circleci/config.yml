@@ -117,4 +117,4 @@ workflows:
             - test-server
           filters:
             branches:
-              only: main      
+              only: main
