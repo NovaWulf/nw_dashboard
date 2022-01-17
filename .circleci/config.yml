@@ -23,11 +23,11 @@ executors:
 
 jobs:
   bundle_install:
-    working_directory: ~/nw-dashboard/server
+    working_directory: ~/nw_dashboard/server
     executor: ruby
     steps:
       - checkout:
-          path: ~/nw-dashboard/
+          path: ~/nw_dashboard/
       - attach_workspace:
           at: .
       - restore_cache:
@@ -48,12 +48,12 @@ jobs:
           paths:
             - vendor/bundle
   test-server:
-    working_directory: ~/nw-dashboard/server
+    working_directory: ~/nw_dashboard/server
     <<: *environment
     executor: ruby
     steps:
       - checkout:
-          path: ~/nw-dashboard/
+          path: ~/nw_dashboard/
       - attach_workspace:
           at: .
       - run:
@@ -85,26 +85,26 @@ jobs:
           path: test-results
 
   deploy_server:
-    working_directory: ~/nw-dashboard/server
+    working_directory: ~/nw_dashboard/server
     <<: *environment
     docker:
       - image: buildpack-deps:trusty
     steps:
       - checkout:
-          path: ~/nw-dashboard/
+          path: ~/nw_dashboard/
       - run:
           name: Should I run?
           command: |
-            . ~/nw-dashboard/.circleci/should_i_run.sh
+            . ~/nw_dashboard/.circleci/should_i_run.sh
             shouldIRun api $CIRCLE_COMPARE_URL
       - run:
           name: Deploy API to Heroku
           command: |
-            git push -f https://heroku:$HEROKU_API_KEY@git.heroku.com/nw-dashboard.git master
+            git push -f https://heroku:$HEROKU_API_KEY@git.heroku.com/nw_dashboard.git master
 
 workflows:
   version: 2
-  nw-dashboard:
+  nw_dashboard:
     jobs:
       - bundle_install
       - test-server:
