@@ -9,11 +9,11 @@ module Types
 
     def mvrv
       # grab only sundays for weekly data
-      Metric.where(name: 'btc_mvrv').where('extract(DOW from timestamp) = ?', 0)
+      Metric.by_metric('btc_mvrv').sundays
     end
 
     def btc
-      Metric.where(name: 'btc_price').where('extract(DOW from timestamp) = ?', 0)
+      Metric.by_metric('btc_price').sundays
     end
   end
 end

@@ -8,17 +8,13 @@
 
 if Metric.count.zero?
 
-  puts 'Fetching btc price'
-  mc = Messari.new.all_btc_price
-  mc_vals = mc.parsed_response['data']['values']
-  puts 'Saving btc'
-  mc_vals.each { |m| Metric.create(timestamp: Time.at(m[0] / 1000).to_datetime, value: m[1], name: 'btc_price') }
+  BtcDataFetcher.run
 
   puts 'Fetching circulating mcap'
   mc = Messari.new.all_circulating_marketcap
   mc_vals = mc.parsed_response['data']['values']
   puts 'Saving circulating mcap'
-  mc_vals.each { |m| Metric.create(timestamp: Time.at(m[0] / 1000).to_datetime, value: m[1], name: 'btc_circ_mcap') }
+  mc_vals.each { |m| Metric.create(timestamp: Time.at(m[0] / 1000).to_date, value: m[1], name: 'btc_circ_mcap') }
 
   puts 'Fetching realized mcap'
   rmc = Messari.new.all_realized_marketcap
@@ -26,7 +22,7 @@ if Metric.count.zero?
 
   puts 'Saving realized mcap'
   rmc_vals.each do |m|
-    Metric.create(timestamp: Time.at(m[0] / 1000).to_datetime, value: m[1], name: 'btc_realized_mcap')
+    Metric.create(timestamp: Time.at(m[0] / 1000).to_date, value: m[1], name: 'btc_realized_mcap')
   end
 
   puts 'Storing MVRV'
@@ -37,7 +33,7 @@ if Metric.count.zero?
     end
 
     v = cm[1] / rmc_vals[idx][1]
-    Metric.create(timestamp: Time.at(cm[0] / 1000).to_datetime, value: v, name: 'btc_mvrv')
+    Metric.create(timestamp: Time.at(cm[0] / 1000).to_date, value: v, name: 'btc_mvrv')
   end
 
 end
