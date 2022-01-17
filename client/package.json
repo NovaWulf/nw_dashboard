@@ -3,13 +3,14 @@
   "version": "5.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3001",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "post-update": "echo \"codesandbox preview only, need an update\" && yarn upgrade --latest"
   },
   "dependencies": {
+    "@apollo/client": "^3.5.6",
     "@auth0/nextjs-auth0": "^1.7.0",
     "@emotion/cache": "latest",
     "@emotion/react": "latest",
@@ -17,10 +18,14 @@
     "@emotion/styled": "latest",
     "@mui/icons-material": "latest",
     "@mui/material": "latest",
+    "dayjs": "^1.10.7",
+    "graphql": "^16.2.0",
     "next": "latest",
     "prop-types": "latest",
     "react": "latest",
-    "react-dom": "latest"
+    "react-dom": "latest",
+    "recharts": "^2.1.8",
+    "trendline": "^0.3.1"
   },
   "devDependencies": {
     "eslint": "latest",
