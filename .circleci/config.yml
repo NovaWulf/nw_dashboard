@@ -1,0 +1,120 @@
+version: 2.1
+
+shared:
+  shared-environment: &environment
+    environment:
+      CIRCLE_COMPARE_URL: << pipeline.project.git_url >>/compare/<< pipeline.git.base_revision >>...<<pipeline.git.revision>>
+  
+executors:
+  ruby:
+    docker:
+      - image: cimg/ruby:2.6.6-node
+        environment: # environment variables for primary container
+          BUNDLE_PATH: vendor/bundle
+          PGHOST: 127.0.0.1
+          PGUSER: nw_server
+          RAILS_ENV: test
+      - image: circleci/postgres:11.9-ram
+        environment:
+          POSTGRES_USER: nw_server
+          POSTGRES_DB: nw_server_test
+          POSTGRES_PASSWORD: ''
+          POSTGRES_HOST_AUTH_METHOD: trust
+
+jobs:
+  bundle_install:
+    working_directory: ~/nw-dashboard/server
+    executor: ruby
+    steps:
+      - checkout:
+          path: ~/nw-dashboard/
+      - attach_workspace:
+          at: .
+      - restore_cache:
+          keys:
+            - nw-server-v1-{{ checksum "Gemfile.lock" }}
+      - run:
+          name: Installing bundler dependencies
+          command: bundle check || bundle install --frozen
+      - run:
+          name: Clean stale dependencies
+          command: bundle clean
+      - save_cache:
+          key: nw-server-v1-{{ checksum "Gemfile.lock" }}
+          paths:
+            - vendor/bundle
+      - persist_to_workspace:
+          root: .
+          paths:
+            - vendor/bundle
+  test-server:
+    working_directory: ~/nw-dashboard/server
+    <<: *environment
+    executor: ruby
+    steps:
+      - checkout:
+          path: ~/nw-dashboard/
+      - attach_workspace:
+          at: .
+      - run:
+          name: Should I run?
+          command: |
+            . ~/nw/.circleci/should_i_run.sh
+            shouldIRun api $CIRCLE_COMPARE_URL
+      - run:
+          name: Which bundler?
+          command: bundle -v
+      - run:
+          name: Wait for DB
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
+      - run:
+          name: Database setup
+          command: |
+            bundle exec rake db:create db:schema:load --trace
+            bundle exec rake db:migrate
+      - run:
+          name: Parallel RSpec
+          command: |
+            bundle exec rspec --profile 5 \
+                        --format RspecJunitFormatter \
+                        --out test-results/rspec/results.xml \
+                        --format progress \
+                        $(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
+
+      - store_test_results:
+          path: test-results
+
+  deploy_server:
+    working_directory: ~/nw-dashboard/server
+    <<: *environment
+    docker:
+      - image: buildpack-deps:trusty
+    steps:
+      - checkout:
+          path: ~/nw-dashboard/
+      - run:
+          name: Should I run?
+          command: |
+            . ~/nw-dashboard/.circleci/should_i_run.sh
+            shouldIRun api $CIRCLE_COMPARE_URL
+      - run:
+          name: Deploy API to Heroku
+          command: |
+            git push -f https://heroku:$HEROKU_API_KEY@git.heroku.com/nw-dashboard.git master
+
+workflows:
+  version: 2
+  nw-dashboard:
+    jobs:
+      - bundle_install
+      - test-server:
+          requires:
+            - bundle_install
+      - deploy_server:
+          post-steps:
+            - run: bundle exec rake db:migrate
+          requires:
+            - test-server
+          filters:
+            branches:
+              only: main      

@@ -17,7 +17,7 @@ class ServiceResult
   ensure
     if @error
       Rails.logger.error(@error_message)
-      Rails.logger.error(@error.backtrace)
+      Rails.logger.error(@error.backtrace.join("\n"))
     end
   end
 
