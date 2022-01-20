@@ -85,8 +85,11 @@ jobs:
 
   deploy_server:
     executor: heroku/default
+    working_directory: ~/nw_dashboard/server
     <<: *environment
     steps:
+      - checkout:
+          path: ~/nw_dashboard/
       - run:
           name: Should I run?
           command: |
