@@ -32,15 +32,11 @@ jobs:
           at: .
       - restore_cache:
           keys:
-            - nw-server-v1-{{ checksum "Gemfile.lock" }}
-      - run:
-          name: Installing bundler dependencies
-          command: bundle check || bundle install --frozen
-      - run:
-          name: Clean stale dependencies
-          command: bundle clean
+            - nw-server-v1-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
+            - nw-server-v1-{{ .Branch }}
+      - run: bundle install --path vendor/bundle
       - save_cache:
-          key: nw-server-v1-{{ checksum "Gemfile.lock" }}
+          key: nw-server-v1-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
           paths:
             - vendor/bundle
       - persist_to_workspace:
@@ -100,7 +96,7 @@ jobs:
       - run:
           name: Deploy API to Heroku
           command: |
-            git push -f https://heroku:$HEROKU_API_KEY@git.heroku.com/nw_dashboard.git master
+            git push -f https://heroku:$HEROKU_API_KEY@git.heroku.com/nw_dashboard.git main
 
 workflows:
   version: 2
