@@ -59,7 +59,7 @@ jobs:
       - run:
           name: Should I run?
           command: |
-            . ~/nw/.circleci/should_i_run.sh
+            . ~/nw_dashboard/.circleci/should_i_run.sh
             shouldIRun api $CIRCLE_COMPARE_URL
       - run:
           name: Which bundler?
