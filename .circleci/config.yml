@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs: 
+  heroku: circleci/heroku@1.2.6
+
 shared:
   shared-environment: &environment
     environment:
@@ -81,22 +84,16 @@ jobs:
           path: test-results
 
   deploy_server:
-    working_directory: ~/nw_dashboard/server
+    executor: heroku/default
     <<: *environment
-    docker:
-      - image: buildpack-deps:trusty
     steps:
-      - checkout:
-          path: ~/nw_dashboard/
       - run:
           name: Should I run?
           command: |
             . ~/nw_dashboard/.circleci/should_i_run.sh
             shouldIRun api $CIRCLE_COMPARE_URL
-      - run:
-          name: Deploy API to Heroku
-          command: |
-            git push -f https://heroku:$HEROKU_API_KEY@git.heroku.com/NovaWulf/nw_dashboard.git main
+      - heroku/install
+      - heroku/deploy-via-git
 
 workflows:
   version: 2
