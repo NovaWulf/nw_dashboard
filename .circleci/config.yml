@@ -59,7 +59,7 @@ jobs:
           name: Should I run?
           command: |
             . ~/nw_dashboard/.circleci/should_i_run.sh
-            shouldIRun api $CIRCLE_COMPARE_URL
+            shouldIRun server $CIRCLE_COMPARE_URL
       - run:
           name: Which bundler?
           command: bundle -v
@@ -94,7 +94,7 @@ jobs:
           name: Should I run?
           command: |
             . ~/nw_dashboard/.circleci/should_i_run.sh
-            shouldIRun api $CIRCLE_COMPARE_URL
+            shouldIRun server $CIRCLE_COMPARE_URL
       - heroku/install
       - heroku/deploy-via-git
 
