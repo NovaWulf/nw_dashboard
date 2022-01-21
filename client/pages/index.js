@@ -3,12 +3,14 @@ import { useUser } from '@auth0/nextjs-auth0';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import * as React from 'react';
+
+import { withPageAuthRequired } from '@auth0/nextjs-auth0';
 import client from '../apollo-client';
 import Layout from '../components/Layout';
 import MvrvChart from '../components/MvrvChart';
 import MvrvRegressionChart from '../components/MvrvRegressionChart';
 
-export default function Dashboard({ mvrv, btc }) {
+const Dashboard = ({ mvrv, btc }) => {
   const { user, error, isLoading } = useUser();
 
   return (
@@ -25,7 +27,7 @@ export default function Dashboard({ mvrv, btc }) {
       </Container>
     </Layout>
   );
-}
+};
 
 export async function getStaticProps() {
   const { data } = await client.query({
@@ -50,3 +52,5 @@ export async function getStaticProps() {
     },
   };
 }
+
+export default withPageAuthRequired(Dashboard);

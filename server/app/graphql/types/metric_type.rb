@@ -10,7 +10,7 @@ module Types
     end
 
     def ts
-      object.timestamp.to_i
+      object.timestamp.to_time.to_i
     end
 
     def v

@@ -12,7 +12,7 @@ class MvrvCalculator < BaseService
       rv = Metric.by_name('btc_realized_mcap').by_day(day).first
 
       if !mv || !rv
-        Rails.logger.info "can't calculate mvrv for #{day} as don't have both mv: #{mv} and rv: #{rv}"
+        Rails.logger.info "can't calculate mvrv for #{day}. mv present? #{mv.present?} rv present? #{rv.present?}"
         next
       end
       v = mv.value / rv.value
