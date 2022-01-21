@@ -107,8 +107,6 @@ workflows:
           requires:
             - bundle_install
       - deploy_server:
-          post-steps:
-            - run: bundle exec rake db:migrate
           requires:
             - test-server
           filters:
