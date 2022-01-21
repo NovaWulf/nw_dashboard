@@ -6,6 +6,8 @@ module Types
 
     field :mvrv, [Types::MetricType], null: false, description: 'Return a list of mvrv metrics'
     field :btc, [Types::MetricType], null: false, description: 'Return a list of btc metrics'
+    field :btc_active_addresses, [Types::MetricType], null: false,
+                                                      description: 'Return a list of btc active addresses metrics'
 
     def mvrv
       # grab only sundays for weekly data
@@ -14,6 +16,10 @@ module Types
 
     def btc
       Metric.by_name('btc_price').sundays
+    end
+
+    def btc_active_addresses
+      Metric.by_name('btc_active_addresses').sundays
     end
   end
 end

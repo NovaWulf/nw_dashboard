@@ -34,70 +34,10 @@ export function linearRegression(data, xKey, yKey) {
     2,
   ).toPrecision(4);
 
-  //   // average of X values and Y values
-  //   const xMean = getAvg(xData);
-  //   const yMean = getAvg(yData);
-
-  //   // Subtract X or Y mean from corresponding axis value
-  //   const xMinusxMean = xData.map(val => val - xMean);
-  //   const yMinusyMean = yData.map(val => val - yMean);
-
-  //   const xMinusxMeanSq = xMinusxMean.map(val => Math.pow(val, 2));
-
-  //   const xy = [];
-  //   for (let x = 0; x < data.length; x++) {
-  //     xy.push(xMinusxMean[x] * yMinusyMean[x]);
-  //   }
-
-  //   // const xy = xMinusxMean.map((val, index) => val * yMinusyMean[index]);
-
-  //   const xySum = getSum(xy);
-
-  //   // b1 is the slope
-  //   const b1 = xySum / getSum(xMinusxMeanSq);
-  //   // b0 is the start of the slope on the Y axis
-  //   const b0 = yMean - b1 * xMean;
-
   return {
     slope,
     yStart,
     r2,
     calcY: x => yStart + slope * x,
-  };
-}
-export function getRSquared(predict, data) {
-  var yAxis = data;
-  var rPrediction = [];
-
-  var meanValue = 0; // MEAN VALUE
-  var SStot = 0; // THE TOTAL SUM OF THE SQUARES
-  var SSres = 0; // RESIDUAL SUM OF SQUARES
-  var rSquared = 0;
-
-  // SUM ALL VALUES
-  for (var n in yAxis) {
-    meanValue += yAxis[n];
-  }
-
-  // GET MEAN VALUE
-  meanValue = meanValue / yAxis.length;
-
-  for (var n in yAxis) {
-    // CALCULATE THE SSTOTAL
-    SStot += Math.pow(yAxis[n] - meanValue, 2);
-    // REGRESSION PREDICTION
-    rPrediction.push(predict(n));
-    // CALCULATE THE SSRES
-    SSres += Math.pow(rPrediction[n] - yAxis[n], 2);
-  }
-
-  // R SQUARED
-  rSquared = (1 - SSres / SStot).toPrecision(3);
-
-  return {
-    meanValue: meanValue,
-    SStot: SStot,
-    SSres: SSres,
-    rSquared: rSquared,
   };
 }

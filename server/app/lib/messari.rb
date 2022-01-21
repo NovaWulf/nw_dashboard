@@ -20,6 +20,10 @@ class Messari
     daily_response('/assets/bitcoin/metrics/mcap-realized/time-series', start_date || DEFAULT_START_DATE)
   end
 
+  def btc_active_addresses(start_date = DEFAULT_START_DATE)
+    daily_response('/assets/bitcoin/metrics/act-addr-cnt/time-series', start_date || DEFAULT_START_DATE)
+  end
+
   private
 
   def daily_response(path, start_date)
