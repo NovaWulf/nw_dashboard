@@ -63,6 +63,10 @@ Rails.application.configure do
   # config.active_job.queue_name_prefix = "server_production"
 
   config.action_mailer.perform_caching = false
+  config.action_mailer.sendgrid_actionmailer_settings = {
+    api_key:               ENV["SENDGRID_API_KEY"],
+    raise_delivery_errors: true
+  }
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
