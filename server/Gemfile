@@ -27,7 +27,6 @@ gem 'jbuilder', '~> 2.7'
 
 # inline css for emails
 gem 'premailer-rails'
-gem 'sendgrid-actionmailer'
 
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.4.4', require: false
@@ -38,8 +37,6 @@ gem 'rack-cors' # for graphql from apollo
 gem 'graphiql-rails', group: :development
 gem 'graphql', '~> 1.13'
 
-gem 'clockwork', '~> 3.0'
-
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: %i[mri mingw x64_mingw]
@@ -47,7 +44,7 @@ group :development, :test do
 end
 
 group :development do
-  gem 'letter_opener' # open emails in the browser
+  # gem 'letter_opener' # open emails in the browser
 
   # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
   gem 'web-console', '>= 4.1.0'

@@ -68,9 +68,6 @@ GEM
       msgpack (~> 1.0)
     builder (3.2.4)
     byebug (11.1.3)
-    clockwork (3.0.0)
-      activesupport
-      tzinfo
     concurrent-ruby (1.1.9)
     crass (1.0.6)
     css_parser (1.9.0)
@@ -97,10 +94,6 @@ GEM
     jbuilder (2.11.5)
       actionview (>= 5.0.0)
       activesupport (>= 5.0.0)
-    launchy (2.5.0)
-      addressable (~> 2.7)
-    letter_opener (1.7.0)
-      launchy (~> 2.2)
     listen (3.7.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
@@ -217,7 +210,6 @@ GEM
     rubocop-rspec (2.7.0)
       rubocop (~> 1.19)
     ruby-progressbar (1.11.0)
-    ruby_http_client (3.5.2)
     sass-rails (6.0.0)
       sassc-rails (~> 2.1, >= 2.1.1)
     sassc (2.4.0)
@@ -229,11 +221,6 @@ GEM
       sprockets-rails
       tilt
     semantic_range (3.0.0)
-    sendgrid-actionmailer (3.2.0)
-      mail (~> 2.7)
-      sendgrid-ruby (~> 6.4)
-    sendgrid-ruby (6.4.0)
-      ruby_http_client (~> 3.4)
     sprockets (4.0.2)
       concurrent-ruby (~> 1.0)
       rack (> 1, < 3)
@@ -270,13 +257,11 @@ PLATFORMS
 DEPENDENCIES
   bootsnap (>= 1.4.4)
   byebug
-  clockwork (~> 3.0)
   database_cleaner-active_record
   graphiql-rails
   graphql (~> 1.13)
   httparty
   jbuilder (~> 2.7)
-  letter_opener
   listen (~> 3.3)
   pg (~> 1.1)
   premailer-rails
@@ -290,7 +275,6 @@ DEPENDENCIES
   rubocop-rails
   rubocop-rspec
   sass-rails (>= 6)
-  sendgrid-actionmailer
   turbolinks (~> 5)
   tzinfo-data
   web-console (>= 4.1.0)
