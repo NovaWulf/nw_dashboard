@@ -4,8 +4,7 @@ class GraphqlController < ApplicationController
   # but you'll have to authenticate your user separately
   protect_from_forgery with: :null_session
 
-  before_action :authorize
-
+  include Secured
 
   def execute
     variables = prepare_variables(params[:variables])
@@ -50,9 +49,5 @@ class GraphqlController < ApplicationController
     logger.error e.backtrace.join("\n")
 
     render json: { errors: [{ message: e.message, backtrace: e.backtrace }], data: {} }, status: 500
-  end
-
-  def authorize
-    render json: {}, status: :unauthorized unless request.headers['novawulf'] == ENV["NOVAWULF_API_KEY"]
   end
 end

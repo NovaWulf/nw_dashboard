@@ -21,7 +21,7 @@ export default function Layout({ children }) {
       <CssBaseline />
       <AppBar position="absolute">
         <Toolbar>
-          <Image src={logo} width="29" height="33" mr />
+          <Image src={logo} width="29" height="33" />
           <Typography
             component="h1"
             variant="h6"

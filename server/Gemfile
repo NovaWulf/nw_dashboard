@@ -26,6 +26,7 @@ gem 'jbuilder', '~> 2.7'
 # gem 'image_processing', '~> 1.2'
 
 # inline css for emails
+gem 'jwt' # for auth0 jwt validation
 gem 'premailer-rails'
 
 # Reduces boot times through caching; required in config/boot.rb
