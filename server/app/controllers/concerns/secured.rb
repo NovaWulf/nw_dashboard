@@ -15,7 +15,6 @@ module Secured
   end
 
   def http_token
-    debugger
     request.headers['Authorization'].split(' ').last if request.headers['Authorization'].present?
   end
 

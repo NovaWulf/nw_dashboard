@@ -5,7 +5,6 @@ require 'uri'
 
 class JsonWebToken
   def self.verify(token)
-    debugger
     JWT.decode(token, nil,
                true, # Verify the signature of this token
                algorithms: 'RS256',
@@ -18,7 +17,6 @@ class JsonWebToken
   end
 
   def self.jwks_hash
-    debugger
     jwks_raw = Net::HTTP.get URI("#{issuer}.well-known/jwks.json")
     jwks_keys = Array(JSON.parse(jwks_raw)['keys'])
     Hash[
