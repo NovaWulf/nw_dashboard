@@ -1,5 +1,5 @@
-RSpec.describe BtcPriceDataFetcher do
-  subject { described_class.run }
+RSpec.describe PriceDataFetcher do
+  subject { described_class.run(token: 'btc') }
 
   let(:messari_double) do
     double('messari client', btc_price: { data: { values: [[Time.now.to_i * 1000, 50_000]] } }.with_indifferent_access)
@@ -13,7 +13,8 @@ RSpec.describe BtcPriceDataFetcher do
     subject
     expect(Metric.count).to eql 1
     m = Metric.first
-    expect(m.name).to eql 'btc_price'
+    expect(m.token).to eql 'btc'
+    expect(m.metric).to eql 'price'
     expect(m.value).to eql 50_000.0
     expect(m.timestamp).to eql Date.today
   end

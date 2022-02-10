@@ -14,7 +14,8 @@ RSpec.describe BtcActiveAddressesFetcher do
     subject
     expect(Metric.count).to eql 1
     m = Metric.first
-    expect(m.name).to eql 'btc_active_addresses'
+    expect(m.token).to eql 'btc'
+    expect(m.metric).to eql 'active_addresses'
     expect(m.value).to eql 50_000.0
     expect(m.timestamp).to eql Date.today
   end
