@@ -1,21 +1,16 @@
+import { Box, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import {
-  LineChart,
+  ComposedChart,
   Line,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-  Tooltip,
   ResponsiveContainer,
   Scatter,
-  ComposedChart,
+  XAxis,
+  YAxis,
 } from 'recharts';
-import dayjs from 'dayjs';
-import DashboardItem from './DashboardItem';
-// import createTrend from 'trendline';
-import { linearRegression } from '../lib/regression';
-import { useTheme } from '@mui/material/styles';
-import { Box, Typography } from '@mui/material';
 import { nFormatter } from '../lib/formatters';
+import { linearRegression } from '../lib/regression';
+import DashboardItem from './DashboardItem';
 
 export default function ActiveAddressRegressionChart({ activeAddresses, btc }) {
   const theme = useTheme();
@@ -36,8 +31,6 @@ export default function ActiveAddressRegressionChart({ activeAddresses, btc }) {
     { btc: trend.calcY(xMin), activeAddresses: xMin },
     { btc: trend.calcY(xMax), activeAddresses: xMax },
   ];
-
-  // const rSquared = getRSquared(trend.calcY, btcs).rSquared;
 
   return (
     <DashboardItem title="Active Address / BTC Regression">

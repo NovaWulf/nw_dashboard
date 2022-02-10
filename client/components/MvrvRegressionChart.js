@@ -1,21 +1,16 @@
+import { Box, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import {
-  LineChart,
+  ComposedChart,
   Line,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-  Tooltip,
   ResponsiveContainer,
   Scatter,
-  ComposedChart,
+  XAxis,
+  YAxis,
 } from 'recharts';
-import dayjs from 'dayjs';
-import DashboardItem from './DashboardItem';
-// import createTrend from 'trendline';
-import { linearRegression } from '../lib/regression';
-import { useTheme } from '@mui/material/styles';
-import { Box, Typography } from '@mui/material';
 import { nFormatter } from '../lib/formatters';
+import { linearRegression } from '../lib/regression';
+import DashboardItem from './DashboardItem';
 
 export default function MvrvRegressionChart({ mvrv, btc }) {
   const theme = useTheme();
@@ -37,18 +32,13 @@ export default function MvrvRegressionChart({ mvrv, btc }) {
     { btc: trend.calcY(xMax), mvrv: xMax },
   ];
 
-  // const rSquared = getRSquared(trend.calcY, btcs).rSquared;
-
   return (
     <DashboardItem title="MVRV / BTC Regression">
       <ResponsiveContainer width="99%" height={300}>
         <ComposedChart
-          // width={600}
-          // height={300}
           data={data}
           margin={{ top: 5, right: 0, bottom: 10, left: 15 }}
         >
-          {/* <CartesianGrid stroke="#ccc" strokeDasharray="5 5" /> */}
           <XAxis
             name="MVRV"
             dataKey="mvrv"
@@ -75,14 +65,9 @@ export default function MvrvRegressionChart({ mvrv, btc }) {
             type="monotoneX"
             dataKey="btc"
             shape="cross"
-            // stroke={theme.palette.primary.main}
             fill={theme.palette.primary.main}
-            // strokeWidth={1}
           />
-          {/* <Tooltip
-          // labelFormatter={DateFormatter}
-          // formatter={TooltipValueFormatter}
-          /> */}
+
           <Line
             data={trendData}
             dataKey="btc"
@@ -99,27 +84,3 @@ export default function MvrvRegressionChart({ mvrv, btc }) {
     </DashboardItem>
   );
 }
-
-const DollarFormater = number => {
-  if (number > 1000000000000) {
-    return '$' + (number / 1000000000000).toString() + 'T';
-  } else if (number > 1000000000) {
-    return '$' + (number / 1000000000).toString() + 'B';
-  } else if (number > 1000000) {
-    return '$' + (number / 1000000).toString() + 'M';
-  } else if (number > 1000) {
-    return '$' + (number / 1000).toString() + 'K';
-  } else {
-    return '$' + number.toString();
-  }
-};
-
-const EpochFormatter = time => {
-  return dayjs(time * 1000).format('MMM YY');
-};
-
-const DateFormatter = time => {
-  return dayjs(time * 1000).format('MM/DD/YY');
-};
-
-const TooltipValueFormatter = (value, name, props) => [value, 'MVRV'];

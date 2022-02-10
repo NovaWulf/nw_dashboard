@@ -11,7 +11,7 @@ import {
 import dayjs from 'dayjs';
 import DashboardItem from './DashboardItem';
 import { useTheme } from '@mui/material';
-import { nFormatter } from '../lib/formatters';
+import { nFormatter, epochFormatter, dateFormatter } from '../lib/formatters';
 
 export default function ActiveAddressesChart({ activeAddresses, btc }) {
   const theme = useTheme();
@@ -23,8 +23,6 @@ export default function ActiveAddressesChart({ activeAddresses, btc }) {
     <DashboardItem title="Active Addresses">
       <ResponsiveContainer width="99%" height={300}>
         <LineChart
-          // width={600}
-          // height={300}
           data={data}
           margin={{ top: 5, right: 15, bottom: 5, left: 10 }}
         >
@@ -43,8 +41,6 @@ export default function ActiveAddressesChart({ activeAddresses, btc }) {
             stroke={theme.palette.primary.main}
             yAxisId="btc"
             dot={false}
-
-            // strokeDasharray="5 5"
           />
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
           <XAxis
@@ -52,7 +48,7 @@ export default function ActiveAddressesChart({ activeAddresses, btc }) {
             domain={['dataMin', 'dataMax']}
             type="number"
             scale="time"
-            tickFormatter={EpochFormatter}
+            tickFormatter={epochFormatter}
           />
           <YAxis
             yAxisId="aa"
@@ -72,26 +68,12 @@ export default function ActiveAddressesChart({ activeAddresses, btc }) {
               value: 'BTC Price',
               angle: -270,
               position: 'insideRight',
-              // offset: '-10',
             }}
           />
-          <Tooltip
-            labelFormatter={DateFormatter}
-            // formatter={TooltipValueFormatter}
-          />
+          <Tooltip labelFormatter={dateFormatter} />
           <Legend />
         </LineChart>
       </ResponsiveContainer>
     </DashboardItem>
   );
 }
-
-const EpochFormatter = time => {
-  return dayjs(time * 1000).format('MMM YY');
-};
-
-const DateFormatter = time => {
-  return dayjs(time * 1000).format('MM/DD/YY');
-};
-
-const TooltipValueFormatter = (value, name, props) => [value, name];
