@@ -6,18 +6,32 @@ import ActiveAddressesChart from '../components/ActiveAddressesChart';
 import ActiveAddressRegressionChart from '../components/ActiveAddressRegressionChart';
 import MvrvChart from '../components/MvrvChart';
 import MvrvRegressionChart from '../components/MvrvRegressionChart';
+import BtcDevActivityChart from './BtcDevActivityChart';
+import EthDevActivityChart from './EthDevActivityChart';
 
 const QUERY = gql`
   query Metrics {
-    mvrv {
+    btcMvrv {
       ts
       v
     }
-    btc {
+    btcPrice {
+      ts
+      v
+    }
+    ethPrice {
       ts
       v
     }
     btcActiveAddresses {
+      ts
+      v
+    }
+    btcDevActivity {
+      ts
+      v
+    }
+    ethDevActivity {
       ts
       v
     }
@@ -40,27 +54,43 @@ export default function DashboardCharts() {
     return null;
   }
 
-  const { mvrv, btc, btcActiveAddresses: activeAddresses } = data || {};
+  const {
+    btcMvrv,
+    btcPrice,
+    ethPrice,
+    btcActiveAddresses,
+    btcDevActivity,
+    ethDevActivity,
+  } = data || {};
 
   return (
     <Grid container spacing={3}>
       <LoadingGridItem loading={loading}>
-        <MvrvChart mvrv={mvrv} btc={btc} />
+        <MvrvChart mvrv={btcMvrv} btc={btcPrice} />
       </LoadingGridItem>
 
       <LoadingGridItem loading={loading}>
-        <MvrvRegressionChart mvrv={mvrv} btc={btc} />
+        <MvrvRegressionChart mvrv={btcMvrv} btc={btcPrice} />
       </LoadingGridItem>
 
       <LoadingGridItem loading={loading}>
-        <ActiveAddressesChart activeAddresses={activeAddresses} btc={btc} />
+        <ActiveAddressesChart
+          activeAddresses={btcActiveAddresses}
+          btc={btcPrice}
+        />
       </LoadingGridItem>
 
       <LoadingGridItem loading={loading}>
         <ActiveAddressRegressionChart
-          activeAddresses={activeAddresses}
-          btc={btc}
+          activeAddresses={btcActiveAddresses}
+          btc={btcPrice}
         />
+      </LoadingGridItem>
+      <LoadingGridItem loading={loading}>
+        <BtcDevActivityChart btcDevActivity={btcDevActivity} btc={btcPrice} />
+      </LoadingGridItem>
+      <LoadingGridItem loading={loading}>
+        <EthDevActivityChart ethDevActivity={ethDevActivity} eth={ethPrice} />
       </LoadingGridItem>
     </Grid>
   );
