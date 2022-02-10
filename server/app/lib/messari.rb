@@ -8,8 +8,13 @@ class Messari
     @options = { headers: { "x-messari-api-key": ENV['MESSARI_API_KEY'] } }
   end
 
+  # NOTE: these names must match "#{token}_#{metric}"
   def btc_price(start_date = DEFAULT_START_DATE)
     daily_response('/assets/bitcoin/metrics/price/time-series', start_date || DEFAULT_START_DATE)
+  end
+
+  def eth_price(start_date = DEFAULT_START_DATE)
+    daily_response('/assets/ethereum/metrics/price/time-series', start_date || DEFAULT_START_DATE)
   end
 
   def btc_circ_mcap(start_date = DEFAULT_START_DATE)
