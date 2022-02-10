@@ -25,9 +25,13 @@ gem 'jbuilder', '~> 2.7'
 # Use Active Storage variant
 # gem 'image_processing', '~> 1.2'
 
+gem 'toml' # parse toml
+
 # inline css for emails
 gem 'jwt' # for auth0 jwt validation
 gem 'premailer-rails'
+
+gem 'groupdate' # easier sql
 
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.4.4', require: false

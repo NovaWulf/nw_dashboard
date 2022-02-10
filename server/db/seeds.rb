@@ -5,5 +5,5 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
-BtcPriceDataFetcher.run
+PriceDataFetcher.run(token: 'btc')
 MvrvCalculator.run
