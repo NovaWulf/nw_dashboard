@@ -1,9 +1,9 @@
-RSpec.describe BtcActiveAddressesFetcher do
-  subject { described_class.run }
+RSpec.describe ActiveAddressesFetcher do
+  subject { described_class.run(token: 'btc') }
 
   let(:messari_double) do
     double('messari client',
-           btc_active_addresses: { data: { values: [[Time.now.to_i * 1000, 50_000]] } }.with_indifferent_access)
+           active_addresses: { data: { values: [[Time.now.to_i * 1000, 50_000]] } }.with_indifferent_access)
   end
 
   before(:each) do

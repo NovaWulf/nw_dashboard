@@ -31,8 +31,18 @@ class DevActivityFetcher < BaseService
     case token
     when 'eth'
       'ethereum'
+    when 'sol'
+      'solana'
     when 'btc'
       'bitcoin'
+    when 'luna'
+      'terra'
+    when 'fil'
+      'file-coin'
+    when 'xrp'
+      'ripple'
+    when 'etc'
+      'ethereum-classic'
     end
   end
 

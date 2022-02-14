@@ -15,23 +15,23 @@ const QUERY = gql`
       ts
       v
     }
-    btcPrice {
+    btcPrice: tokenPrice(token: "btc") {
       ts
       v
     }
-    ethPrice {
+    ethPrice: tokenPrice(token: "eth") {
       ts
       v
     }
-    btcActiveAddresses {
+    btcActiveAddresses: activeAddresses(token: "btc") {
       ts
       v
     }
-    btcDevActivity {
+    btcDevActivity: devActivity(token: "btc") {
       ts
       v
     }
-    ethDevActivity {
+    ethDevActivity: devActivity(token: "eth") {
       ts
       v
     }

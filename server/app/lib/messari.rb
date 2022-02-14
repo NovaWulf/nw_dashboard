@@ -9,30 +9,53 @@ class Messari
   end
 
   # NOTE: these names must match "#{token}_#{metric}"
-  def btc_price(start_date = DEFAULT_START_DATE)
-    daily_response('/assets/bitcoin/metrics/price/time-series', start_date || DEFAULT_START_DATE)
+  def price(token:, start_date: DEFAULT_START_DATE)
+    daily_response("/assets/#{chain_name(token)}/metrics/price/time-series", start_date || DEFAULT_START_DATE)
   end
 
-  def eth_price(start_date = DEFAULT_START_DATE)
-    daily_response('/assets/ethereum/metrics/price/time-series', start_date || DEFAULT_START_DATE)
+  def circ_mcap(token:, start_date: DEFAULT_START_DATE)
+    daily_response("/assets/#{chain_name(token)}/metrics/mcap-circ/time-series", start_date || DEFAULT_START_DATE)
   end
 
-  def btc_circ_mcap(start_date = DEFAULT_START_DATE)
-    daily_response('/assets/bitcoin/metrics/mcap-circ/time-series', start_date || DEFAULT_START_DATE)
+  def realized_mcap(token:, start_date: DEFAULT_START_DATE)
+    daily_response("/assets/#{chain_name(token)}/metrics/mcap-realized/time-series", start_date || DEFAULT_START_DATE)
   end
 
-  def btc_realized_mcap(start_date = DEFAULT_START_DATE)
-    daily_response('/assets/bitcoin/metrics/mcap-realized/time-series', start_date || DEFAULT_START_DATE)
-  end
-
-  def btc_active_addresses(start_date = DEFAULT_START_DATE)
-    daily_response('/assets/bitcoin/metrics/act-addr-cnt/time-series', start_date || DEFAULT_START_DATE)
+  def active_addresses(token:, start_date: DEFAULT_START_DATE)
+    weekly_response("/assets/#{chain_name(token)}/metrics/act-addr-cnt/time-series", start_date || DEFAULT_START_DATE)
   end
 
   private
 
   def daily_response(path, start_date)
-    response = self.class.get("#{path}?start=#{start_date}&end=#{Date.today}&interval=1d", @options)
+    response(path, start_date, '1d')
+  end
+
+  def weekly_response(path, start_date)
+    response(path, start_date, '1w')
+  end
+
+  def response(path, start_date, interval)
+    response = self.class.get("#{path}?start=#{start_date}&end=#{Date.today}&interval=#{interval}", @options)
     response.parsed_response
+  end
+
+  def chain_name(token)
+    case token
+    when 'eth'
+      'ethereum'
+    when 'sol'
+      'solana'
+    when 'btc'
+      'bitcoin'
+    when 'luna'
+      'terra'
+    when 'fil'
+      'file-coin'
+    when 'xrp'
+      'ripple'
+    when 'etc'
+      'ethereum-classic'
+    end
   end
 end
