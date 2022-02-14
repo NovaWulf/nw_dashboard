@@ -19,19 +19,7 @@ const QUERY = gql`
       ts
       v
     }
-    ethPrice: tokenPrice(token: "eth") {
-      ts
-      v
-    }
     btcActiveAddresses: activeAddresses(token: "btc") {
-      ts
-      v
-    }
-    btcDevActivity: devActivity(token: "btc") {
-      ts
-      v
-    }
-    ethDevActivity: devActivity(token: "eth") {
       ts
       v
     }
@@ -54,14 +42,7 @@ export default function DashboardCharts() {
     return null;
   }
 
-  const {
-    btcMvrv,
-    btcPrice,
-    ethPrice,
-    btcActiveAddresses,
-    btcDevActivity,
-    ethDevActivity,
-  } = data || {};
+  const { btcMvrv, btcPrice, btcActiveAddresses } = data || {};
 
   return (
     <Grid container spacing={3}>
@@ -85,12 +66,6 @@ export default function DashboardCharts() {
           activeAddresses={btcActiveAddresses}
           btc={btcPrice}
         />
-      </LoadingGridItem>
-      <LoadingGridItem loading={loading}>
-        <BtcDevActivityChart btcDevActivity={btcDevActivity} btc={btcPrice} />
-      </LoadingGridItem>
-      <LoadingGridItem loading={loading}>
-        <EthDevActivityChart ethDevActivity={ethDevActivity} eth={ethPrice} />
       </LoadingGridItem>
     </Grid>
   );

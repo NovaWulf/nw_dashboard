@@ -12,14 +12,24 @@ import {
 import { dateFormatter, epochFormatter, nFormatter } from '../lib/formatters';
 import DashboardItem from './DashboardItem';
 
-export default function BtcDevActivityChart({ btcDevActivity, btc }) {
+export default function DevActivityChart({
+  devActivity,
+  price,
+  tokenName,
+  chainName,
+}) {
   const theme = useTheme();
 
-  const data = btcDevActivity.map((da, idx) => {
-    return { ...da, btc: btc[idx].v };
+  const mergedData = devActivity.map((da, idx) => {
+    const p = price.find(priceItem => priceItem.ts === da.ts);
+    return p ? { ...da, price: p.v } : null;
+  });
+
+  const data = mergedData.filter(x => {
+    return x !== null;
   });
   return (
-    <DashboardItem title="Dev Activity - Bitcoin Ecosystem">
+    <DashboardItem title={`Dev Activity - ${chainName} Ecosystem`}>
       <ResponsiveContainer width="99%" height={300}>
         <LineChart
           data={data}
@@ -35,10 +45,10 @@ export default function BtcDevActivityChart({ btcDevActivity, btc }) {
           />
           <Line
             type="monotone"
-            dataKey="btc"
-            name="BTC Price"
+            dataKey="price"
+            name={`${tokenName} Price`}
             stroke={theme.palette.primary.main}
-            yAxisId="btc"
+            yAxisId="price"
             dot={false}
           />
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
@@ -59,11 +69,11 @@ export default function BtcDevActivityChart({ btcDevActivity, btc }) {
             }}
           />
           <YAxis
-            yAxisId="btc"
+            yAxisId="price"
             orientation="right"
             tickFormatter={nFormatter}
             label={{
-              value: 'BTC Price',
+              value: `${tokenName} Price`,
               angle: -270,
               position: 'insideRight',
             }}
