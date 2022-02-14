@@ -24,17 +24,15 @@ module Types
     end
 
     def token_price(token:)
-      Metric.by_token(token).by_metric('price').mondays.oldest_first
+      PriceDisplayer.run(token: token).value
     end
 
     def active_addresses(token:)
-      Metric.by_token(token).by_metric('active_addresses').mondays.oldest_first
+      ActiveAddressDisplayer.run(token: token).value
     end
 
     def dev_activity(token:)
-      Metric.by_token(token).by_metric('dev_activity').oldest_first.group_by_week(:timestamp).sum(:value).to_a.map do |m|
-        OpenStruct.new(timestamp: m[0], value: m[1])
-      end
+      ActivityDisplayer.run(token: token).value
     end
   end
 end
