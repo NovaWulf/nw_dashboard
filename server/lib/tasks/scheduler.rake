@@ -21,4 +21,6 @@ task get_recent_data: :environment do
   DevActivityFetcher.run(token: 'etc')
   DevActivityFetcher.run(token: 'fil')
   DevActivityFetcher.run(token: 'xrp')
+
+  RhodlFetcher.run(token: 'btc')
 end
