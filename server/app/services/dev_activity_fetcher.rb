@@ -14,7 +14,7 @@ class DevActivityFetcher < BaseService
 
     start_date = last_date ? last_date + 1.day : nil
     Rails.logger.info "fetching #{metric_display_name}, start date: #{start_date}"
-    response = santiment_client.dev_activity(chain: chain_name, start_date: start_date)
+    response = santiment_client.dev_activity(token: token, start_date: start_date)
     return if response.blank?
 
     Rails.logger.info "saving #{metric_display_name}"
@@ -25,25 +25,6 @@ class DevActivityFetcher < BaseService
 
   def santiment_client
     Santiment.new
-  end
-
-  def chain_name
-    case token
-    when 'eth'
-      'ethereum'
-    when 'sol'
-      'solana'
-    when 'btc'
-      'bitcoin'
-    when 'luna'
-      'terra'
-    when 'fil'
-      'file-coin'
-    when 'xrp'
-      'ripple'
-    when 'etc'
-      'ethereum-classic'
-    end
   end
 
   def metric_display_name

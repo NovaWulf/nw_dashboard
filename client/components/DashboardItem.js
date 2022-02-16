@@ -1,7 +1,15 @@
 import React from 'react';
-import { Card, CardContent, Typography } from '@mui/material';
+import {
+  Box,
+  Card,
+  CardContent,
+  IconButton,
+  Tooltip,
+  Typography,
+} from '@mui/material';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
-const DashboardItem = ({ children, title, subtitle }) => (
+const DashboardItem = ({ children, title, subtitle, helpText }) => (
   <Card
     style={{
       display: 'flex',
@@ -11,21 +19,28 @@ const DashboardItem = ({ children, title, subtitle }) => (
     }}
   >
     <CardContent>
-      {title && (
-        <Typography
-          component="h2"
-          variant="h6"
-          color="primary"
-          gutterBottom={!subtitle}
-        >
-          {title}
-        </Typography>
-      )}
-      {subtitle && (
-        <Typography component="h3" variant="caption" color="secondary">
-          {subtitle}
-        </Typography>
-      )}
+      <Box
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        {title && (
+          <Typography component="h2" variant="h6" color="primary">
+            {title}
+          </Typography>
+        )}
+        {helpText && (
+          <Tooltip title={helpText}>
+            <IconButton color="primary">
+              <HelpOutlineIcon />
+            </IconButton>
+          </Tooltip>
+        )}
+      </Box>
+
       {children}
     </CardContent>
   </Card>

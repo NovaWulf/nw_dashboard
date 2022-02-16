@@ -24,7 +24,10 @@ export default function MvrvChart({ mvrv, btc }) {
   const data = mergeTimestamps(mvrv, btc, 'btc');
 
   return (
-    <DashboardItem title="MVRV">
+    <DashboardItem
+      title="MVRV Ratio"
+      helpText="MVRV (market-value-to-realized-value) is a ratio of an asset's Market Capitalization versus its Realized Capitalization. By comparing these two metrics, MVRV can be used to get a sense of when price is above or below 'fair value', and to assess market profitability. Extreme deviations between market value and realized value can be used to identify market tops and bottoms as they reflect periods of extremes investor unrealized profit and loss, respectively"
+    >
       <ResponsiveContainer width="99%" height={300}>
         <LineChart
           data={data}

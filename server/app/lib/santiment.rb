@@ -28,7 +28,7 @@ class Santiment
     end
   end
 
-  def dev_activity(chain:, start_date: DEFAULT_START_DATE)
+  def dev_activity(token:, start_date: DEFAULT_START_DATE)
     query = '
     query DevActivity($startDate: DateTime!, $endDate: DateTime!, $tokens: [String]!) {
         getMetric(metric: "dev_activity") {
@@ -40,7 +40,7 @@ class Santiment
     }
     '
 
-    tokens = projects(chain)
+    tokens = projects(token)
     body = {
       query: query,
       variables: { tokens: tokens, startDate: (start_date || DEFAULT_START_DATE).to_time.iso8601,
@@ -49,6 +49,13 @@ class Santiment
 
     response = run_query(body)
     response['data']['getMetric']['timeseriesData']
+  end
+
+  def projects(token)
+    chain = chain_name(token)
+    electric_projects = Electric.new.sub_ecosystems(chain)
+    ecosystem_tokens = clean_project_names(electric_projects + [chain])
+    ecosystem_tokens & all_slugs
   end
 
   private
@@ -62,13 +69,26 @@ class Santiment
     ).parsed_response
   end
 
-  def projects(chain)
-    electric_projects = Electric.new.sub_ecosystems(chain)
-    ecosystem_tokens = clean_project_names(electric_projects + [chain])
-    ecosystem_tokens & all_slugs
-  end
-
   def clean_project_names(projects)
     projects.map { |s| s.downcase.gsub(' ', '-') }
+  end
+
+  def chain_name(token)
+    case token
+    when 'eth'
+      'ethereum'
+    when 'sol'
+      'solana'
+    when 'btc'
+      'bitcoin'
+    when 'luna'
+      'terra'
+    when 'fil'
+      'file-coin'
+    when 'xrp'
+      'ripple'
+    when 'etc'
+      'ethereum-classic'
+    end
   end
 end

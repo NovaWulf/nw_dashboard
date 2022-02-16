@@ -19,7 +19,10 @@ export default function RhodlRatioChart({ rhodlRatio, btc }) {
     return { ...mv, btc: btc[idx].v };
   });
   return (
-    <DashboardItem title="RHODL Ratio">
+    <DashboardItem
+      title="RHODL Ratio"
+      helpText="The RHODL Ratio takes the ratio between the 1 week and the 1-2 years RCap HODL bands. In addition, it accounts for increased supply by weighting the ratio by the total market age. A high ratio is an indication of an overheated market and can be used to time cycle tops."
+    >
       <ResponsiveContainer width="99%" height={300}>
         <LineChart
           data={data}

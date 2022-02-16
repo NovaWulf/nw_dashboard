@@ -24,7 +24,7 @@ export default function ActiveAddressesChart({ activeAddresses, btc }) {
   const data = mergeTimestamps(activeAddresses, btc, 'btc');
 
   return (
-    <DashboardItem title="Active Addresses">
+    <DashboardItem title="Active Addresses" helpText="Weekly Active Addresses">
       <ResponsiveContainer width="99%" height={300}>
         <LineChart
           data={data}
