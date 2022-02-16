@@ -5,6 +5,7 @@ module Types
     include GraphQL::Types::Relay::HasNodesField
 
     field :btc_mvrv, [Types::MetricType], null: false
+    field :rhodl_ratio, [Types::MetricType], null: false
 
     field :active_addresses, [Types::MetricType], null: false do
       argument :token, String
@@ -21,6 +22,10 @@ module Types
     def btc_mvrv
       # grab only mondays for weekly data
       Metric.by_token('btc').by_metric('mvrv').mondays.oldest_first
+    end
+
+    def rhodl_ratio
+      Metric.by_token('btc').by_metric('rhodl_ratio').mondays.oldest_first
     end
 
     def token_price(token:)

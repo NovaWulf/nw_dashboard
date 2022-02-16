@@ -6,12 +6,15 @@ import ActiveAddressesChart from '../components/ActiveAddressesChart';
 import ActiveAddressRegressionChart from '../components/ActiveAddressRegressionChart';
 import MvrvChart from '../components/MvrvChart';
 import MvrvRegressionChart from '../components/MvrvRegressionChart';
-import BtcDevActivityChart from './BtcDevActivityChart';
-import EthDevActivityChart from './EthDevActivityChart';
+import RhodlRatioChart from './RhodlRatioChart';
 
 const QUERY = gql`
   query Metrics {
     btcMvrv {
+      ts
+      v
+    }
+    rhodlRatio {
       ts
       v
     }
@@ -42,7 +45,7 @@ export default function DashboardCharts() {
     return null;
   }
 
-  const { btcMvrv, btcPrice, btcActiveAddresses } = data || {};
+  const { btcMvrv, btcPrice, btcActiveAddresses, rhodlRatio } = data || {};
 
   return (
     <Grid container spacing={3}>
@@ -66,6 +69,10 @@ export default function DashboardCharts() {
           activeAddresses={btcActiveAddresses}
           btc={btcPrice}
         />
+      </LoadingGridItem>
+
+      <LoadingGridItem loading={loading}>
+        <RhodlRatioChart rhodlRatio={rhodlRatio} btc={btcPrice} />
       </LoadingGridItem>
     </Grid>
   );

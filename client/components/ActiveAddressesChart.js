@@ -11,14 +11,18 @@ import {
 import dayjs from 'dayjs';
 import DashboardItem from './DashboardItem';
 import { useTheme } from '@mui/material';
-import { nFormatter, epochFormatter, dateFormatter } from '../lib/formatters';
+import {
+  nFormatter,
+  epochFormatter,
+  dateFormatter,
+  mergeTimestamps,
+} from '../lib/formatters';
 
 export default function ActiveAddressesChart({ activeAddresses, btc }) {
   const theme = useTheme();
 
-  const data = activeAddresses.map((aa, idx) => {
-    return { ...aa, btc: btc[idx].v };
-  });
+  const data = mergeTimestamps(activeAddresses, btc, 'btc');
+
   return (
     <DashboardItem title="Active Addresses">
       <ResponsiveContainer width="99%" height={300}>

@@ -8,19 +8,18 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
-import dayjs from 'dayjs';
 import DashboardItem from './DashboardItem';
 import { useTheme } from '@mui/material';
 import { nFormatter, epochFormatter, dateFormatter } from '../lib/formatters';
 
-export default function EthDevActivityChart({ ethDevActivity, eth }) {
+export default function RhodlRatioChart({ rhodlRatio, btc }) {
   const theme = useTheme();
 
-  const data = ethDevActivity.map((da, idx) => {
-    return { ...da, eth: eth[idx].v };
+  const data = rhodlRatio.map((mv, idx) => {
+    return { ...mv, btc: btc[idx].v };
   });
   return (
-    <DashboardItem title="Dev Activity - Ethereum Ecosystem">
+    <DashboardItem title="RHODL Ratio">
       <ResponsiveContainer width="99%" height={300}>
         <LineChart
           data={data}
@@ -29,17 +28,17 @@ export default function EthDevActivityChart({ ethDevActivity, eth }) {
           <Line
             type="monotone"
             dataKey="v"
-            name="Dev Activity"
+            name="RHODL Ratio"
             stroke={theme.palette.secondary.main}
             dot={false}
-            yAxisId="dev"
+            yAxisId="rhodlRatio"
           />
           <Line
             type="monotone"
-            dataKey="eth"
-            name="ETH Price"
+            dataKey="btc"
+            name="BTC Price"
             stroke={theme.palette.primary.main}
-            yAxisId="eth"
+            yAxisId="btc"
             dot={false}
           />
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
@@ -51,20 +50,20 @@ export default function EthDevActivityChart({ ethDevActivity, eth }) {
             tickFormatter={epochFormatter}
           />
           <YAxis
-            yAxisId="dev"
+            yAxisId="rhodlRatio"
             tickFormatter={nFormatter}
             label={{
-              value: 'Dev Activity',
+              value: 'RHODL RATIO',
               angle: -90,
               position: 'insideBottomLeft',
             }}
           />
           <YAxis
-            yAxisId="eth"
+            yAxisId="btc"
             orientation="right"
             tickFormatter={nFormatter}
             label={{
-              value: 'ETH Price',
+              value: 'BTC Price',
               angle: -270,
               position: 'insideRight',
             }}

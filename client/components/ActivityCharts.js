@@ -2,12 +2,6 @@ import { gql, useQuery } from '@apollo/client';
 import { Skeleton } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import * as React from 'react';
-import ActiveAddressesChart from './ActiveAddressesChart';
-import ActiveAddressRegressionChart from './ActiveAddressRegressionChart';
-import MvrvChart from './MvrvChart';
-import MvrvRegressionChart from './MvrvRegressionChart';
-import BtcDevActivityChart from './BtcDevActivityChart';
-import EthDevActivityChart from './EthDevActivityChart';
 import DevActivityChart from './DevActivityChart';
 
 const QUERY = gql`

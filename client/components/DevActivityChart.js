@@ -9,7 +9,12 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { dateFormatter, epochFormatter, nFormatter } from '../lib/formatters';
+import {
+  dateFormatter,
+  epochFormatter,
+  nFormatter,
+  mergeTimestamps,
+} from '../lib/formatters';
 import DashboardItem from './DashboardItem';
 
 export default function DevActivityChart({
@@ -20,14 +25,8 @@ export default function DevActivityChart({
 }) {
   const theme = useTheme();
 
-  const mergedData = devActivity.map((da, idx) => {
-    const p = price.find(priceItem => priceItem.ts === da.ts);
-    return p ? { ...da, price: p.v } : null;
-  });
+  const data = mergeTimestamps(devActivity, price, 'price');
 
-  const data = mergedData.filter(x => {
-    return x !== null;
-  });
   return (
     <DashboardItem title={`Dev Activity - ${chainName} Ecosystem`}>
       <ResponsiveContainer width="99%" height={300}>

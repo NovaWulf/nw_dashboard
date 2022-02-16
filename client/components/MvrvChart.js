@@ -11,14 +11,18 @@ import {
 import dayjs from 'dayjs';
 import DashboardItem from './DashboardItem';
 import { useTheme } from '@mui/material';
-import { nFormatter, epochFormatter, dateFormatter } from '../lib/formatters';
+import {
+  nFormatter,
+  epochFormatter,
+  dateFormatter,
+  mergeTimestamps,
+} from '../lib/formatters';
 
 export default function MvrvChart({ mvrv, btc }) {
   const theme = useTheme();
 
-  const data = mvrv.map((mv, idx) => {
-    return { ...mv, btc: btc[idx].v };
-  });
+  const data = mergeTimestamps(mvrv, btc, 'btc');
+
   return (
     <DashboardItem title="MVRV">
       <ResponsiveContainer width="99%" height={300}>

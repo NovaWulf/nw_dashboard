@@ -20,3 +20,15 @@ export function epochFormatter(time) {
 export function dateFormatter(time) {
   return dayjs(time * 1000).format('MM/DD/YY');
 }
+
+export function mergeTimestamps(array1, array2, key) {
+  const mergedData = array1.map(a1Item => {
+    const p = array2.find(a2Item => a2Item.ts === a1Item.ts);
+    return p ? { ...a1Item, [key]: p.v } : null;
+  });
+
+  const data = mergedData.filter(x => {
+    return x !== null;
+  });
+  return data;
+}
