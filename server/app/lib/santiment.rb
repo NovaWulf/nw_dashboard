@@ -54,7 +54,7 @@ class Santiment
   def projects(token)
     chain = chain_name(token)
     electric_projects = Electric.new.sub_ecosystems(chain)
-    ecosystem_tokens = clean_project_names(electric_projects + [chain])
+    ecosystem_tokens = clean_project_names(electric_projects + [chain, token])
     ecosystem_tokens & all_slugs
   end
 
@@ -83,12 +83,20 @@ class Santiment
       'bitcoin'
     when 'luna'
       'terra'
+    when 'avax'
+      'avalanche'
+    when 'algo'
+      'algorand'
     when 'fil'
       'file-coin'
     when 'xrp'
       'ripple'
     when 'etc'
       'ethereum-classic'
+    when 'near'
+      'near-protocol'
+    else
+      token
     end
   end
 end
