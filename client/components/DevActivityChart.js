@@ -61,21 +61,13 @@ export default function DevActivityChart({
           <YAxis
             yAxisId="dev"
             tickFormatter={nFormatter}
-            label={{
-              value: 'Dev Activity',
-              angle: -90,
-              position: 'insideBottomLeft',
-            }}
+            stroke={theme.palette.secondary.main}
           />
           <YAxis
             yAxisId="price"
             orientation="right"
             tickFormatter={nFormatter}
-            label={{
-              value: `${tokenName} Price`,
-              angle: -270,
-              position: 'insideRight',
-            }}
+            stroke={theme.palette.primary.main}
           />
           <Tooltip labelFormatter={dateFormatter} />
           <Legend />

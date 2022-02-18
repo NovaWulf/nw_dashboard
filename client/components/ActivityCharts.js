@@ -18,6 +18,10 @@ const QUERY = gql`
       ts
       v
     }
+    lunaPrice: tokenPrice(token: "luna") {
+      ts
+      v
+    }
 
     btcDevActivity: devActivity(token: "btc") {
       ts
@@ -28,6 +32,10 @@ const QUERY = gql`
       v
     }
     solDevActivity: devActivity(token: "sol") {
+      ts
+      v
+    }
+    lunaDevActivity: devActivity(token: "luna") {
       ts
       v
     }
@@ -54,9 +62,11 @@ export default function ActivityCharts() {
     btcPrice,
     ethPrice,
     solPrice,
+    lunaPrice,
     btcDevActivity,
     ethDevActivity,
     solDevActivity,
+    lunaDevActivity,
   } = data || {};
 
   return (
@@ -83,6 +93,14 @@ export default function ActivityCharts() {
           price={solPrice}
           tokenName="SOL"
           chainName="Solana"
+        />
+      </LoadingGridItem>
+      <LoadingGridItem loading={loading}>
+        <DevActivityChart
+          devActivity={lunaDevActivity}
+          price={lunaPrice}
+          tokenName="LUNA"
+          chainName="Terra"
         />
       </LoadingGridItem>
     </Grid>
