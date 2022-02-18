@@ -7,6 +7,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend,
+  ReferenceLine,
 } from 'recharts';
 import dayjs from 'dayjs';
 import DashboardItem from './DashboardItem';
@@ -64,6 +65,19 @@ export default function MvrvChart({ mvrv, btc }) {
             tickFormatter={nFormatter}
             stroke={theme.palette.primary.main}
           />
+          <ReferenceLine
+            y={3}
+            yAxisId="mvrv"
+            stroke="#B6465F"
+            strokeDasharray="2 2"
+          />
+          <ReferenceLine
+            y={1}
+            yAxisId="mvrv"
+            stroke="#678D58"
+            strokeDasharray="2 2"
+          />
+
           <Tooltip labelFormatter={dateFormatter} />
           <Legend />
         </LineChart>
