@@ -57,23 +57,12 @@ export default function MvrvChart({ mvrv, btc }) {
             scale="time"
             tickFormatter={epochFormatter}
           />
-          <YAxis
-            yAxisId="mvrv"
-            label={{
-              value: 'MVRV',
-              angle: -90,
-              position: 'inside',
-            }}
-          />
+          <YAxis yAxisId="mvrv" stroke={theme.palette.secondary.main} />
           <YAxis
             yAxisId="btc"
             orientation="right"
             tickFormatter={nFormatter}
-            label={{
-              value: 'BTC Price',
-              angle: -270,
-              position: 'insideRight',
-            }}
+            stroke={theme.palette.primary.main}
           />
           <Tooltip labelFormatter={dateFormatter} />
           <Legend />

@@ -11,6 +11,10 @@ module Types
       argument :token, String
     end
 
+    field :market_cap, [Types::MetricType], null: false do
+      argument :token, String
+    end
+
     field :token_price, [Types::MetricType], null: false do
       argument :token, String
     end
@@ -34,6 +38,10 @@ module Types
 
     def active_addresses(token:)
       ActiveAddressDisplayer.run(token: token).value
+    end
+
+    def market_cap(token:)
+      MarketCapDisplayer.run(token: token).value
     end
 
     def dev_activity(token:)

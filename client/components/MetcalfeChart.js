@@ -8,20 +8,34 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
+import dayjs from 'dayjs';
 import DashboardItem from './DashboardItem';
 import { useTheme } from '@mui/material';
-import { nFormatter, epochFormatter, dateFormatter } from '../lib/formatters';
+import {
+  nFormatter,
+  epochFormatter,
+  dateFormatter,
+  mergeTimestamps,
+} from '../lib/formatters';
 
-export default function RhodlRatioChart({ rhodlRatio, btc }) {
+export default function MetcalfeChart({ activeAddresses, btcMarketCap }) {
   const theme = useTheme();
 
-  const data = rhodlRatio.map((mv, idx) => {
-    return { ...mv, btc: btc[idx].v };
-  });
+  const activeAddressesSquared = activeAddresses.map(aa => ({
+    ...aa,
+    v: aa.v * aa.v,
+  }));
+
+  const data = mergeTimestamps(
+    activeAddressesSquared,
+    btcMarketCap,
+    'btcMarketCap',
+  );
+
   return (
     <DashboardItem
-      title="RHODL Ratio"
-      helpText="The RHODL Ratio takes the ratio between the 1 week and the 1-2 years RCap HODL bands. In addition, it accounts for increased supply by weighting the ratio by the total market age. A high ratio is an indication of an overheated market and can be used to time cycle tops."
+      title="Metcalfe's Law"
+      helpText="Weekly Active Addresses Squared"
     >
       <ResponsiveContainer width="99%" height={300}>
         <LineChart
@@ -31,17 +45,17 @@ export default function RhodlRatioChart({ rhodlRatio, btc }) {
           <Line
             type="monotone"
             dataKey="v"
-            name="RHODL Ratio"
+            name="Weekly Active Addresses Squared"
             stroke={theme.palette.secondary.main}
             dot={false}
-            yAxisId="rhodlRatio"
+            yAxisId="aa"
           />
           <Line
             type="monotone"
-            dataKey="btc"
-            name="BTC Price"
+            dataKey="btcMarketCap"
+            name="BTC Market Cap"
             stroke={theme.palette.primary.main}
-            yAxisId="btc"
+            yAxisId="btcMarketCap"
             dot={false}
           />
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
@@ -53,12 +67,12 @@ export default function RhodlRatioChart({ rhodlRatio, btc }) {
             tickFormatter={epochFormatter}
           />
           <YAxis
-            yAxisId="rhodlRatio"
+            yAxisId="aa"
             tickFormatter={nFormatter}
             stroke={theme.palette.secondary.main}
           />
           <YAxis
-            yAxisId="btc"
+            yAxisId="btcMarketCap"
             orientation="right"
             tickFormatter={nFormatter}
             stroke={theme.palette.primary.main}

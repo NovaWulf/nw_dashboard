@@ -57,22 +57,13 @@ export default function ActiveAddressesChart({ activeAddresses, btc }) {
           <YAxis
             yAxisId="aa"
             tickFormatter={nFormatter}
-            label={{
-              value: 'Active Addresses',
-              angle: -90,
-              position: 'insideBottomLeft',
-              offset: '10',
-            }}
+            stroke={theme.palette.secondary.main}
           />
           <YAxis
             yAxisId="btc"
             orientation="right"
             tickFormatter={nFormatter}
-            label={{
-              value: 'BTC Price',
-              angle: -270,
-              position: 'insideRight',
-            }}
+            stroke={theme.palette.primary.main}
           />
           <Tooltip labelFormatter={dateFormatter} />
           <Legend />
