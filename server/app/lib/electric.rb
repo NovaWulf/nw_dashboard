@@ -2,13 +2,16 @@ class Electric
   include HTTParty
   base_uri 'raw.githubusercontent.com/electric-capital/crypto-ecosystems/master/data/ecosystems'
 
-  def sub_ecosystems(chain)
+  def parsed_toml(chain)
     mapping = file_mapping(chain)
     raise "No mapping found for #{chain}" unless mapping
 
     response = self.class.get(mapping)
-    result = TOML::Parser.new(response.body).parsed
-    result['sub_ecosystems']
+    TOML::Parser.new(response.body).parsed
+  end
+
+  def sub_ecosystems(chain)
+    parsed_toml(chain)['sub_ecosystems']
   end
 
   def file_mapping(chain)
