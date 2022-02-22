@@ -1,14 +1,7 @@
 RSpec.describe DevActivityFetcher do
   subject { described_class.run(token: 'btc') }
 
-  let(:santiment_double) do
-    double('santiment client',
-           dev_activity: [{ datetime: Date.today.to_time.iso8601, value: 1000.0 }.with_indifferent_access])
-  end
-
-  before(:each) do
-    allow_any_instance_of(described_class).to receive(:santiment_client).and_return(santiment_double)
-  end
+  include_context 'santiment client'
 
   it 'persists' do
     subject
