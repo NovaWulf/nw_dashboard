@@ -12,28 +12,21 @@ class Glassnode
     daily_response('/indicators/rhodl_ratio', token, start_date || DEFAULT_START_DATE)
   end
 
+  def s2f_ratio(token:, start_date: DEFAULT_START_DATE)
+    daily_response('/indicators/stock_to_flow_ratio', token, start_date || DEFAULT_START_DATE)
+  end
+
+  def hash_rate(token:, start_date: DEFAULT_START_DATE)
+    daily_response('/mining/hash_rate_mean', token, start_date || DEFAULT_START_DATE)
+  end
+
+  def non_zero_count(token:, start_date: DEFAULT_START_DATE)
+    daily_response('/addresses/non_zero_count', token, start_date || DEFAULT_START_DATE)
+  end
+
   private
 
   def daily_response(path, token, start_date)
     JSON.parse self.class.get("#{path}?a=#{token}&s=#{start_date.to_time.to_i}&i=24h", @options).body
   end
-
-  # def chain_name(token)
-  #   case token
-  #   when 'eth'
-  #     'ethereum'
-  #   when 'sol'
-  #     'solana'
-  #   when 'btc'
-  #     'bitcoin'
-  #   when 'luna'
-  #     'terra'
-  #   when 'fil'
-  #     'file-coin'
-  #   when 'xrp'
-  #     'ripple'
-  #   when 'etc'
-  #     'ethereum-classic'
-  #   end
-  # end
 end
