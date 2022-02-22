@@ -1,12 +1,18 @@
 class MvrvCalculator < BaseService
-  def run
+  attr_reader :default_date
+
+  def initialize(default_date:)
+    @default_date = default_date
+  end
+
+  def run(default_date: Date.new(2017, 1, 1))
     BtcCirculatingMcapDataFetcher.run
     BtcRealizedMcapDataFetcher.run
 
     last_date = Metric.by_token('btc').by_metric('mvrv').last&.timestamp
     return if last_date && last_date >= Date.today
 
-    start_date = last_date ? last_date + 1.day : Date.new(2017, 1, 1)
+    start_date = last_date ? last_date + 1.day : default_date
     m = nil
     (start_date..Date.today).each do |day|
       mv = Metric.by_token('btc').by_metric('circ_mcap').by_day(day).first
