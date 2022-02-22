@@ -6,6 +6,7 @@ module Types
 
     field :btc_mvrv, [Types::MetricType], null: false
     field :rhodl_ratio, [Types::MetricType], null: false
+    field :jesse, [Types::MetricType], null: false
 
     field :active_addresses, [Types::MetricType], null: false do
       argument :token, String
@@ -46,6 +47,10 @@ module Types
 
     def dev_activity(token:)
       ActivityDisplayer.run(token: token).value
+    end
+
+    def jesse
+      Metric.by_token('btc').by_metric('jesse').mondays.oldest_first
     end
   end
 end
