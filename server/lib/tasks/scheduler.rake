@@ -5,8 +5,6 @@ task get_recent_data: :environment do
   PriceDataFetcher.run(token: 'luna')
   PriceDataFetcher.run(token: 'avax')
 
-  MvrvCalculator.run
-
   ActiveAddressesFetcher.run(token: 'eth')
   ActiveAddressesFetcher.run(token: 'btc')
   ActiveAddressesFetcher.run(token: 'sol')
@@ -19,5 +17,8 @@ task get_recent_data: :environment do
   DevActivityFetcher.run(token: 'luna')
   DevActivityFetcher.run(token: 'avax')
 
-  RhodlFetcher.run(token: 'btc')
+  RhodlFetcher.run
+
+  MvrvCalculator.run
+  JesseCalculator.run
 end
