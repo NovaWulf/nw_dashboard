@@ -3,6 +3,7 @@ import ErrorIcon from '@mui/icons-material/Error';
 import MenuIcon from '@mui/icons-material/Menu';
 import PublicIcon from '@mui/icons-material/Public';
 import RowingIcon from '@mui/icons-material/Rowing';
+import AutoGraphIcon from '@mui/icons-material/AutoGraph';
 import {
   Button,
   CircularProgress,
@@ -55,6 +56,14 @@ export default function Layout({ children }) {
               <RowingIcon />
             </ListItemIcon>
             <ListItemText primary="Dev Activity" />
+          </ListItem>
+        </Link>
+        <Link href="/jesse">
+          <ListItem button key="Jesse's Indicator">
+            <ListItemIcon>
+              <AutoGraphIcon />
+            </ListItemIcon>
+            <ListItemText primary="Jesse's Indicator" />
           </ListItem>
         </Link>
       </List>

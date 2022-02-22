@@ -7,7 +7,9 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend,
+  ReferenceLine,
 } from 'recharts';
+import dayjs from 'dayjs';
 import DashboardItem from './DashboardItem';
 import { useTheme } from '@mui/material';
 import {
@@ -17,34 +19,53 @@ import {
   mergeTimestamps,
 } from '../lib/formatters';
 
-export default function RhodlRatioChart({ rhodlRatio, btc }) {
+export default function JesseChart({ jesse, btc }) {
   const theme = useTheme();
 
-  const data = mergeTimestamps(rhodlRatio, btc, 'btc');
+  const data = mergeTimestamps(jesse, btc, 'btc');
+
+  const STD_ERROR = 3540;
+
+  const updatedData = data.map(d => {
+    return {
+      ts: d.ts,
+      btc: d.btc,
+      jesseLow: d.v - STD_ERROR,
+      jesseHigh: d.v + STD_ERROR,
+    };
+  });
 
   return (
     <DashboardItem
-      title="RHODL Ratio"
-      helpText="The RHODL Ratio takes the ratio between the 1 week and the 1-2 years RCap HODL bands. In addition, it accounts for increased supply by weighting the ratio by the total market age. A high ratio is an indication of an overheated market and can be used to time cycle tops."
+      title="Jesse's Indicator"
+      helpText="Jesse's Indicator looks at a regression of Stock To Flow Ratio, Hashrate, Metcalfe's Law and Google Trends for Bitcoin"
     >
       <ResponsiveContainer width="99%" height={300}>
         <LineChart
-          data={data}
-          margin={{ top: 5, right: 15, bottom: 5, left: 10 }}
+          data={updatedData}
+          margin={{ top: 5, right: 15, bottom: 5, left: 0 }}
         >
           <Line
             type="monotone"
-            dataKey="v"
-            name="RHODL Ratio"
-            stroke={theme.palette.secondary.main}
+            dataKey="jesseLow"
+            name="Low Range"
+            stroke={theme.palette.primary.main}
             dot={false}
-            yAxisId="rhodlRatio"
+            yAxisId="btc"
+          />
+          <Line
+            type="monotone"
+            dataKey="jesseHigh"
+            name="High Range"
+            stroke={theme.palette.primary.main}
+            dot={false}
+            yAxisId="btc"
           />
           <Line
             type="monotone"
             dataKey="btc"
             name="BTC Price"
-            stroke={theme.palette.primary.main}
+            stroke={theme.palette.secondary.main}
             yAxisId="btc"
             dot={false}
           />
@@ -57,16 +78,13 @@ export default function RhodlRatioChart({ rhodlRatio, btc }) {
             tickFormatter={epochFormatter}
           />
           <YAxis
-            yAxisId="rhodlRatio"
-            tickFormatter={nFormatter}
-            stroke={theme.palette.secondary.main}
-          />
-          <YAxis
             yAxisId="btc"
-            orientation="right"
+            orientation="left"
             tickFormatter={nFormatter}
             stroke={theme.palette.primary.main}
+            domain={[-3000, 'dataMax']}
           />
+
           <Tooltip labelFormatter={dateFormatter} />
           <Legend />
         </LineChart>
