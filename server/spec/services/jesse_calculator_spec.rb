@@ -17,11 +17,11 @@ RSpec.describe JesseCalculator do
     m = Metric.last
     expect(m.token).to eql 'btc'
     expect(m.metric).to eql 'jesse'
-    expect(m.value).to eql s2f * JesseCalculator::S2F_COEFF +
+    expect(m.value.round(2)).to eql (s2f * JesseCalculator::S2F_COEFF +
                            hashrate * JesseCalculator::HASHRATE_COEFF +
                            google_trends * JesseCalculator::GOOGLE_TRENDS_COEFF +
                            (non_zero_count * non_zero_count) * JesseCalculator::NON_ZERO_COEFF +
-                           JesseCalculator::Y_INTERCEPT
+                           JesseCalculator::Y_INTERCEPT).round(2)
     expect(m.timestamp).to eql Date.today
   end
 end
