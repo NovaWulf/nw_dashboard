@@ -11,6 +11,6 @@ RSpec.describe TrendsImporter do
     expect(m.token).to eql 'btc'
     expect(m.metric).to eql 'google_trends'
     expect(m.value).to eql 5.0
-    expect(m.timestamp).to eql Date.parse('2017-02-26')
+    expect(m.timestamp).to eql Date.parse('2017-03-04')
   end
 end
