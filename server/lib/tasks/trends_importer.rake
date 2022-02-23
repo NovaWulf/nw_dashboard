@@ -3,7 +3,7 @@ require 'csv'
 task :import_trends, [:path] => [:environment] do |_t, args|
   path = args[:path]
   file_contents = open(path) { |f| f.read }
-  text = file_contents.split("(Worldwide)\n")[1] # get rid of the headers
+  text = file_contents.split("(Worldwide)\n").count == 2 ? file_contents.split("(Worldwide)\n")[1] : file_contents # get rid of the headers
   data = CSV.parse text
   data.each do |date, value|
     d = Date.parse(date)
