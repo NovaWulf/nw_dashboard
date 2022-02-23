@@ -1,5 +1,5 @@
 RSpec.describe MvrvCalculator do
-  subject { described_class.run(default_date: 2.days.ago) }
+  subject { described_class.run(default_date: 2.days.ago.to_date) }
   before do
     Metric.create(token: 'btc', metric: 'circ_mcap', timestamp: Date.today, value: 2000.0)
     Metric.create(token: 'btc', metric: 'realized_mcap', timestamp: Date.today, value: 1000.0)

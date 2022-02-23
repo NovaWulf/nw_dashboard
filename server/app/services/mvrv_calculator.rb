@@ -1,11 +1,13 @@
 class MvrvCalculator < BaseService
   attr_reader :default_date
 
-  def initialize(default_date:)
+  DEFAULT_DATE = Date.new(2017, 1, 1)
+
+  def initialize(default_date: DEFAULT_DATE)
     @default_date = default_date
   end
 
-  def run(default_date: Date.new(2017, 1, 1))
+  def run
     BtcCirculatingMcapDataFetcher.run
     BtcRealizedMcapDataFetcher.run
 
