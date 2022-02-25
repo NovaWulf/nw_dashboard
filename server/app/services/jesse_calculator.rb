@@ -18,16 +18,28 @@ class JesseCalculator < BaseService
     m = nil
     (start_date..Date.today).each do |day|
       s2f = Metric.by_token('btc').by_metric('s2f_ratio').by_day(day).first
-      next unless s2f&.value
-
+      if !s2f&.value
+        Rails.logger.error "can't generate Jesse metric, no s2f for #{day}"
+        next
+      end
+        
       hash_rate = Metric.by_token('btc').by_metric('hash_rate').by_day(day).first
-      next unless hash_rate&.value
+      if !hash_rate&.value
+        Rails.logger.error "can't generate Jesse metric, no hash_rate for #{day}"
+        next
+      end
 
       non_zero_count = Metric.by_token('btc').by_metric('non_zero_count').by_day(day).first
-      next unless non_zero_count&.value
+      if !non_zero_count&.value
+        Rails.logger.error "can't generate Jesse metric, no non_zero_count for #{day}"
+        next
+      end
 
       google_trends = Metric.by_token('btc').by_metric('google_trends').by_day(day).first
-      next unless google_trends&.value
+      if !google_trends&.value
+        Rails.logger.error "can't generate Jesse metric, no google_trends for #{day}"
+        next
+      end
 
       value = s2f.value * S2F_COEFF +
               hash_rate.value * HASHRATE_COEFF +
