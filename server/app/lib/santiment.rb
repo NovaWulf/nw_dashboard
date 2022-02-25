@@ -75,6 +75,8 @@ class Santiment
 
   def chain_name(token)
     case token
+    when 'dot'
+      'polkadot-new'
     when 'eth'
       'ethereum'
     when 'sol'

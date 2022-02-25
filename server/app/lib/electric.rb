@@ -23,6 +23,8 @@ class Electric
     case chain
     when 'file-coin'
       'filecoin'
+    when 'polkadot-new'
+      'polkadot'
     when 'ripple'
       'xrp'
     else
