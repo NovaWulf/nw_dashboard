@@ -5,6 +5,10 @@ RSpec.describe MvrvCalculator do
     Metric.create(token: 'btc', metric: 'realized_mcap', timestamp: Date.today, value: 1000.0)
   end
 
+  before(:each) do
+    allow_any_instance_of(described_class).to receive(:fetch_required_data).and_return(true)
+  end
+
   it 'persists' do
     subject
     expect(Metric.count).to eql 3

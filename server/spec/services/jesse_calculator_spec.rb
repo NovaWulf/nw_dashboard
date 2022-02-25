@@ -1,5 +1,6 @@
 RSpec.describe JesseCalculator do
   subject { described_class.run }
+
   let!(:s2f) { Metric.create(token: 'btc', metric: 's2f_ratio', timestamp: Date.today, value: 1.0).value }
   let!(:hashrate) do
     Metric.create(token: 'btc', metric: 'hash_rate', timestamp: Date.today, value: 1_000_000_000_000.0).value
@@ -9,6 +10,10 @@ RSpec.describe JesseCalculator do
   end
   let!(:google_trends) do
     Metric.create(token: 'btc', metric: 'google_trends', timestamp: Date.today, value: 10).value
+  end 
+
+  before(:each) do
+    allow_any_instance_of(described_class).to receive(:fetch_required_data).and_return(true)
   end
 
   it 'persists' do

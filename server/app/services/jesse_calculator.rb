@@ -7,10 +7,7 @@ class JesseCalculator < BaseService
   STD_ERROR = 3540
 
   def run
-    S2fFetcher.run
-    HashRateFetcher.run
-    NonZeroAddressFetcher.run
-    TrendsImporter.run(path: 'https://gist.githubusercontent.com/iamnader/03b2da71d50c3cdeee4772ba66aeff2e/raw/812c4fa646908fc5f991312b7b75d6dadb2197da/bitcoin_trends')
+    fetch_required_data
 
     last_date = Metric.by_token('btc').by_metric('jesse').last&.timestamp
     return if last_date && last_date >= Date.today
@@ -52,6 +49,14 @@ class JesseCalculator < BaseService
     end
 
     email_notification m.value if m
+  end
+
+  def fetch_required_data
+    S2fFetcher.run
+    HashRateFetcher.run
+    NonZeroAddressFetcher.run
+    TrendsImporter.run(path: 'https://gist.githubusercontent.com/iamnader/03b2da71d50c3cdeee4772ba66aeff2e/raw/812c4fa646908fc5f991312b7b75d6dadb2197da/bitcoin_trends')
+
   end
 
   def email_notification(jesse_value)

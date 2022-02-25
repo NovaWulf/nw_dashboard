@@ -8,8 +8,7 @@ class MvrvCalculator < BaseService
   end
 
   def run
-    BtcCirculatingMcapDataFetcher.run
-    BtcRealizedMcapDataFetcher.run
+    fetch_required_data
 
     last_date = Metric.by_token('btc').by_metric('mvrv').last&.timestamp
     return if last_date && last_date >= Date.today
@@ -29,6 +28,11 @@ class MvrvCalculator < BaseService
     end
 
     email_notification m.value if m
+  end
+
+  def fetch_required_data
+    BtcCirculatingMcapDataFetcher.run
+    BtcRealizedMcapDataFetcher.run
   end
 
   def email_notification(mvrv_value)
