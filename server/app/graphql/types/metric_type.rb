@@ -7,7 +7,7 @@ module Types
     field :v, Float, null: false
 
     def ts
-      object.timestamp.to_time.to_i
+      object.timestamp.to_time.utc.to_i
     end
 
     def v

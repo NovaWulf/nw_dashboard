@@ -27,6 +27,6 @@ class Glassnode
   private
 
   def daily_response(path, token, start_date)
-    JSON.parse self.class.get("#{path}?a=#{token}&s=#{start_date.to_time.to_i}&i=24h", @options).body
+    JSON.parse self.class.get("#{path}?a=#{token}&s=#{start_date.to_time.utc.to_i}&i=24h", @options).body
   end
 end

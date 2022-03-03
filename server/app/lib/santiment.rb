@@ -43,8 +43,8 @@ class Santiment
     tokens = projects(token)
     body = {
       query: query,
-      variables: { tokens: tokens, startDate: (start_date || DEFAULT_START_DATE).to_time.iso8601,
-                   endDate: Date.today.to_time.iso8601 }
+      variables: { tokens: tokens, startDate: (start_date || DEFAULT_START_DATE).to_time.utc.iso8601,
+                   endDate: Date.today.to_time.utc.iso8601 }
     }.to_json
 
     response = run_query(body)
@@ -75,28 +75,32 @@ class Santiment
 
   def chain_name(token)
     case token
-    when 'dot'
-      'polkadot-new'
-    when 'eth'
-      'ethereum'
-    when 'sol'
-      'solana'
-    when 'btc'
-      'bitcoin'
-    when 'luna'
-      'terra'
-    when 'avax'
-      'avalanche'
+    when 'ada'
+      'cardano'
     when 'algo'
       'algorand'
-    when 'fil'
-      'file-coin'
-    when 'xrp'
-      'ripple'
+    when 'ar'
+      'arweave'
+    when 'avax'
+      'avalanche'
+    when 'btc'
+      'bitcoin'
+    when 'dot'
+      'polkadot-new'
     when 'etc'
       'ethereum-classic'
+    when 'eth'
+      'ethereum'
+    when 'fil'
+      'file-coin'
+    when 'luna'
+      'terra'
     when 'near'
       'near-protocol'
+    when 'sol'
+      'solana'
+    when 'xrp'
+      'ripple'
     else
       token
     end
