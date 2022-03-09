@@ -55,7 +55,7 @@ class JesseCalculator < BaseService
     S2fFetcher.run
     HashRateFetcher.run
     NonZeroAddressFetcher.run
-    TrendsImporter.run(path: 'https://gist.githubusercontent.com/iamnader/03b2da71d50c3cdeee4772ba66aeff2e/raw/812c4fa646908fc5f991312b7b75d6dadb2197da/bitcoin_trends')
+    TrendsImporter.run(path: 'https://gist.githubusercontent.com/iamnader/03b2da71d50c3cdeee4772ba66aeff2e/raw/bitcoin_trends')
 
   end
 
