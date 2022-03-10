@@ -16,25 +16,25 @@ class JesseCalculator < BaseService
     m = nil
     (start_date..Date.today).each do |day|
       s2f = Metric.by_token('btc').by_metric('s2f_ratio').by_day(day).first
-      if !s2f&.value
+      unless s2f&.value
         Rails.logger.error "can't generate Jesse metric, no s2f for #{day}"
         next
       end
-        
+
       hash_rate = Metric.by_token('btc').by_metric('hash_rate').by_day(day).first
-      if !hash_rate&.value
+      unless hash_rate&.value
         Rails.logger.error "can't generate Jesse metric, no hash_rate for #{day}"
         next
       end
 
       non_zero_count = Metric.by_token('btc').by_metric('non_zero_count').by_day(day).first
-      if !non_zero_count&.value
+      unless non_zero_count&.value
         Rails.logger.error "can't generate Jesse metric, no non_zero_count for #{day}"
         next
       end
 
       google_trends = Metric.by_token('btc').by_metric('google_trends').by_day(day).first
-      if !google_trends&.value
+      unless google_trends&.value
         Rails.logger.error "can't generate Jesse metric, no google_trends for #{day}"
         next
       end
@@ -48,7 +48,7 @@ class JesseCalculator < BaseService
       m = Metric.create(timestamp: day, value: value, token: 'btc', metric: 'jesse')
     end
 
-    email_notification m.value if m
+    email_notification m if m
   end
 
   def fetch_required_data
@@ -56,20 +56,22 @@ class JesseCalculator < BaseService
     HashRateFetcher.run
     NonZeroAddressFetcher.run
     TrendsImporter.run(path: 'https://gist.githubusercontent.com/iamnader/03b2da71d50c3cdeee4772ba66aeff2e/raw/bitcoin_trends')
-
   end
 
-  def email_notification(jesse_value)
-    btc_price = Metric.by_token('btc').by_metric('jesse').by_day(Date.today).first
+  def email_notification(jesse_metric)
+    btc_price = Metric.by_token('btc').by_metric('price').by_day(jesse_metric.timestamp).first
 
-    return unless btc_price && jesse_value
+    return unless btc_price && jesse_metric
 
-    if btc_price > jesse_value + STD_ERROR
+    btc_value = btc_price.value
+    jesse_value = jesse_metric.value
+
+    if btc_value > jesse_value + STD_ERROR
       NotificationMailer.with(subject: 'Jesse Indicator Alert',
-                              text: "BTC (#{btc_price.round(2)}) is above the high band of Jesse's indicator (#{(jesse_value + STD_ERROR).round(2)}").notification.deliver_now
-    elsif btc_price < jesse_value - STD_ERROR
+                              text: "BTC (#{btc_value.round(2)}) is above the high band of Jesse's indicator (#{(jesse_value + STD_ERROR).round(2)}").notification.deliver_now
+    elsif btc_value < jesse_value - STD_ERROR
       NotificationMailer.with(subject: 'Jesse Indicator Alert',
-                              text: "BTC (#{btc_price.round(2)}) is below the low band of Jesse's indicator (#{(jesse_value - STD_ERROR).round(2)}").notification.deliver_now
+                              text: "BTC (#{btc_value.round(2)}) is below the low band of Jesse's indicator (#{(jesse_value - STD_ERROR).round(2)}").notification.deliver_now
     end
   end
 end
