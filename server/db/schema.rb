@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_02_10_113825) do
+ActiveRecord::Schema.define(version: 2022_03_16_130910) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -24,4 +24,22 @@ ActiveRecord::Schema.define(version: 2022_02_10_113825) do
     t.string "metric"
   end
 
+  create_table "repo_commits", force: :cascade do |t|
+    t.date "day"
+    t.integer "count"
+    t.bigint "repo_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["repo_id"], name: "index_repo_commits_on_repo_id"
+  end
+
+  create_table "repos", force: :cascade do |t|
+    t.string "token"
+    t.string "user"
+    t.string "name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  add_foreign_key "repo_commits", "repos"
 end
