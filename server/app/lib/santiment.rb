@@ -53,7 +53,7 @@ class Santiment
 
   def projects(token)
     chain = chain_name(token)
-    electric_projects = Electric.new.sub_ecosystems(chain)
+    electric_projects = Electric.new.sub_ecosystems(token)
     ecosystem_tokens = clean_project_names(electric_projects + [chain, token])
     ecosystem_tokens & all_slugs
   end
