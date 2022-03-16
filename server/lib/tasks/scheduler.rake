@@ -8,9 +8,13 @@ task get_recent_data: :environment do
   end
 
   GithubActivityFetcher.run
-  
   RhodlFetcher.run
-
   MvrvCalculator.run
   JesseCalculator.run
+end
+
+task backfill_github_data: :environment do 
+  # this runs every 10 mins, and github's rate limit is 5000
+  # each run makes about 200 calls, so we estimate we can do this 4 times
+  4.times { GithubBackfiller.run }
 end

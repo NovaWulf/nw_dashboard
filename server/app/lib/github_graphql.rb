@@ -24,9 +24,9 @@ class GithubGraphql
     response['data']['viewer']['login']
   end
 
-  def dev_activity(repo:, day:)
+  def weekly_dev_activity(repo:, day:)
     start_time = day.to_time.utc.iso8601
-    end_time = (day + 1.day - 1.minute).to_time.utc.iso8601
+    end_time = (day + 1.week - 1.minute).to_time.utc.iso8601
     query = '
 query ($user: String!, $name: String!, $startDate: GitTimestamp!, $endDate: GitTimestamp!) {
   repository(owner: $user, name: $name) {
