@@ -1,22 +1,14 @@
 task get_recent_data: :environment do
-  PriceDataFetcher.run(token: 'btc')
-  PriceDataFetcher.run(token: 'eth')
-  PriceDataFetcher.run(token: 'sol')
-  PriceDataFetcher.run(token: 'luna')
-  PriceDataFetcher.run(token: 'avax')
+  tracked_tokens = %w(btc eth sol luna avax near)
+  tracked_tokens.each do |t|
+    EcosystemRepoFetcher.run(token: t)
+    PriceDataFetcher.run(token: t)
+    ActiveAddressesFetcher.run(token: t)
+    # DevActivityFetcher.run(token: t)
+  end
 
-  ActiveAddressesFetcher.run(token: 'eth')
-  ActiveAddressesFetcher.run(token: 'btc')
-  ActiveAddressesFetcher.run(token: 'sol')
-  ActiveAddressesFetcher.run(token: 'luna')
-  ActiveAddressesFetcher.run(token: 'avax')
-
-  DevActivityFetcher.run(token: 'eth')
-  DevActivityFetcher.run(token: 'btc')
-  DevActivityFetcher.run(token: 'sol')
-  DevActivityFetcher.run(token: 'luna')
-  DevActivityFetcher.run(token: 'avax')
-
+  GithubActivityFetcher.run
+  
   RhodlFetcher.run
 
   MvrvCalculator.run
