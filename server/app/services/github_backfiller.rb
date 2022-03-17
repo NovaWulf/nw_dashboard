@@ -8,7 +8,8 @@ class GithubBackfiller < BaseService
     day = DEFAULT_START_DATE
     while day < 1.year.ago
       count = github_client.weekly_dev_activity(repo: r, day: day)
-      RepoCommit.create(day: day, count: count, repo: r)
+      count ||= 0 # might return nil if something is wrong
+      RepoCommit.create(day: day, count: count, repo: r) 
       day += 7.days
     end
     r.update(backfilled_at: Time.now)

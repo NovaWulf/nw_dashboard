@@ -49,7 +49,7 @@ query ($user: String!, $name: String!, $startDate: GitTimestamp!, $endDate: GitT
     }.to_json
 
     response = run_query(body)
-    response['data']['repository']['defaultBranchRef']['target']['history']['totalCount']
+    response.dig('data', 'repository', 'defaultBranchRef', 'target', 'history', 'totalCount')
   end
 
   private
