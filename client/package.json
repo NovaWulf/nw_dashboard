@@ -16,7 +16,7 @@
     "@emotion/react": "latest",
     "@emotion/server": "latest",
     "@emotion/styled": "latest",
-    "@mui/icons-material": "latest",
+    "@mui/icons-material": "^5.5.1",
     "@mui/material": "latest",
     "dayjs": "^1.10.7",
     "graphql": "^16.2.0",

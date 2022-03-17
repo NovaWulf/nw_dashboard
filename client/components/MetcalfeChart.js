@@ -1,22 +1,22 @@
-import {
-  LineChart,
-  Line,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from 'recharts';
-import dayjs from 'dayjs';
-import DashboardItem from './DashboardItem';
 import { useTheme } from '@mui/material';
 import {
-  nFormatter,
-  epochFormatter,
+  CartesianGrid,
+  ComposedChart,
+  Legend,
+  Line,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
+import {
   dateFormatter,
+  epochFormatter,
   mergeTimestamps,
+  nFormatter,
 } from '../lib/formatters';
+import BtcArea from './BtcArea';
+import DashboardItem from './DashboardItem';
 
 export default function MetcalfeChart({ activeAddresses, btcMarketCap }) {
   const theme = useTheme();
@@ -26,11 +26,7 @@ export default function MetcalfeChart({ activeAddresses, btcMarketCap }) {
     v: aa.v * aa.v,
   }));
 
-  const data = mergeTimestamps(
-    activeAddressesSquared,
-    btcMarketCap,
-    'btcMarketCap',
-  );
+  const data = mergeTimestamps(activeAddressesSquared, btcMarketCap, 'btc');
 
   return (
     <DashboardItem
@@ -38,7 +34,7 @@ export default function MetcalfeChart({ activeAddresses, btcMarketCap }) {
       helpText="Weekly Active Addresses Squared"
     >
       <ResponsiveContainer width="99%" height={300}>
-        <LineChart
+        <ComposedChart
           data={data}
           margin={{ top: 5, right: 15, bottom: 5, left: 10 }}
         >
@@ -50,14 +46,7 @@ export default function MetcalfeChart({ activeAddresses, btcMarketCap }) {
             dot={false}
             yAxisId="aa"
           />
-          <Line
-            type="monotone"
-            dataKey="btcMarketCap"
-            name="BTC Market Cap"
-            stroke={theme.palette.primary.main}
-            yAxisId="btcMarketCap"
-            dot={false}
-          />
+          {BtcArea({})}
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
           <XAxis
             dataKey="ts"
@@ -72,14 +61,14 @@ export default function MetcalfeChart({ activeAddresses, btcMarketCap }) {
             stroke={theme.palette.secondary.main}
           />
           <YAxis
-            yAxisId="btcMarketCap"
+            yAxisId="btc"
             orientation="right"
             tickFormatter={nFormatter}
             stroke={theme.palette.primary.main}
           />
           <Tooltip labelFormatter={dateFormatter} />
           <Legend />
-        </LineChart>
+        </ComposedChart>
       </ResponsiveContainer>
     </DashboardItem>
   );

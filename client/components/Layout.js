@@ -4,6 +4,8 @@ import MenuIcon from '@mui/icons-material/Menu';
 import PublicIcon from '@mui/icons-material/Public';
 import RowingIcon from '@mui/icons-material/Rowing';
 import AutoGraphIcon from '@mui/icons-material/AutoGraph';
+import CurrencyBitcoinIcon from '@mui/icons-material/CurrencyBitcoin';
+
 import {
   Button,
   CircularProgress,
@@ -25,7 +27,6 @@ import * as React from 'react';
 import logo from '../images/nw_logo.png';
 import Copyright from '../src/Copyright';
 import Link from '../src/Link';
-
 const drawerWidth = 200;
 
 export default function Layout({ children }) {
@@ -43,11 +44,11 @@ export default function Layout({ children }) {
       <Divider />
       <List>
         <Link href="/">
-          <ListItem button key="Macro">
+          <ListItem button key="Bitcoin">
             <ListItemIcon>
-              <PublicIcon />
+              <CurrencyBitcoinIcon />
             </ListItemIcon>
-            <ListItemText primary="Macro" />
+            <ListItemText primary="Bitcoin" />
           </ListItem>
         </Link>
         <Link href="/developerActivity">

@@ -1,22 +1,22 @@
-import {
-  LineChart,
-  Line,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from 'recharts';
-import dayjs from 'dayjs';
-import DashboardItem from './DashboardItem';
 import { useTheme } from '@mui/material';
 import {
-  nFormatter,
-  epochFormatter,
+  CartesianGrid,
+  ComposedChart,
+  Legend,
+  Line,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
+import {
   dateFormatter,
+  epochFormatter,
   mergeTimestamps,
+  nFormatter,
 } from '../lib/formatters';
+import BtcArea from './BtcArea';
+import DashboardItem from './DashboardItem';
 
 export default function ActiveAddressesChart({ activeAddresses, btc }) {
   const theme = useTheme();
@@ -26,7 +26,7 @@ export default function ActiveAddressesChart({ activeAddresses, btc }) {
   return (
     <DashboardItem title="Active Addresses" helpText="Weekly Active Addresses">
       <ResponsiveContainer width="99%" height={300}>
-        <LineChart
+        <ComposedChart
           data={data}
           margin={{ top: 5, right: 15, bottom: 5, left: 10 }}
         >
@@ -38,14 +38,7 @@ export default function ActiveAddressesChart({ activeAddresses, btc }) {
             dot={false}
             yAxisId="aa"
           />
-          <Line
-            type="monotone"
-            dataKey="btc"
-            name="BTC Price"
-            stroke={theme.palette.primary.main}
-            yAxisId="btc"
-            dot={false}
-          />
+          {BtcArea({})}
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
           <XAxis
             dataKey="ts"
@@ -67,7 +60,7 @@ export default function ActiveAddressesChart({ activeAddresses, btc }) {
           />
           <Tooltip labelFormatter={dateFormatter} />
           <Legend />
-        </LineChart>
+        </ComposedChart>
       </ResponsiveContainer>
     </DashboardItem>
   );
