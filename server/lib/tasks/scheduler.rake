@@ -14,7 +14,8 @@ task get_recent_data: :environment do
 end
 
 task backfill_github_data: :environment do 
-  # this runs every 10 mins, and github's rate limit is 5000
-  # each run makes about 200 calls, so we estimate we can do this 4 times
+  # this runs every 10 mins, and github's rate limit is 5000/hr 
+  # so we don't want to make more than 833 calls in here
+  # each backfill makes about 220 calls (4.3 years x 52 weeks), so we estimate we can do roughly 4 times
   4.times { GithubBackfiller.run }
 end
