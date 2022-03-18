@@ -8,21 +8,32 @@ class Messari
     @options = { headers: { "x-messari-api-key": ENV['MESSARI_API_KEY'] } }
   end
 
-  # NOTE: these names must match "#{token}_#{metric}"
   def price(token:, start_date: DEFAULT_START_DATE)
-    daily_response("/assets/#{chain_name(token)}/metrics/price/time-series", start_date || DEFAULT_START_DATE)
+    daily_response("/assets/#{slug(token)}/metrics/price/time-series", start_date || DEFAULT_START_DATE)
   end
 
   def circ_mcap(token:, start_date: DEFAULT_START_DATE)
-    daily_response("/assets/#{chain_name(token)}/metrics/mcap-circ/time-series", start_date || DEFAULT_START_DATE)
+    daily_response("/assets/#{slug(token)}/metrics/mcap-circ/time-series", start_date || DEFAULT_START_DATE)
   end
 
   def realized_mcap(token:, start_date: DEFAULT_START_DATE)
-    daily_response("/assets/#{chain_name(token)}/metrics/mcap-realized/time-series", start_date || DEFAULT_START_DATE)
+    daily_response("/assets/#{slug(token)}/metrics/mcap-realized/time-series", start_date || DEFAULT_START_DATE)
   end
 
   def active_addresses(token:, start_date: DEFAULT_START_DATE)
-    weekly_response("/assets/#{chain_name(token)}/metrics/act-addr-cnt/time-series", start_date || DEFAULT_START_DATE)
+    weekly_response("/assets/#{slug(token)}/metrics/act-addr-cnt/time-series", start_date || DEFAULT_START_DATE)
+  end
+
+  def assets
+    self.class.get('/assets?fields=symbol').parsed_response
+  end
+
+  def asset(token:)
+    self.class.get("/assets/#{token}").parsed_response
+  end
+
+  def asset_metrics(token:)
+    self.class.get("/assets/#{token}/metrics").parsed_response
   end
 
   private
@@ -40,26 +51,8 @@ class Messari
     response.parsed_response
   end
 
-  def chain_name(token)
-    case token
-    when 'eth'
-      'ethereum'
-    when 'sol'
-      'solana'
-    when 'btc'
-      'bitcoin'
-    when 'luna'
-      'terra'
-    when 'avax'
-      'avalanche'
-    when 'algo'
-      'algorand'
-    when 'fil'
-      'file-coin'
-    when 'xrp'
-      'ripple'
-    when 'etc'
-      'ethereum-classic'
-    end
+  def slug(token)
+    # in case we need to map
+    token
   end
 end
