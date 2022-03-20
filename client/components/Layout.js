@@ -26,6 +26,7 @@ import Copyright from '../src/Copyright';
 import Link from '../src/Link';
 import { EthereumIcon } from './icons/EthereumIcon';
 import { NearIcon } from './icons/NearIcon';
+import { SolanaIcon } from './icons/SolanaIcon';
 
 const drawerWidth = 200;
 
@@ -65,6 +66,14 @@ export default function Layout({ children }) {
               <NearIcon />
             </ListItemIcon>
             <ListItemText primary="Near" />
+          </ListItem>
+        </Link>
+        <Link href="/solana">
+          <ListItem button key="Solana">
+            <ListItemIcon>
+              <SolanaIcon />
+            </ListItemIcon>
+            <ListItemText primary="Solana" />
           </ListItem>
         </Link>
       </List>
