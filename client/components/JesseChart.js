@@ -49,7 +49,7 @@ export default function JesseChart({ jesse, btc }) {
             type="monotone"
             dataKey="jesseLow"
             name="Low Range"
-            stroke={theme.palette.primary.main}
+            stroke="green"
             dot={false}
             yAxisId="btc"
           />
@@ -57,7 +57,7 @@ export default function JesseChart({ jesse, btc }) {
             type="monotone"
             dataKey="jesseHigh"
             name="High Range"
-            stroke={theme.palette.primary.main}
+            stroke="red"
             dot={false}
             yAxisId="btc"
           />
@@ -65,7 +65,7 @@ export default function JesseChart({ jesse, btc }) {
             type="monotone"
             dataKey="btc"
             name="BTC Price"
-            stroke={theme.palette.secondary.main}
+            stroke={theme.palette.secondary.secondary}
             yAxisId="btc"
             dot={false}
           />

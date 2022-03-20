@@ -27,6 +27,7 @@ import * as React from 'react';
 import logo from '../images/nw_logo.png';
 import Copyright from '../src/Copyright';
 import Link from '../src/Link';
+import { EthereumIcon } from './icons/EthereumIcon';
 const drawerWidth = 200;
 
 export default function Layout({ children }) {
@@ -51,12 +52,12 @@ export default function Layout({ children }) {
             <ListItemText primary="Bitcoin" />
           </ListItem>
         </Link>
-        <Link href="/developerActivity">
-          <ListItem button key="Dev Activity">
+        <Link href="/ethereum">
+          <ListItem button key="Ethereum">
             <ListItemIcon>
-              <RowingIcon />
+              <EthereumIcon />
             </ListItemIcon>
-            <ListItemText primary="Dev Activity" />
+            <ListItemText primary="Ethereum" />
           </ListItem>
         </Link>
         <Link href="/jesse">

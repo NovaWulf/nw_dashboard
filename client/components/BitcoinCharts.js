@@ -87,7 +87,8 @@ export default function BitcoinCharts() {
       <LoadingGridItem loading={loading}>
         <ActiveAddressesChart
           activeAddresses={btcActiveAddresses}
-          btc={btcPrice}
+          price={btcPrice}
+          token="btc"
         />
       </LoadingGridItem>
       {/* 
