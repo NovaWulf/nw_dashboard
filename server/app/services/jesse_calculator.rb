@@ -68,10 +68,10 @@ class JesseCalculator < BaseService
 
     if btc_value > jesse_value + STD_ERROR
       NotificationMailer.with(subject: 'Jesse Indicator Alert',
-                              text: "BTC (#{btc_value.round(2)}) is above the high band of Jesse's indicator (#{(jesse_value + STD_ERROR).round(2)}").notification.deliver_now
+                              text: "BTC (#{btc_value.round(2)}) is above the high band of Jesse's indicator (#{(jesse_value + STD_ERROR).round(2)})").notification.deliver_now
     elsif btc_value < jesse_value - STD_ERROR
       NotificationMailer.with(subject: 'Jesse Indicator Alert',
-                              text: "BTC (#{btc_value.round(2)}) is below the low band of Jesse's indicator (#{(jesse_value - STD_ERROR).round(2)}").notification.deliver_now
+                              text: "BTC (#{btc_value.round(2)}) is below the low band of Jesse's indicator (#{(jesse_value - STD_ERROR).round(2)})").notification.deliver_now
     end
   end
 end
