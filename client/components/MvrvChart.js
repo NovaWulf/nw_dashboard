@@ -20,7 +20,7 @@ import {
   dateFormatter,
   mergeTimestamps,
 } from '../lib/formatters';
-import BtcArea from './BtcArea';
+import PriceArea from './PriceArea';
 
 export default function MvrvChart({ mvrv, btc }) {
   const theme = useTheme();
@@ -61,7 +61,7 @@ export default function MvrvChart({ mvrv, btc }) {
             dot={false}
             yAxisId="mvrv"
           />
-          {BtcArea({})}
+          {PriceArea({token: "btc"})}
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
           <XAxis
             dataKey="ts"

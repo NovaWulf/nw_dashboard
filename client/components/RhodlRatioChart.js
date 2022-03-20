@@ -1,25 +1,13 @@
-import {
-  LineChart,
-  Area,
-  ComposedChart,
-  Line,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-  ReferenceLine,
-} from 'recharts';
-import DashboardItem from './DashboardItem';
 import { useTheme } from '@mui/material';
 import {
-  nFormatter,
-  epochFormatter,
-  dateFormatter,
-  mergeTimestamps,
+  CartesianGrid, ComposedChart, Legend, Line, ReferenceLine, ResponsiveContainer, Tooltip, XAxis,
+  YAxis
+} from 'recharts';
+import {
+  dateFormatter, epochFormatter, mergeTimestamps, nFormatter
 } from '../lib/formatters';
-import BtcArea from './BtcArea';
+import DashboardItem from './DashboardItem';
+import PriceArea from './PriceArea';
 
 export default function RhodlRatioChart({ rhodlRatio, btc }) {
   const theme = useTheme();
@@ -63,7 +51,7 @@ export default function RhodlRatioChart({ rhodlRatio, btc }) {
             dot={false}
             yAxisId="rhodlRatio"
           />
-          {BtcArea({})}
+          {PriceArea({token: "btc"})}
       
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
           <XAxis

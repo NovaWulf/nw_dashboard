@@ -15,13 +15,13 @@ import {
   mergeTimestamps,
   nFormatter,
 } from '../lib/formatters';
-import BtcArea from './BtcArea';
+import PriceArea from './PriceArea';
 import DashboardItem from './DashboardItem';
 
-export default function ActiveAddressesChart({ activeAddresses, btc }) {
+export default function ActiveAddressesChart({ activeAddresses, price, token }) {
   const theme = useTheme();
 
-  const data = mergeTimestamps(activeAddresses, btc, 'btc');
+  const data = mergeTimestamps(activeAddresses, price, token);
 
   return (
     <DashboardItem title="Active Addresses" helpText="Weekly Active Addresses">
@@ -38,7 +38,7 @@ export default function ActiveAddressesChart({ activeAddresses, btc }) {
             dot={false}
             yAxisId="aa"
           />
-          {BtcArea({})}
+          {PriceArea({token: token, name: `${token.toUpperCase()} Price`})}
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
           <XAxis
             dataKey="ts"
@@ -53,7 +53,7 @@ export default function ActiveAddressesChart({ activeAddresses, btc }) {
             stroke={theme.palette.secondary.main}
           />
           <YAxis
-            yAxisId="btc"
+            yAxisId={token}
             orientation="right"
             tickFormatter={nFormatter}
             stroke={theme.palette.primary.main}

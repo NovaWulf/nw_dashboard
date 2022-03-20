@@ -1,17 +1,17 @@
 import { useTheme } from '@mui/material';
 import { Area } from 'recharts';
 
-export default function BtcArea() {
+export default function PriceArea({name = "BTC Price", token}) {
   const theme = useTheme();
 
   return (
     <Area
-      dataKey="btc"
-      name="BTC Price"
+      dataKey={token}
+      name={name}
       fill={theme.palette.primary.main}
       stroke={theme.palette.primary.main}
       opacity="50%"
-      yAxisId="btc"
+      yAxisId={token}
     />
   );
 }

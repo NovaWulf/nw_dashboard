@@ -1,6 +1,7 @@
 import { useTheme } from '@mui/material';
 import {
   CartesianGrid,
+  ComposedChart,
   Legend,
   Line,
   LineChart,
@@ -16,6 +17,7 @@ import {
   mergeTimestamps,
 } from '../lib/formatters';
 import DashboardItem from './DashboardItem';
+import PriceArea from './PriceArea';
 
 export default function DevActivityChart({
   devActivity,
@@ -30,7 +32,7 @@ export default function DevActivityChart({
   return (
     <DashboardItem title={`Dev Activity - ${chainName} Ecosystem`}>
       <ResponsiveContainer width="99%" height={300}>
-        <LineChart
+        <ComposedChart
           data={data}
           margin={{ top: 5, right: 15, bottom: 5, left: 10 }}
         >
@@ -42,14 +44,11 @@ export default function DevActivityChart({
             dot={false}
             yAxisId="dev"
           />
-          <Line
-            type="monotone"
-            dataKey="price"
-            name={`${tokenName} Price`}
-            stroke={theme.palette.primary.main}
-            yAxisId="price"
-            dot={false}
-          />
+          {PriceArea({
+            token: 'price',
+            name: `${tokenName.toUpperCase()} Price`,
+          })}
+
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
           <XAxis
             dataKey="ts"
@@ -71,7 +70,7 @@ export default function DevActivityChart({
           />
           <Tooltip labelFormatter={dateFormatter} />
           <Legend />
-        </LineChart>
+        </ComposedChart>
       </ResponsiveContainer>
     </DashboardItem>
   );

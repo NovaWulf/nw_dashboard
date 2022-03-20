@@ -15,7 +15,7 @@ import {
   mergeTimestamps,
   nFormatter,
 } from '../lib/formatters';
-import BtcArea from './BtcArea';
+import PriceArea from './PriceArea';
 import DashboardItem from './DashboardItem';
 
 export default function MetcalfeChart({ activeAddresses, btcMarketCap }) {
@@ -46,7 +46,7 @@ export default function MetcalfeChart({ activeAddresses, btcMarketCap }) {
             dot={false}
             yAxisId="aa"
           />
-          {BtcArea({})}
+          {PriceArea({token: "btc", name: "BTC Market Cap"})}
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
           <XAxis
             dataKey="ts"
