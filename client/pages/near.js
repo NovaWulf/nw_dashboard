@@ -5,7 +5,7 @@ import ClientOnly from '../components/ClientOnly';
 import EthereumCharts from '../components/EthereumCharts';
 import Layout from '../components/Layout';
 
-const Ethereum = () => {
+const Near = () => {
   return (
     <Layout>
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
@@ -17,4 +17,4 @@ const Ethereum = () => {
   );
 };
 
-export default withPageAuthRequired(Ethereum);
+export default withPageAuthRequired(Near);

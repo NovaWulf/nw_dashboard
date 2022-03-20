@@ -3,30 +3,19 @@ import { Skeleton } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import * as React from 'react';
 import ActiveAddressesChart from './ActiveAddressesChart';
-import ActiveAddressRegressionChart from './ActiveAddressRegressionChart';
-import MvrvChart from './MvrvChart';
-import MvrvRegressionChart from './MvrvRegressionChart';
-import MetcalfeChart from './MetcalfeChart';
-import RhodlRatioChart from './RhodlRatioChart';
-import JesseChart from './JesseChart';
 import DevActivityChart from './DevActivityChart';
 
 const QUERY = gql`
   query Metrics {
-    
-    ethPrice: tokenPrice(token: "eth") {
+    tokenPrice(token: "eth") {
       ts
       v
     }
-    ethActiveAddresses: activeAddresses(token: "eth") {
+    activeAddresses(token: "eth") {
       ts
       v
     }
-    ethMarketCap: marketCap(token: "eth") {
-      ts
-      v
-    }
-    ethDevActivity: devActivity(token: "eth") {
+    devActivity(token: "eth") {
       ts
       v
     }
@@ -49,35 +38,22 @@ export default function EthereumCharts() {
     return null;
   }
 
-  const {
-    ethPrice,
-    ethActiveAddresses,
-    ethMarketCap,
-    ethDevActivity,
-  } = data || {};
+  const { tokenPrice, activeAddresses, devActivity } =
+    data || {};
 
   return (
     <Grid container spacing={3}>
-   
-
       <LoadingGridItem loading={loading}>
         <ActiveAddressesChart
-          activeAddresses={ethActiveAddresses}
-          price={ethPrice}
+          activeAddresses={activeAddresses}
+          price={tokenPrice}
           token="eth"
         />
       </LoadingGridItem>
-
-      {/* <LoadingGridItem loading={loading}>
-        <MetcalfeChart
-          activeAddresses={btcActiveAddresses}
-          btcMarketCap={btcMarketCap}
-        />
-      </LoadingGridItem> */}
       <LoadingGridItem loading={loading}>
         <DevActivityChart
-          devActivity={ethDevActivity}
-          price={ethPrice}
+          devActivity={devActivity}
+          price={tokenPrice}
           tokenName="ETH"
           chainName="Ethereum"
         />
