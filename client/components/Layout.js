@@ -1,11 +1,8 @@
 import { useUser } from '@auth0/nextjs-auth0';
-import ErrorIcon from '@mui/icons-material/Error';
-import MenuIcon from '@mui/icons-material/Menu';
-import PublicIcon from '@mui/icons-material/Public';
-import RowingIcon from '@mui/icons-material/Rowing';
 import AutoGraphIcon from '@mui/icons-material/AutoGraph';
 import CurrencyBitcoinIcon from '@mui/icons-material/CurrencyBitcoin';
-
+import ErrorIcon from '@mui/icons-material/Error';
+import MenuIcon from '@mui/icons-material/Menu';
 import {
   Button,
   CircularProgress,
@@ -15,7 +12,7 @@ import {
   List,
   ListItem,
   ListItemIcon,
-  ListItemText,
+  ListItemText
 } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -28,6 +25,8 @@ import logo from '../images/nw_logo.png';
 import Copyright from '../src/Copyright';
 import Link from '../src/Link';
 import { EthereumIcon } from './icons/EthereumIcon';
+import { NearIcon } from './icons/NearIcon';
+
 const drawerWidth = 200;
 
 export default function Layout({ children }) {
@@ -60,12 +59,12 @@ export default function Layout({ children }) {
             <ListItemText primary="Ethereum" />
           </ListItem>
         </Link>
-        <Link href="/jesse">
-          <ListItem button key="Jesse's Indicator">
+        <Link href="/near">
+          <ListItem button key="Near">
             <ListItemIcon>
-              <AutoGraphIcon />
+              <NearIcon />
             </ListItemIcon>
-            <ListItemText primary="Jesse's Indicator" />
+            <ListItemText primary="Near" />
           </ListItem>
         </Link>
       </List>
