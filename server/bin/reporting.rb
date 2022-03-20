@@ -15,3 +15,11 @@ def dev_activity(token)
     puts m[1].to_s
   end
 end
+
+columns_that_make_record_distinct = [:user, :name]
+distinct_records = Repo.select("MIN(id) as id").group(columns_that_make_record_distinct)
+duplicate_records = Repo.where.not(id: distinct_records)
+
+ids = Repo.where(user: "terra-project").map(&:id)
+Repo.where(id: ids).update(user: "terra-money", backfilled_at: nil)
+RepoCommit.where(repo_id: ids).destroy

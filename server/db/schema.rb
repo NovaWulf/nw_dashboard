@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_03_16_165031) do
+ActiveRecord::Schema.define(version: 2022_03_20_150200) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -40,6 +40,7 @@ ActiveRecord::Schema.define(version: 2022_03_16_165031) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.datetime "backfilled_at"
+    t.index ["user", "name", "token"], name: "index_repos_on_user_and_name_and_token", unique: true
   end
 
   add_foreign_key "repo_commits", "repos"
