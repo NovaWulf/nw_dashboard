@@ -24,9 +24,11 @@ import * as React from 'react';
 import logo from '../images/nw_logo.png';
 import Copyright from '../src/Copyright';
 import Link from '../src/Link';
+import { AvalancheIcon } from './icons/AvalancheIcon';
 import { EthereumIcon } from './icons/EthereumIcon';
 import { NearIcon } from './icons/NearIcon';
 import { SolanaIcon } from './icons/SolanaIcon';
+import { TerraIcon } from './icons/TerraIcon';
 
 const drawerWidth = 200;
 
@@ -74,6 +76,22 @@ export default function Layout({ children }) {
               <SolanaIcon />
             </ListItemIcon>
             <ListItemText primary="Solana" />
+          </ListItem>
+        </Link>
+        <Link href="/avalanche">
+          <ListItem button key="Avalanche">
+            <ListItemIcon>
+              <AvalancheIcon />
+            </ListItemIcon>
+            <ListItemText primary="Avalanche" />
+          </ListItem>
+        </Link>
+        <Link href="/terra">
+          <ListItem button key="Terra">
+            <ListItemIcon>
+              <TerraIcon />
+            </ListItemIcon>
+            <ListItemText primary="Terra" />
           </ListItem>
         </Link>
       </List>
