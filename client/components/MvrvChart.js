@@ -16,6 +16,7 @@ import DashboardItem from './DashboardItem';
 import { useTheme } from '@mui/material';
 import {
   nFormatter,
+  mvrvFormatter,
   epochFormatter,
   dateFormatter,
   mergeTimestamps,
@@ -94,7 +95,7 @@ export default function MvrvChart({ mvrv, btc }) {
             strokeDasharray="2 2"
           />
 
-          <Tooltip labelFormatter={dateFormatter} formatter={nFormatter} />
+          <Tooltip labelFormatter={dateFormatter} formatter={mvrvFormatter} />
           <Legend />
         </ComposedChart>
       </ResponsiveContainer>
