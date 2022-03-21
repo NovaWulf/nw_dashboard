@@ -9,7 +9,7 @@ class GithubBackfiller < BaseService
     while day < 1.year.ago
       count = github_client.weekly_dev_activity(repo: r, day: day)
       count ||= 0 # might return nil if something is wrong
-      RepoCommit.create(day: day, count: count, repo: r) 
+      RepoCommit.create(day: day, count: count, repo: r) unless RepoCommit.find(day: day, repo: r).any?
       day += 7.days
     end
     r.update(backfilled_at: Time.now)
