@@ -31,3 +31,6 @@ repos.each do |r|
 rescue ActiveRecord::RecordNotUnique
   r.destroy
 end
+
+dupe_ids = RepoCommit.group(:repo_id, :day).having('count(*) > 1').select('unnest((array_agg("id"))[2:])')
+RepoCommit.where(id: dupe_ids)

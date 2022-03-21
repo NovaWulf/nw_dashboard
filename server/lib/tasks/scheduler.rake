@@ -21,6 +21,6 @@ task backfill_github_data: :environment do
 end
 
 task fetch_github_data: :environment do
-  repos = Repo.healthy.order('last_fetched_at ASC').first(1000)
+  repos = Repo.healthy.least_recently_fetched.first(1000)
   repos.each { |r| GithubActivityFetcher.run(repo: r) }
 end

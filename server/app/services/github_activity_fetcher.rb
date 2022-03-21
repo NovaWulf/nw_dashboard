@@ -21,6 +21,7 @@ class GithubActivityFetcher < BaseService
       rc = RepoCommit.find_or_create_by(day: d, repo: repo)
       rc.update(count: w['total']) unless rc.count == w['total']
     end
+    repo.update(last_fetched_at: Time.now)
   end
 
   def github_client

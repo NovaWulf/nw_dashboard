@@ -11,6 +11,11 @@ RSpec.describe GithubActivityFetcher do
       expect(RepoCommit.last.repo).to eq repo
       expect(RepoCommit.last.count).to eq 10
     end
+
+    it 'sets last fetched at' do
+      subject
+      expect(repo.last_fetched_at).to be_present
+    end
   end
 
   context 'existing data' do
