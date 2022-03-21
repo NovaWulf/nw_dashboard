@@ -1,22 +1,25 @@
 class GithubActivityFetcher < BaseService
+  attr_reader :repo
+
+  def initialize(repo:)
+    @repo = repo
+  end
+
   def run
-    Rails.logger.info "Running Github Activity Fetcher"
-    repos = Repo.all
-    repos.each do |r|
-      last_date = r.repo_commits.last&.day
-      if last_date && (last_date + 6.days) >= Date.today # do we have data from the last week?
-        Rails.logger.info "have recent commit data for #{r.name}, returning"
-        next
-      end
-      weekly_data = github_client.commit_activity(repo: r)
-      next unless weekly_data.is_a?(Array)
+    Rails.logger.info "about to fetch data for #{repo.description}"
+    weekly_data = github_client.commit_activity(repo: repo)
+    unless weekly_data.is_a?(Array)
+      Rails.logger.error "could not fetch data for #{repo.description}"
+      Rails.logger.error weekly_data
+      repo.update(error_fetching_at: Time.now)
+      return
+    end
 
-      weekly_data.each do |w|
-        d = Time.at(w['week']).to_date
-        next if last_date && last_date >= d
+    weekly_data.each do |w|
+      d = Time.at(w['week']).to_date
 
-        RepoCommit.create(day: d, count: w['total'], repo: r)
-      end
+      rc = RepoCommit.find_or_create_by(day: d, repo: repo)
+      rc.update(count: w['total']) unless rc.count == w['total']
     end
   end
 

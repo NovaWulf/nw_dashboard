@@ -1,6 +1,6 @@
 RSpec.describe ActiveAddressesFetcher do
   subject { described_class.run(token: 'btc') }
-include_context "messari client"
+  include_context 'messari client'
 
   it 'persists' do
     subject

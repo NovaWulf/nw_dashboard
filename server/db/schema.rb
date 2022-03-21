@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_03_20_150200) do
+ActiveRecord::Schema.define(version: 2022_03_21_112720) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -30,6 +30,7 @@ ActiveRecord::Schema.define(version: 2022_03_20_150200) do
     t.bigint "repo_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["repo_id", "day"], name: "index_repo_commits_on_repo_id_and_day", unique: true
     t.index ["repo_id"], name: "index_repo_commits_on_repo_id"
   end
 
@@ -40,6 +41,8 @@ ActiveRecord::Schema.define(version: 2022_03_20_150200) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.datetime "backfilled_at"
+    t.datetime "last_fetched_at"
+    t.datetime "error_fetching_at"
     t.index ["user", "name", "token"], name: "index_repos_on_user_and_name_and_token", unique: true
   end
 

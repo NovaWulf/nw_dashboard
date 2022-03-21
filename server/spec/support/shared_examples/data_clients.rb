@@ -34,3 +34,15 @@ RSpec.shared_context 'santiment client' do
     allow_any_instance_of(described_class).to receive(:santiment_client).and_return(santiment_double)
   end
 end
+
+
+RSpec.shared_context 'github rest client' do
+  let(:github_double) do
+    double('github client',
+           commit_activity: [{ week: Date.today.to_time, total: 10 }.with_indifferent_access])
+  end
+
+  before(:each) do
+    allow_any_instance_of(described_class).to receive(:github_client).and_return(github_double)
+  end
+end
