@@ -6,6 +6,10 @@ class VolumeDisplayer < BaseService
   end
 
   def run
-    Metric.by_token(token).by_metric('volume').mondays.oldest_first
+    Groupdate.week_start = :monday
+
+    Metric.by_token(token).by_metric('volume').group_by_week(:timestamp, time_zone: false).sum(:value).to_a.map do |m|
+      OpenStruct.new(timestamp: m[0], value: m[1])
+    end
   end
 end

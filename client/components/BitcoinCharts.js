@@ -10,6 +10,7 @@ import MetcalfeChart from './MetcalfeChart';
 import RhodlRatioChart from './RhodlRatioChart';
 import JesseChart from './JesseChart';
 import DevActivityChart from './DevActivityChart';
+import VolumeChart from './VolumeChart';
 
 const QUERY = gql`
   query Metrics {
@@ -30,6 +31,10 @@ const QUERY = gql`
       v
     }
     btcMarketCap: marketCap(token: "btc") {
+      ts
+      v
+    }
+    volume(token: "btc") {
       ts
       v
     }
@@ -68,6 +73,7 @@ export default function BitcoinCharts() {
     rhodlRatio,
     btcMarketCap,
     jesse,
+    volume,
     btcDevActivity,
   } = data || {};
 
@@ -90,6 +96,10 @@ export default function BitcoinCharts() {
           price={btcPrice}
           token="btc"
         />
+      </LoadingGridItem>
+
+      <LoadingGridItem loading={loading}>
+        <VolumeChart volume={volume} price={btcPrice} token="btc" />
       </LoadingGridItem>
       {/* 
       <LoadingGridItem loading={loading}>

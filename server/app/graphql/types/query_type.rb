@@ -20,6 +20,10 @@ module Types
       argument :token, String
     end
 
+    field :volume, [Types::MetricType], null: false do
+      argument :token, String
+    end
+
     field :dev_activity, [Types::MetricType], null: false do
       argument :token, String
     end
