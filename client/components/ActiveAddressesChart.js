@@ -18,7 +18,11 @@ import {
 import PriceArea from './PriceArea';
 import DashboardItem from './DashboardItem';
 
-export default function ActiveAddressesChart({ activeAddresses, price, token }) {
+export default function ActiveAddressesChart({
+  activeAddresses,
+  price,
+  token,
+}) {
   const theme = useTheme();
 
   const data = mergeTimestamps(activeAddresses, price, token);
@@ -38,7 +42,7 @@ export default function ActiveAddressesChart({ activeAddresses, price, token }) 
             dot={false}
             yAxisId="aa"
           />
-          {PriceArea({token: token, name: `${token.toUpperCase()} Price`})}
+          {PriceArea({ token: token, name: `${token.toUpperCase()} Price` })}
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
           <XAxis
             dataKey="ts"
@@ -58,7 +62,7 @@ export default function ActiveAddressesChart({ activeAddresses, price, token }) 
             tickFormatter={nFormatter}
             stroke={theme.palette.primary.main}
           />
-          <Tooltip labelFormatter={dateFormatter} />
+          <Tooltip labelFormatter={dateFormatter} formatter={nFormatter} />
           <Legend />
         </ComposedChart>
       </ResponsiveContainer>

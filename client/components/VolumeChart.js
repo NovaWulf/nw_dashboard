@@ -61,7 +61,7 @@ export default function VolumeChart({ volume, price, token }) {
             tickFormatter={nFormatter}
             stroke={theme.palette.primary.main}
           />
-          <Tooltip labelFormatter={dateFormatter} />
+          <Tooltip labelFormatter={dateFormatter} formatter={nFormatter} />
           <Legend />
         </ComposedChart>
       </ResponsiveContainer>

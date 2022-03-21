@@ -46,7 +46,7 @@ export default function MetcalfeChart({ activeAddresses, btcMarketCap }) {
             dot={false}
             yAxisId="aa"
           />
-          {PriceArea({token: "btc", name: "BTC Market Cap"})}
+          {PriceArea({ token: 'btc', name: 'BTC Market Cap' })}
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
           <XAxis
             dataKey="ts"
@@ -66,7 +66,7 @@ export default function MetcalfeChart({ activeAddresses, btcMarketCap }) {
             tickFormatter={nFormatter}
             stroke={theme.palette.primary.main}
           />
-          <Tooltip labelFormatter={dateFormatter} />
+          <Tooltip labelFormatter={dateFormatter} formatter={nFormatter} />
           <Legend />
         </ComposedChart>
       </ResponsiveContainer>

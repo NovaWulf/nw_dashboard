@@ -28,8 +28,8 @@ export default function MvrvChart({ mvrv, btc }) {
   const data = mergeTimestamps(mvrv, btc, 'btc');
 
   const dataMax = Math.max(...data.map(i => i.v));
-  const endOfRed = (dataMax - 3) / dataMax
-  const startOfGreen = 100 - (1 / dataMax)
+  const endOfRed = (dataMax - 3) / dataMax;
+  const startOfGreen = 100 - 1 / dataMax;
 
   return (
     <DashboardItem
@@ -46,7 +46,11 @@ export default function MvrvChart({ mvrv, btc }) {
               <stop offset="0%" stopColor="red" stopOpacity={1} />
               <stop offset={`${endOfRed}%`} stopColor="red" stopOpacity={1} />
               <stop offset="70%" stopColor="gray" stopOpacity={1} />
-              <stop offset={`${startOfGreen}%`} stopColor="green" stopOpacity={1} />
+              <stop
+                offset={`${startOfGreen}%`}
+                stopColor="green"
+                stopOpacity={1}
+              />
               <stop offset="100%" stopColor="green" stopOpacity={1} />
             </linearGradient>
           </defs>
@@ -54,14 +58,14 @@ export default function MvrvChart({ mvrv, btc }) {
             type="monotone"
             dataKey="v"
             name="MVRV"
-            stroke='url(#splitColor)'
+            stroke="url(#splitColor)"
             // stroke={theme.palette.secondary.main}
             // fill="green"
             // fill="url(#splitColor)"
             dot={false}
             yAxisId="mvrv"
           />
-          {PriceArea({token: "btc"})}
+          {PriceArea({ token: 'btc' })}
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
           <XAxis
             dataKey="ts"
@@ -90,7 +94,7 @@ export default function MvrvChart({ mvrv, btc }) {
             strokeDasharray="2 2"
           />
 
-          <Tooltip labelFormatter={dateFormatter} />
+          <Tooltip labelFormatter={dateFormatter} formatter={nFormatter} />
           <Legend />
         </ComposedChart>
       </ResponsiveContainer>

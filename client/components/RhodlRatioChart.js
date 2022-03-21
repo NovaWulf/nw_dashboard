@@ -1,10 +1,20 @@
 import { useTheme } from '@mui/material';
 import {
-  CartesianGrid, ComposedChart, Legend, Line, ReferenceLine, ResponsiveContainer, Tooltip, XAxis,
-  YAxis
+  CartesianGrid,
+  ComposedChart,
+  Legend,
+  Line,
+  ReferenceLine,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
 } from 'recharts';
 import {
-  dateFormatter, epochFormatter, mergeTimestamps, nFormatter
+  dateFormatter,
+  epochFormatter,
+  mergeTimestamps,
+  nFormatter,
 } from '../lib/formatters';
 import DashboardItem from './DashboardItem';
 import PriceArea from './PriceArea';
@@ -51,8 +61,8 @@ export default function RhodlRatioChart({ rhodlRatio, btc }) {
             dot={false}
             yAxisId="rhodlRatio"
           />
-          {PriceArea({token: "btc"})}
-      
+          {PriceArea({ token: 'btc' })}
+
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
           <XAxis
             dataKey="ts"
@@ -74,7 +84,7 @@ export default function RhodlRatioChart({ rhodlRatio, btc }) {
             tickFormatter={nFormatter}
             stroke={theme.palette.primary.main}
           />
-          <Tooltip labelFormatter={dateFormatter} />
+          <Tooltip labelFormatter={dateFormatter} formatter={nFormatter} />
           <ReferenceLine
             y={50000}
             yAxisId="rhodlRatio"
