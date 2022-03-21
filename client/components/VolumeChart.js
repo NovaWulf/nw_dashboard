@@ -36,7 +36,7 @@ export default function VolumeChart({ volume, price, token }) {
           <Line
             type="monotone"
             dataKey="v"
-            name="Volume"
+            name="Volume ($)"
             stroke={theme.palette.secondary.main}
             dot={false}
             yAxisId="vol"

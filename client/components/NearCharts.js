@@ -4,6 +4,7 @@ import Grid from '@mui/material/Grid';
 import * as React from 'react';
 import ActiveAddressesChart from './ActiveAddressesChart';
 import DevActivityChart from './DevActivityChart';
+import VolumeChart from './VolumeChart';
 
 const QUERY = gql`
   query Metrics {
@@ -12,6 +13,10 @@ const QUERY = gql`
       v
     }
     activeAddresses(token: "near") {
+      ts
+      v
+    }
+    volume(token: "near") {
       ts
       v
     }
@@ -38,8 +43,7 @@ export default function NearCharts() {
     return null;
   }
 
-  const { tokenPrice, activeAddresses, devActivity } =
-    data || {};
+  const { tokenPrice, activeAddresses, devActivity, volume } = data || {};
 
   return (
     <Grid container spacing={3}>
@@ -50,6 +54,9 @@ export default function NearCharts() {
           token="near"
         />
       </LoadingGridItem> */}
+      <LoadingGridItem loading={loading}>
+        <VolumeChart volume={volume} price={tokenPrice} token="near" />
+      </LoadingGridItem>
       <LoadingGridItem loading={loading}>
         <DevActivityChart
           devActivity={devActivity}

@@ -2,8 +2,8 @@ import { gql, useQuery } from '@apollo/client';
 import { Skeleton } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import * as React from 'react';
-import ActiveAddressesChart from './ActiveAddressesChart';
 import DevActivityChart from './DevActivityChart';
+import VolumeChart from './VolumeChart';
 
 const QUERY = gql`
   query Metrics {
@@ -16,6 +16,10 @@ const QUERY = gql`
       v
     }
     devActivity(token: "luna") {
+      ts
+      v
+    }
+    volume(token: "luna") {
       ts
       v
     }
@@ -38,8 +42,7 @@ export default function TerraCharts() {
     return null;
   }
 
-  const { tokenPrice, activeAddresses, devActivity } =
-    data || {};
+  const { tokenPrice, activeAddresses, devActivity, volume } = data || {};
 
   return (
     <Grid container spacing={3}>
@@ -49,7 +52,11 @@ export default function TerraCharts() {
           price={tokenPrice}
           token="luna"
         />
+        
       </LoadingGridItem> */}
+      <LoadingGridItem loading={loading}>
+        <VolumeChart volume={volume} price={tokenPrice} token="luna" />
+      </LoadingGridItem>
       <LoadingGridItem loading={loading}>
         <DevActivityChart
           devActivity={devActivity}

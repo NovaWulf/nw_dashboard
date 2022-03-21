@@ -4,6 +4,7 @@ import Grid from '@mui/material/Grid';
 import * as React from 'react';
 import ActiveAddressesChart from './ActiveAddressesChart';
 import DevActivityChart from './DevActivityChart';
+import VolumeChart from './VolumeChart';
 
 const QUERY = gql`
   query Metrics {
@@ -16,6 +17,10 @@ const QUERY = gql`
       v
     }
     devActivity(token: "avax") {
+      ts
+      v
+    }
+    volume(token: "avax") {
       ts
       v
     }
@@ -38,8 +43,7 @@ export default function AvalancheCharts() {
     return null;
   }
 
-  const { tokenPrice, activeAddresses, devActivity } =
-    data || {};
+  const { tokenPrice, activeAddresses, devActivity, volume } = data || {};
 
   return (
     <Grid container spacing={3}>
@@ -50,6 +54,9 @@ export default function AvalancheCharts() {
           token="avax"
         />
       </LoadingGridItem> */}
+      <LoadingGridItem loading={loading}>
+        <VolumeChart volume={volume} price={tokenPrice} token="avax" />
+      </LoadingGridItem>
       <LoadingGridItem loading={loading}>
         <DevActivityChart
           devActivity={devActivity}
