@@ -11,7 +11,10 @@ class GithubActivityFetcher < BaseService
     unless weekly_data.is_a?(Array)
       Rails.logger.error "could not fetch data for #{repo.description}"
       Rails.logger.error weekly_data
-      repo.update(error_fetching_at: Time.now)
+      if weekly_data && weekly_data['message'] && weekly_data['message'] == 'Not Found'
+        repo.update(error_fetching_at: Time.now)
+      end
+
       return
     end
 
