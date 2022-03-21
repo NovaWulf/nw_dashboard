@@ -16,6 +16,7 @@ RSpec.shared_context 'messari client' do
            price: { data: { values: [[Time.now.to_i * 1000, 50_000]] } }.with_indifferent_access,
            circ_mcap: { data: { values: [[Time.now.to_i * 1000, 500_000]] } }.with_indifferent_access,
            realized_mcap: { data: { values: [[Time.now.to_i * 1000, 400_000]] } }.with_indifferent_access,
+           volume: { data: { values: [[Time.now.to_i * 1000, 2_000_000]] } }.with_indifferent_access,
            active_addresses: { data: { values: [[Time.now.to_i * 1000, 50_000]] } }.with_indifferent_access)
   end
 
@@ -34,7 +35,6 @@ RSpec.shared_context 'santiment client' do
     allow_any_instance_of(described_class).to receive(:santiment_client).and_return(santiment_double)
   end
 end
-
 
 RSpec.shared_context 'github rest client' do
   let(:github_double) do

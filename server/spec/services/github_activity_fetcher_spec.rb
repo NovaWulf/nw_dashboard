@@ -32,7 +32,7 @@ RSpec.describe GithubActivityFetcher do
 
   context 'error' do
     let(:github_double) do
-      double('github client', commit_activity: { message: 'Not Found' })
+      double('github client', commit_activity: { message: 'Not Found' }.with_indifferent_access)
     end
 
     it 'should set error' do

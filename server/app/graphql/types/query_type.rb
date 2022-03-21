@@ -37,6 +37,10 @@ module Types
       PriceDisplayer.run(token: token).value
     end
 
+    def volume(token:)
+      VolumeDisplayer.run(token: token).value
+    end
+
     def active_addresses(token:)
       ActiveAddressDisplayer.run(token: token).value
     end
