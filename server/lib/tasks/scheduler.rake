@@ -25,3 +25,8 @@ task fetch_github_data: :environment do
   repos = Repo.healthy.least_recently_fetched.first(1000)
   repos.each { |r| GithubActivityFetcher.run(repo: r) }
 end
+
+task :fetch_token_github_data, [:token] => [:environment] do |_t, args|
+  repos = Repo.by_token(args[:token])
+  repos.each { |r| GithubActivityFetcher.run(repo: r) }
+end

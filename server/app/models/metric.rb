@@ -5,5 +5,6 @@ class Metric < ApplicationRecord
   scope :by_token, ->(t) { where(token: t) }
   scope :by_day, ->(d) { where(timestamp: d) }
   scope :mondays, -> { where('extract(dow from timestamp) = ?', 1) }
+  scope :sundays, -> { where('extract(dow from timestamp) = ?', 0) }
   scope :oldest_first, -> { order(timestamp: :asc) }
 end

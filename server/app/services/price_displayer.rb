@@ -6,6 +6,6 @@ class PriceDisplayer < BaseService
   end
 
   def run
-    Metric.by_token(token).by_metric('price').mondays.oldest_first
+    Metric.by_token(token).by_metric('price').sundays.oldest_first
   end
 end

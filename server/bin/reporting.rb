@@ -5,7 +5,7 @@ def dev_activity(token)
 end
 
 def active(token)
-  Metric.by_token(token).by_metric('active_addresses').mondays.oldest_first.each do |m|
+  Metric.by_token(token).by_metric('active_addresses').sundays.oldest_first.each do |m|
     puts m.value.to_s
   end
 end

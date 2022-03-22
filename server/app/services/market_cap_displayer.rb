@@ -6,6 +6,6 @@ class MarketCapDisplayer < BaseService
   end
 
   def run
-    Metric.by_token(token).by_metric('circ_mcap').mondays.oldest_first
+    Metric.by_token(token).by_metric('circ_mcap').sundays.oldest_first
   end
 end

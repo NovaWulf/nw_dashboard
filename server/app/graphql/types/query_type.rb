@@ -29,12 +29,11 @@ module Types
     end
 
     def btc_mvrv
-      # grab only mondays for weekly data
-      Metric.by_token('btc').by_metric('mvrv').mondays.oldest_first
+      Metric.by_token('btc').by_metric('mvrv').sundays.oldest_first
     end
 
     def rhodl_ratio
-      Metric.by_token('btc').by_metric('rhodl_ratio').mondays.oldest_first
+      Metric.by_token('btc').by_metric('rhodl_ratio').sundays.oldest_first
     end
 
     def token_price(token:)
@@ -58,7 +57,7 @@ module Types
     end
 
     def jesse
-      Metric.by_token('btc').by_metric('jesse').mondays.oldest_first
+      Metric.by_token('btc').by_metric('jesse').sundays.oldest_first
     end
   end
 end

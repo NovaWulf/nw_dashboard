@@ -3,7 +3,7 @@ RSpec.describe ActiveAddressDisplayer do
 
   before(:each) do
     Metric.create(token: 'btc', metric: 'price', timestamp: Date.today, value: 500.0)
-    Metric.create(token: 'btc', metric: 'active_addresses', timestamp: Date.today.prev_occurring(:monday),
+    Metric.create(token: 'btc', metric: 'active_addresses', timestamp: Date.today.prev_occurring(:sunday),
                   value: 1000.0)
   end
 
