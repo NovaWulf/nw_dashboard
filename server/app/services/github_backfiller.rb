@@ -2,7 +2,7 @@ class GithubBackfiller < BaseService
   DEFAULT_START_DATE = Date.new(2017, 1, 1)
 
   def run
-    r = Repo.where(backfilled_at: nil).first
+    r = Repo.healthy.not_backfilled.canonical.first
     Rails.logger.info "Running Github Activity Fetcher for #{r.name}"
 
     day = DEFAULT_START_DATE

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_03_21_112720) do
+ActiveRecord::Schema.define(version: 2022_04_04_134949) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -43,6 +43,8 @@ ActiveRecord::Schema.define(version: 2022_03_21_112720) do
     t.datetime "backfilled_at"
     t.datetime "last_fetched_at"
     t.datetime "error_fetching_at"
+    t.integer "github_id"
+    t.boolean "canonical", default: false
     t.index ["user", "name", "token"], name: "index_repos_on_user_and_name_and_token", unique: true
   end
 

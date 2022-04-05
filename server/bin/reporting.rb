@@ -34,3 +34,23 @@ end
 
 dupe_ids = RepoCommit.group(:repo_id, :day).having('count(*) > 1').select('unnest((array_agg("id"))[2:])')
 RepoCommit.where(id: dupe_ids)
+
+Metric.by_token('btc').by_metric('active_addresses').each do |m|
+  m.delete unless m.timestamp.monday?
+end
+
+def token_activity_detail(token)
+  repos = Repo.by_token(token)
+  header = ['Repo', *repos.first.repo_commits.map(&:day).sort]
+  csv_string = CSV.generate do |csv|
+    csv << header
+    repos.each do |r|
+      csv << ["https://github.com/#{r.description}", *r.repo_commits.sort_by { |c| c.day }.map(&:count)]
+    end
+  end
+  puts csv_string
+end
+
+Repo.healthy.each do |r|
+  RepoCanonicalizer.run(repo: r)
+end
