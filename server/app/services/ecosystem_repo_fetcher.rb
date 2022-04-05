@@ -7,21 +7,13 @@ class EcosystemRepoFetcher < BaseService
 
   def run
     repos = electric_client.repos(token)
-    Rails.logger.info 'found '
+    Rails.logger.info "found #{repos.count} repos for #{token}"
     repos.each do |r|
-      Repo.find_or_create_by(token: token, name: repo_name(r), user: repo_user(r))
+      RepoCreator.run(token: token, description: r)
     end
   end
 
   def electric_client
     Electric.new
-  end
-
-  def repo_name(repo)
-    repo.split('/').last
-  end
-
-  def repo_user(repo)
-    repo.split('/').second_to_last
   end
 end
