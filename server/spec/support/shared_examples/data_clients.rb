@@ -39,7 +39,8 @@ end
 RSpec.shared_context 'github rest client' do
   let(:github_double) do
     double('github client',
-           commit_activity: [{ week: Date.today.to_time, total: 10 }.with_indifferent_access])
+           commit_activity: [{ week: Date.today.to_time, total: 10 }.with_indifferent_access],
+           repo_details: { id: 123, full_name: 'bob/john' }.with_indifferent_access)
   end
 
   before(:each) do
