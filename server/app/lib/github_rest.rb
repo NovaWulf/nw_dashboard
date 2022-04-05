@@ -8,8 +8,15 @@ class GithubRest
     @options = { headers: { "Authorization": "token #{ENV['GITHUB_TOKEN']}" } }
   end
 
+  def repo_details(user:, name:)
+    response = self.class.get("/repos/#{user}/#{name}", @options)
+    r = response.body
+    r ? JSON.parse(r) : nil
+  end
+
   def commit_activity(repo:)
-    r = self.class.get("/repos/#{repo.user}/#{repo.name}/stats/commit_activity", @options).body
+    response = self.class.get("/repos/#{repo.user}/#{repo.name}/stats/commit_activity", @options)
+    r = response.body
     r ? JSON.parse(r) : []
   end
 end
