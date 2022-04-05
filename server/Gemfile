@@ -45,12 +45,12 @@ gem 'graphql', '~> 1.13'
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: %i[mri mingw x64_mingw]
-  gem 'rspec-rails'
   gem 'dotenv-rails'
-
+  gem 'rspec-rails'
 end
 
 group :development do
+  gem 'annotate'
   # gem 'letter_opener' # open emails in the browser
 
   # Access an interactive console on exception pages or by calling 'console' anywhere in the code.

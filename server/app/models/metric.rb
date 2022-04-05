@@ -1,3 +1,15 @@
+# == Schema Information
+#
+# Table name: metrics
+#
+#  id         :bigint           not null, primary key
+#  metric     :string
+#  timestamp  :date
+#  token      :string
+#  value      :float
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
 class Metric < ApplicationRecord
   self.filter_attributes = []
 
