@@ -14,7 +14,7 @@ class DailyTradeProcessor < BaseService
   private
 
   def fetch_file
-    date_string = Date.yesterday.strftime('%Y%m%d')
+    date_string = Date.today.strftime('%Y%m%d')
 
     Net::SFTP.start(ENV['HS_FTP_SERVER'], ENV['HS_FTP_USER'], password: ENV['HS_FTP_PW']) do |sftp|
       sftp.dir.foreach('/Outgoing') do |entry|
