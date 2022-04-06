@@ -122,6 +122,9 @@ GEM
     minitest (5.15.0)
     msgpack (1.4.2)
     multi_xml (0.6.0)
+    net-sftp (3.0.0)
+      net-ssh (>= 5.0.0, < 7.0.0)
+    net-ssh (6.1.0)
     nio4r (2.5.8)
     nokogiri (1.13.0)
       mini_portile2 (~> 2.7.0)
@@ -280,6 +283,7 @@ DEPENDENCIES
   jbuilder (~> 2.7)
   jwt
   listen (~> 3.3)
+  net-sftp
   pg (~> 1.1)
   premailer-rails
   puma (~> 5.0)

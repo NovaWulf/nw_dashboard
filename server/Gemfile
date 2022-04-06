@@ -33,6 +33,8 @@ gem 'premailer-rails'
 
 gem 'groupdate' # easier sql
 
+gem 'net-sftp' # for fetching hedgeserv files
+
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.4.4', require: false
 

@@ -30,3 +30,7 @@ task :fetch_token_github_data, [:token] => [:environment] do |_t, args|
   repos = Repo.healthy.canonical.by_token(args[:token])
   repos.each { |r| GithubActivityFetcher.run(repo: r) }
 end
+
+task hedgeserv_email: :environment do
+  DailyTradeProcessor.run
+end
