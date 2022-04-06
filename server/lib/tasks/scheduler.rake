@@ -5,7 +5,7 @@ task get_recent_data: :environment do
     PriceDataFetcher.run(token: t)
     ActiveAddressesFetcher.run(token: t)
     VolumeFetcher.run(token: t)
-    # DevActivityFetcher.run(token: t)
+    DevActivityFetcher.run(token: t)
   end
 
   # GithubActivityFetcher.run

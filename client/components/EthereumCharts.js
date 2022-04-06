@@ -20,6 +20,10 @@ const QUERY = gql`
       ts
       v
     }
+    santimentDevActivity(token: "eth") {
+      ts
+      v
+    }
     volume(token: "eth") {
       ts
       v
@@ -43,7 +47,13 @@ export default function EthereumCharts() {
     return null;
   }
 
-  const { tokenPrice, activeAddresses, devActivity, volume } = data || {};
+  const {
+    tokenPrice,
+    activeAddresses,
+    devActivity,
+    santimentDevActivity,
+    volume,
+  } = data || {};
 
   return (
     <Grid container spacing={3}>
@@ -62,7 +72,15 @@ export default function EthereumCharts() {
           devActivity={devActivity}
           price={tokenPrice}
           tokenName="ETH"
-          chainName="Ethereum"
+          chainName="Ethereum Ecosystem"
+        />
+      </LoadingGridItem>
+      <LoadingGridItem loading={loading}>
+        <DevActivityChart
+          devActivity={santimentDevActivity}
+          price={tokenPrice}
+          tokenName="ETH"
+          chainName="Ethereum Org"
         />
       </LoadingGridItem>
     </Grid>

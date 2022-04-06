@@ -19,6 +19,10 @@ const QUERY = gql`
       ts
       v
     }
+    santimentDevActivity(token: "luna") {
+      ts
+      v
+    }
     volume(token: "luna") {
       ts
       v
@@ -42,7 +46,13 @@ export default function TerraCharts() {
     return null;
   }
 
-  const { tokenPrice, activeAddresses, devActivity, volume } = data || {};
+  const {
+    tokenPrice,
+    activeAddresses,
+    devActivity,
+    santimentDevActivity,
+    volume,
+  } = data || {};
 
   return (
     <Grid container spacing={3}>
@@ -62,7 +72,15 @@ export default function TerraCharts() {
           devActivity={devActivity}
           price={tokenPrice}
           tokenName="LUNA"
-          chainName="Terra"
+          chainName="Terra Ecosystem"
+        />
+      </LoadingGridItem>
+      <LoadingGridItem loading={loading}>
+        <DevActivityChart
+          devActivity={santimentDevActivity}
+          price={tokenPrice}
+          tokenName="LUNA"
+          chainName="Terra Org"
         />
       </LoadingGridItem>
     </Grid>

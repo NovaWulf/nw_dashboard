@@ -20,6 +20,10 @@ const QUERY = gql`
       ts
       v
     }
+    santimentDevActivity(token: "avax") {
+      ts
+      v
+    }
     volume(token: "avax") {
       ts
       v
@@ -43,7 +47,13 @@ export default function AvalancheCharts() {
     return null;
   }
 
-  const { tokenPrice, activeAddresses, devActivity, volume } = data || {};
+  const {
+    tokenPrice,
+    activeAddresses,
+    devActivity,
+    santimentDevActivity,
+    volume,
+  } = data || {};
 
   return (
     <Grid container spacing={3}>
@@ -62,7 +72,15 @@ export default function AvalancheCharts() {
           devActivity={devActivity}
           price={tokenPrice}
           tokenName="AVAX"
-          chainName="Avalanche"
+          chainName="Avalanche Ecosystem"
+        />
+      </LoadingGridItem>
+      <LoadingGridItem loading={loading}>
+        <DevActivityChart
+          devActivity={santimentDevActivity}
+          price={tokenPrice}
+          tokenName="AVAX"
+          chainName="Avalanche Org"
         />
       </LoadingGridItem>
     </Grid>

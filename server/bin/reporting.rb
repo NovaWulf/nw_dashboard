@@ -40,7 +40,7 @@ Metric.by_token('btc').by_metric('active_addresses').each do |m|
 end
 
 def token_activity_detail(token)
-  repos = Repo.by_token(token)
+  repos = Repo.by_token(token).healthy.canonical
   header = ['Repo', *repos.first.repo_commits.map(&:day).sort]
   csv_string = CSV.generate do |csv|
     csv << header

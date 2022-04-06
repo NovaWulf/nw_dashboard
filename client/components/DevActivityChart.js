@@ -30,7 +30,7 @@ export default function DevActivityChart({
   const data = mergeTimestamps(devActivity, price, 'price');
 
   return (
-    <DashboardItem title={`Dev Activity - ${chainName} Ecosystem`}>
+    <DashboardItem title={`Dev Activity - ${chainName}`}>
       <ResponsiveContainer width="99%" height={300}>
         <ComposedChart
           data={data}

@@ -24,6 +24,10 @@ const QUERY = gql`
       ts
       v
     }
+    santimentDevActivity(token: "sol") {
+      ts
+      v
+    }
   }
 `;
 
@@ -43,7 +47,13 @@ export default function SolanaCharts() {
     return null;
   }
 
-  const { tokenPrice, activeAddresses, devActivity, volume } = data || {};
+  const {
+    tokenPrice,
+    activeAddresses,
+    devActivity,
+    santimentDevActivity,
+    volume,
+  } = data || {};
 
   return (
     <Grid container spacing={3}>
@@ -62,7 +72,15 @@ export default function SolanaCharts() {
           devActivity={devActivity}
           price={tokenPrice}
           tokenName="SOL"
-          chainName="Solana"
+          chainName="Solana Ecosystem"
+        />
+      </LoadingGridItem>
+      <LoadingGridItem loading={loading}>
+        <DevActivityChart
+          devActivity={santimentDevActivity}
+          price={tokenPrice}
+          tokenName="SOL"
+          chainName="Solana Org"
         />
       </LoadingGridItem>
     </Grid>

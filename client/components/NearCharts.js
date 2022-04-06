@@ -24,6 +24,10 @@ const QUERY = gql`
       ts
       v
     }
+    santimentDevActivity(token: "near") {
+      ts
+      v
+    }
   }
 `;
 
@@ -43,7 +47,13 @@ export default function NearCharts() {
     return null;
   }
 
-  const { tokenPrice, activeAddresses, devActivity, volume } = data || {};
+  const {
+    tokenPrice,
+    activeAddresses,
+    devActivity,
+    santimentDevActivity,
+    volume,
+  } = data || {};
 
   return (
     <Grid container spacing={3}>
@@ -62,7 +72,15 @@ export default function NearCharts() {
           devActivity={devActivity}
           price={tokenPrice}
           tokenName="NEAR"
-          chainName="Near"
+          chainName="Near Ecosystem"
+        />
+      </LoadingGridItem>
+      <LoadingGridItem loading={loading}>
+        <DevActivityChart
+          devActivity={santimentDevActivity}
+          price={tokenPrice}
+          tokenName="NEAR"
+          chainName="Near Org"
         />
       </LoadingGridItem>
     </Grid>

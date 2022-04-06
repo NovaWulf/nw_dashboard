@@ -47,6 +47,10 @@ const QUERY = gql`
       ts
       v
     }
+    santimentDevActivity(token: "btc") {
+      ts
+      v
+    }
   }
 `;
 
@@ -75,6 +79,7 @@ export default function BitcoinCharts() {
     jesse,
     volume,
     btcDevActivity,
+    santimentDevActivity,
   } = data || {};
 
   return (
@@ -124,7 +129,15 @@ export default function BitcoinCharts() {
           devActivity={btcDevActivity}
           price={btcPrice}
           tokenName="BTC"
-          chainName="Bitcoin"
+          chainName="Bitcoin Ecosystem"
+        />
+      </LoadingGridItem>
+      <LoadingGridItem loading={loading}>
+        <DevActivityChart
+          devActivity={santimentDevActivity}
+          price={btcPrice}
+          tokenName="BTC"
+          chainName="Bitcoin Org"
         />
       </LoadingGridItem>
     </Grid>

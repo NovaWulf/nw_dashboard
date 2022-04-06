@@ -28,6 +28,10 @@ module Types
       argument :token, String
     end
 
+    field :santiment_dev_activity, [Types::MetricType], null: false do
+      argument :token, String
+    end
+
     def btc_mvrv
       Metric.by_token('btc').by_metric('mvrv').sundays.oldest_first
     end
@@ -54,6 +58,10 @@ module Types
 
     def dev_activity(token:)
       ActivityDisplayer.run(token: token).value
+    end
+
+    def santiment_dev_activity(token:)
+      SantimentActivityDisplayer.run(token: token).value
     end
 
     def jesse
