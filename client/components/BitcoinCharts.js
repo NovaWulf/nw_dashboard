@@ -11,6 +11,7 @@ import RhodlRatioChart from './RhodlRatioChart';
 import JesseChart from './JesseChart';
 import DevActivityChart from './DevActivityChart';
 import VolumeChart from './VolumeChart';
+import GithubCommitChart from './GithubCommitChart';
 
 const QUERY = gql`
   query Metrics {
@@ -125,11 +126,11 @@ export default function BitcoinCharts() {
         />
       </LoadingGridItem>
       <LoadingGridItem loading={loading}>
-        <DevActivityChart
+        <GithubCommitChart
           devActivity={btcDevActivity}
           price={btcPrice}
           tokenName="BTC"
-          chainName="Bitcoin Ecosystem"
+          chainName="Bitcoin"
         />
       </LoadingGridItem>
       <LoadingGridItem loading={loading}>
@@ -137,7 +138,7 @@ export default function BitcoinCharts() {
           devActivity={santimentDevActivity}
           price={btcPrice}
           tokenName="BTC"
-          chainName="Bitcoin Org"
+          chainName="Bitcoin"
         />
       </LoadingGridItem>
     </Grid>

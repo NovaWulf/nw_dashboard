@@ -19,7 +19,7 @@ import {
 import DashboardItem from './DashboardItem';
 import PriceArea from './PriceArea';
 
-export default function DevActivityChart({
+export default function GithubCommitChart({
   devActivity,
   price,
   tokenName,
@@ -31,8 +31,8 @@ export default function DevActivityChart({
 
   return (
     <DashboardItem
-      title={`Dev Activity - ${chainName} Org`}
-      helpText="Dev Activity includes commits, but also comments, follows, issue creation, etc"
+      title={`Github Commits - ${chainName} Ecosystem`}
+      helpText="This chart is showing commits across projects in the ecosystem as tracked by Electric Capital"
     >
       <ResponsiveContainer width="99%" height={300}>
         <ComposedChart
@@ -42,7 +42,7 @@ export default function DevActivityChart({
           <Line
             type="monotone"
             dataKey="v"
-            name="Dev Activity"
+            name="Github Commits"
             stroke={theme.palette.secondary.main}
             dot={false}
             yAxisId="dev"

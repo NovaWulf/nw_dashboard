@@ -72,7 +72,7 @@ export default function EthereumCharts() {
           devActivity={devActivity}
           price={tokenPrice}
           tokenName="ETH"
-          chainName="Ethereum Ecosystem"
+          chainName="Ethereum"
         />
       </LoadingGridItem>
       <LoadingGridItem loading={loading}>
@@ -80,7 +80,7 @@ export default function EthereumCharts() {
           devActivity={santimentDevActivity}
           price={tokenPrice}
           tokenName="ETH"
-          chainName="Ethereum Org"
+          chainName="Ethereum"
         />
       </LoadingGridItem>
     </Grid>

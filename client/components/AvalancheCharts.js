@@ -4,6 +4,7 @@ import Grid from '@mui/material/Grid';
 import * as React from 'react';
 import ActiveAddressesChart from './ActiveAddressesChart';
 import DevActivityChart from './DevActivityChart';
+import GithubCommitChart from './GithubCommitChart';
 import VolumeChart from './VolumeChart';
 
 const QUERY = gql`
@@ -68,11 +69,11 @@ export default function AvalancheCharts() {
         <VolumeChart volume={volume} price={tokenPrice} token="avax" />
       </LoadingGridItem>
       <LoadingGridItem loading={loading}>
-        <DevActivityChart
+        <GithubCommitChart
           devActivity={devActivity}
           price={tokenPrice}
           tokenName="AVAX"
-          chainName="Avalanche Ecosystem"
+          chainName="Avalanche"
         />
       </LoadingGridItem>
       <LoadingGridItem loading={loading}>
@@ -80,7 +81,7 @@ export default function AvalancheCharts() {
           devActivity={santimentDevActivity}
           price={tokenPrice}
           tokenName="AVAX"
-          chainName="Avalanche Org"
+          chainName="Avalanche"
         />
       </LoadingGridItem>
     </Grid>

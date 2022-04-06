@@ -3,6 +3,7 @@ import { Skeleton } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import * as React from 'react';
 import DevActivityChart from './DevActivityChart';
+import GithubCommitChart from './GithubCommitChart';
 import VolumeChart from './VolumeChart';
 
 const QUERY = gql`
@@ -68,11 +69,11 @@ export default function TerraCharts() {
         <VolumeChart volume={volume} price={tokenPrice} token="luna" />
       </LoadingGridItem>
       <LoadingGridItem loading={loading}>
-        <DevActivityChart
+        <GithubCommitChart
           devActivity={devActivity}
           price={tokenPrice}
           tokenName="LUNA"
-          chainName="Terra Ecosystem"
+          chainName="Terra"
         />
       </LoadingGridItem>
       <LoadingGridItem loading={loading}>
@@ -80,7 +81,7 @@ export default function TerraCharts() {
           devActivity={santimentDevActivity}
           price={tokenPrice}
           tokenName="LUNA"
-          chainName="Terra Org"
+          chainName="Terra"
         />
       </LoadingGridItem>
     </Grid>
