@@ -6,6 +6,7 @@ import ActiveAddressesChart from './ActiveAddressesChart';
 import CircSupplyChart from './CircSupplyChart';
 import DevActivityChart from './DevActivityChart';
 import GithubCommitChart from './GithubCommitChart';
+import McapDominanceChart from './McapDominanceChart';
 import VolumeChart from './VolumeChart';
 
 const QUERY = gql`
@@ -31,6 +32,10 @@ const QUERY = gql`
       v
     }
     circSupply(token: "sol") {
+      ts
+      v
+    }
+    mcapDominance(token: "sol") {
       ts
       v
     }
@@ -60,6 +65,7 @@ export default function SolanaCharts() {
     santimentDevActivity,
     volume,
     circSupply,
+    mcapDominance,
   } = data || {};
 
   return (
@@ -76,6 +82,9 @@ export default function SolanaCharts() {
       </LoadingGridItem>
       <LoadingGridItem loading={loading}>
         <CircSupplyChart circSupply={circSupply} />
+      </LoadingGridItem>
+      <LoadingGridItem loading={loading}>
+        <McapDominanceChart mcapDominance={mcapDominance} />
       </LoadingGridItem>
       <LoadingGridItem loading={loading}>
         <GithubCommitChart

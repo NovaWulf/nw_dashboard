@@ -20,6 +20,10 @@ module Types
       argument :token, String
     end
 
+    field :mcap_dominance, [Types::MetricType], null: false do
+      argument :token, String
+    end
+
     field :token_price, [Types::MetricType], null: false do
       argument :token, String
     end
@@ -58,6 +62,10 @@ module Types
 
     def market_cap(token:)
       MarketCapDisplayer.run(token: token).value
+    end
+
+    def mcap_dominance(token:)
+      MarketCapDominanceDisplayer.run(token: token).value
     end
 
     def circ_supply(token:)

@@ -40,6 +40,10 @@ export function dateFormatter(time) {
   return dayjs(time * 1000).format('MM/DD/YY');
 }
 
+export function percentFormatter(x) {
+  return `${x}%`;
+}
+
 export function mergeTimestamps(array1, array2, key) {
   const mergedData = array1.map(a1Item => {
     const p = array2.find(a2Item => a2Item.ts === a1Item.ts);

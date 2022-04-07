@@ -28,6 +28,10 @@ class Messari
     daily_response("/assets/#{slug(token)}/metrics/mcap-realized/time-series", start_date || DEFAULT_START_DATE)
   end
 
+  def mcap_dominance(token:, start_date: DEFAULT_START_DATE)
+    daily_response("/assets/#{slug(token)}/metrics/mcap-dom/time-series", start_date || DEFAULT_START_DATE)
+  end
+
   def active_addresses(token:, start_date: DEFAULT_START_DATE)
     weekly_response("/assets/#{slug(token)}/metrics/act-addr-cnt/time-series", start_date || DEFAULT_START_DATE)
   end

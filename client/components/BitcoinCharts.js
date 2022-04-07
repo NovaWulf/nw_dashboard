@@ -14,6 +14,7 @@ import VolumeChart from './VolumeChart';
 import GithubCommitChart from './GithubCommitChart';
 import CircMcapChart from './CircSupplyChart';
 import CircSupplyChart from './CircSupplyChart';
+import McapDominanceChart from './McapDominanceChart';
 
 const QUERY = gql`
   query Metrics {
@@ -49,12 +50,15 @@ const QUERY = gql`
       ts
       v
     }
-
     btcDevActivity: devActivity(token: "btc") {
       ts
       v
     }
     santimentDevActivity(token: "btc") {
+      ts
+      v
+    }
+    mcapDominance(token: "btc") {
       ts
       v
     }
@@ -88,6 +92,7 @@ export default function BitcoinCharts() {
     btcDevActivity,
     santimentDevActivity,
     circSupply,
+    mcapDominance,
   } = data || {};
 
   return (
@@ -102,7 +107,9 @@ export default function BitcoinCharts() {
       <LoadingGridItem loading={loading}>
         <MvrvChart mvrv={btcMvrv} btc={btcPrice} />
       </LoadingGridItem>
-
+      <LoadingGridItem loading={loading}>
+        <McapDominanceChart mcapDominance={mcapDominance} />
+      </LoadingGridItem>
       <LoadingGridItem loading={loading}>
         <ActiveAddressesChart
           activeAddresses={btcActiveAddresses}

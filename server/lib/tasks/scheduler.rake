@@ -7,6 +7,7 @@ task get_recent_data: :environment do
     VolumeFetcher.run(token: t)
     DevActivityFetcher.run(token: t)
     CirculatingSupplyFetcher.run(token: t)
+    MarketCapDominanceFetcher.run(token: t)
   end
 
   # GithubActivityFetcher.run

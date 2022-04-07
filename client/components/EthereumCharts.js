@@ -5,6 +5,7 @@ import * as React from 'react';
 import ActiveAddressesChart from './ActiveAddressesChart';
 import CircSupplyChart from './CircSupplyChart';
 import DevActivityChart from './DevActivityChart';
+import McapDominanceChart from './McapDominanceChart';
 import VolumeChart from './VolumeChart';
 
 const QUERY = gql`
@@ -30,6 +31,10 @@ const QUERY = gql`
       v
     }
     circSupply(token: "eth") {
+      ts
+      v
+    }
+    mcapDominance(token: "eth") {
       ts
       v
     }
@@ -59,6 +64,7 @@ export default function EthereumCharts() {
     santimentDevActivity,
     volume,
     circSupply,
+    mcapDominance,
   } = data || {};
 
   return (
@@ -75,6 +81,9 @@ export default function EthereumCharts() {
       </LoadingGridItem>
       <LoadingGridItem loading={loading}>
         <CircSupplyChart circSupply={circSupply} />
+      </LoadingGridItem>
+      <LoadingGridItem loading={loading}>
+        <McapDominanceChart mcapDominance={mcapDominance} />
       </LoadingGridItem>
 
       <LoadingGridItem loading={loading}>
