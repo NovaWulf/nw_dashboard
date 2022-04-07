@@ -12,6 +12,8 @@ import JesseChart from './JesseChart';
 import DevActivityChart from './DevActivityChart';
 import VolumeChart from './VolumeChart';
 import GithubCommitChart from './GithubCommitChart';
+import CircMcapChart from './CircSupplyChart';
+import CircSupplyChart from './CircSupplyChart';
 
 const QUERY = gql`
   query Metrics {
@@ -32,6 +34,10 @@ const QUERY = gql`
       v
     }
     btcMarketCap: marketCap(token: "btc") {
+      ts
+      v
+    }
+    circSupply: circSupply(token: "btc") {
       ts
       v
     }
@@ -81,6 +87,7 @@ export default function BitcoinCharts() {
     volume,
     btcDevActivity,
     santimentDevActivity,
+    circSupply,
   } = data || {};
 
   return (
@@ -102,6 +109,9 @@ export default function BitcoinCharts() {
           price={btcPrice}
           token="btc"
         />
+      </LoadingGridItem>
+      <LoadingGridItem loading={loading}>
+        <CircSupplyChart circSupply={circSupply} />
       </LoadingGridItem>
 
       <LoadingGridItem loading={loading}>

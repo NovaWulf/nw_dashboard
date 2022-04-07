@@ -3,6 +3,7 @@ import { Skeleton } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import * as React from 'react';
 import ActiveAddressesChart from './ActiveAddressesChart';
+import CircSupplyChart from './CircSupplyChart';
 import DevActivityChart from './DevActivityChart';
 import GithubCommitChart from './GithubCommitChart';
 import VolumeChart from './VolumeChart';
@@ -26,6 +27,10 @@ const QUERY = gql`
       v
     }
     santimentDevActivity(token: "near") {
+      ts
+      v
+    }
+    circSupply(token: "near") {
       ts
       v
     }
@@ -54,6 +59,7 @@ export default function NearCharts() {
     devActivity,
     santimentDevActivity,
     volume,
+    circSupply,
   } = data || {};
 
   return (
@@ -69,6 +75,9 @@ export default function NearCharts() {
         <VolumeChart volume={volume} price={tokenPrice} token="near" />
       </LoadingGridItem>
       <LoadingGridItem loading={loading}>
+        <CircSupplyChart circSupply={circSupply} />
+      </LoadingGridItem>
+      <LoadingGridItem loading={loading}>
         <GithubCommitChart
           devActivity={devActivity}
           price={tokenPrice}
@@ -76,6 +85,7 @@ export default function NearCharts() {
           chainName="Near"
         />
       </LoadingGridItem>
+
       <LoadingGridItem loading={loading}>
         <DevActivityChart
           devActivity={santimentDevActivity}

@@ -20,6 +20,10 @@ class Messari
     daily_response("/assets/#{slug(token)}/metrics/mcap-circ/time-series", start_date || DEFAULT_START_DATE)
   end
 
+  def circ_supply(token:, start_date: DEFAULT_START_DATE)
+    daily_response("/assets/#{slug(token)}/metrics/sply-circ/time-series", start_date || DEFAULT_START_DATE)
+  end
+
   def realized_mcap(token:, start_date: DEFAULT_START_DATE)
     daily_response("/assets/#{slug(token)}/metrics/mcap-realized/time-series", start_date || DEFAULT_START_DATE)
   end
@@ -34,10 +38,6 @@ class Messari
 
   def asset(token:)
     self.class.get("/assets/#{token}").parsed_response
-  end
-
-  def asset_metrics(token:)
-    self.class.get("/assets/#{token}/metrics").parsed_response
   end
 
   def asset_metrics(token:)

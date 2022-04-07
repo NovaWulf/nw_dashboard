@@ -2,6 +2,7 @@ import { gql, useQuery } from '@apollo/client';
 import { Skeleton } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import * as React from 'react';
+import CircSupplyChart from './CircSupplyChart';
 import DevActivityChart from './DevActivityChart';
 import GithubCommitChart from './GithubCommitChart';
 import VolumeChart from './VolumeChart';
@@ -25,6 +26,10 @@ const QUERY = gql`
       v
     }
     volume(token: "luna") {
+      ts
+      v
+    }
+    circSupply(token: "luna") {
       ts
       v
     }
@@ -53,6 +58,7 @@ export default function TerraCharts() {
     devActivity,
     santimentDevActivity,
     volume,
+    circSupply,
   } = data || {};
 
   return (
@@ -67,6 +73,9 @@ export default function TerraCharts() {
       </LoadingGridItem> */}
       <LoadingGridItem loading={loading}>
         <VolumeChart volume={volume} price={tokenPrice} token="luna" />
+      </LoadingGridItem>
+      <LoadingGridItem loading={loading}>
+        <CircSupplyChart circSupply={circSupply} />
       </LoadingGridItem>
       <LoadingGridItem loading={loading}>
         <GithubCommitChart

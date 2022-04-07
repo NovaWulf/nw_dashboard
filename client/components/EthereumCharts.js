@@ -3,6 +3,7 @@ import { Skeleton } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import * as React from 'react';
 import ActiveAddressesChart from './ActiveAddressesChart';
+import CircSupplyChart from './CircSupplyChart';
 import DevActivityChart from './DevActivityChart';
 import VolumeChart from './VolumeChart';
 
@@ -25,6 +26,10 @@ const QUERY = gql`
       v
     }
     volume(token: "eth") {
+      ts
+      v
+    }
+    circSupply(token: "eth") {
       ts
       v
     }
@@ -53,6 +58,7 @@ export default function EthereumCharts() {
     devActivity,
     santimentDevActivity,
     volume,
+    circSupply,
   } = data || {};
 
   return (
@@ -67,6 +73,10 @@ export default function EthereumCharts() {
       <LoadingGridItem loading={loading}>
         <VolumeChart volume={volume} price={tokenPrice} token="eth" />
       </LoadingGridItem>
+      <LoadingGridItem loading={loading}>
+        <CircSupplyChart circSupply={circSupply} />
+      </LoadingGridItem>
+
       <LoadingGridItem loading={loading}>
         <DevActivityChart
           devActivity={devActivity}

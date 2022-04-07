@@ -31,7 +31,7 @@ class MvrvCalculator < BaseService
   end
 
   def fetch_required_data
-    BtcCirculatingMcapDataFetcher.run
+    CirculatingMcapDataFetcher.run(token: 'btc')
     BtcRealizedMcapDataFetcher.run
   end
 

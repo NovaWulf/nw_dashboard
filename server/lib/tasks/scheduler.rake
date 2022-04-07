@@ -6,6 +6,7 @@ task get_recent_data: :environment do
     ActiveAddressesFetcher.run(token: t)
     VolumeFetcher.run(token: t)
     DevActivityFetcher.run(token: t)
+    CirculatingSupplyFetcher.run(token: t)
   end
 
   # GithubActivityFetcher.run

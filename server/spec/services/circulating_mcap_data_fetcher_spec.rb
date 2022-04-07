@@ -1,5 +1,5 @@
-RSpec.describe BtcCirculatingMcapDataFetcher do
-  subject { described_class.run }
+RSpec.describe CirculatingMcapDataFetcher do
+  subject { described_class.run(token: 'btc') }
   include_context 'messari client'
 
   it 'persists' do

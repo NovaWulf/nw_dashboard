@@ -3,6 +3,7 @@ import { Skeleton } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import * as React from 'react';
 import ActiveAddressesChart from './ActiveAddressesChart';
+import CircSupplyChart from './CircSupplyChart';
 import DevActivityChart from './DevActivityChart';
 import GithubCommitChart from './GithubCommitChart';
 import VolumeChart from './VolumeChart';
@@ -26,6 +27,10 @@ const QUERY = gql`
       v
     }
     volume(token: "avax") {
+      ts
+      v
+    }
+    circSupply(token: "avax") {
       ts
       v
     }
@@ -54,6 +59,7 @@ export default function AvalancheCharts() {
     devActivity,
     santimentDevActivity,
     volume,
+    circSupply,
   } = data || {};
 
   return (
@@ -67,6 +73,9 @@ export default function AvalancheCharts() {
       </LoadingGridItem> */}
       <LoadingGridItem loading={loading}>
         <VolumeChart volume={volume} price={tokenPrice} token="avax" />
+      </LoadingGridItem>
+      <LoadingGridItem loading={loading}>
+        <CircSupplyChart circSupply={circSupply} />
       </LoadingGridItem>
       <LoadingGridItem loading={loading}>
         <GithubCommitChart
