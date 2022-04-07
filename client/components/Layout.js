@@ -1,5 +1,4 @@
 import { useUser } from '@auth0/nextjs-auth0';
-import AutoGraphIcon from '@mui/icons-material/AutoGraph';
 import CurrencyBitcoinIcon from '@mui/icons-material/CurrencyBitcoin';
 import ErrorIcon from '@mui/icons-material/Error';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -12,7 +11,7 @@ import {
   List,
   ListItem,
   ListItemIcon,
-  ListItemText
+  ListItemText,
 } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -20,6 +19,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
 import * as React from 'react';
 import logo from '../images/nw_logo.png';
 import Copyright from '../src/Copyright';
@@ -41,13 +41,15 @@ export default function Layout({ children }) {
     setMobileOpen(!mobileOpen);
   };
 
+  const router = useRouter();
+
   const drawer = (
     <div>
       <Toolbar />
       <Divider />
       <List>
         <Link href="/">
-          <ListItem button key="Bitcoin">
+          <ListItem button selected={router.pathname == '/'} key="Bitcoin">
             <ListItemIcon>
               <CurrencyBitcoinIcon />
             </ListItemIcon>
@@ -55,7 +57,11 @@ export default function Layout({ children }) {
           </ListItem>
         </Link>
         <Link href="/ethereum">
-          <ListItem button key="Ethereum">
+          <ListItem
+            button
+            selected={router.pathname == '/ethereum'}
+            key="Ethereum"
+          >
             <ListItemIcon>
               <EthereumIcon />
             </ListItemIcon>
@@ -63,7 +69,7 @@ export default function Layout({ children }) {
           </ListItem>
         </Link>
         <Link href="/near">
-          <ListItem button key="Near">
+          <ListItem button selected={router.pathname == '/near'} key="Near">
             <ListItemIcon>
               <NearIcon />
             </ListItemIcon>
@@ -71,7 +77,7 @@ export default function Layout({ children }) {
           </ListItem>
         </Link>
         <Link href="/solana">
-          <ListItem button key="Solana">
+          <ListItem button selected={router.pathname == '/solana'} key="Solana">
             <ListItemIcon>
               <SolanaIcon />
             </ListItemIcon>
@@ -79,7 +85,11 @@ export default function Layout({ children }) {
           </ListItem>
         </Link>
         <Link href="/avalanche">
-          <ListItem button key="Avalanche">
+          <ListItem
+            button
+            selected={router.pathname == '/avalanche'}
+            key="Avalanche"
+          >
             <ListItemIcon>
               <AvalancheIcon />
             </ListItemIcon>
@@ -87,7 +97,7 @@ export default function Layout({ children }) {
           </ListItem>
         </Link>
         <Link href="/terra">
-          <ListItem button key="Terra">
+          <ListItem button selected={router.pathname == '/terra'} key="Terra">
             <ListItemIcon>
               <TerraIcon />
             </ListItemIcon>
