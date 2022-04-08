@@ -3,6 +3,8 @@ class GithubBackfiller < BaseService
 
   def run
     r = Repo.healthy.not_backfilled.canonical.first
+    return unless r
+
     Rails.logger.info "Running Github Activity Fetcher for #{r.name}"
 
     day = DEFAULT_START_DATE
