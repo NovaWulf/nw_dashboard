@@ -34,5 +34,5 @@ task :fetch_token_github_data, [:token] => [:environment] do |_t, args|
 end
 
 task hedgeserv_email: :environment do
-  DailyTradeProcessor.run
+  Hedgeserv::DailyProcessor.run
 end

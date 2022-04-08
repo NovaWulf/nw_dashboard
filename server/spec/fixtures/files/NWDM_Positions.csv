@@ -1,0 +1,16 @@
+Fund Legal Name,BO Clearer Account,Instrument ID,ISIN,End Quantity,Mkt Price (Local),Mkt Val (Local),Daily PNL (Base),MTD PNL (Base),YTD PNL (Base),CL_InvestmentType,CL_Liquidity,CL_Strategy,Posting CCY
+,,,,,,,33701.68,-57676.33,-798489.15,,,,
+NovaWulf Digital Master Fund L.P.,ANCH PHYSICALS 31a3639a418d,Bitcoin,,0.00001517,43943.239999999998,0.67,0,0,27757.83,Incentive Token,1,Liquid digital assets,USD
+NovaWulf Digital Master Fund L.P.,ANCH PHYSICALS 31a3639a418d,Ethereum,,0.0015683,3107.67,4.87,0,0,17132.44,Incentive Token,1,Liquid digital assets,USD
+NovaWulf Digital Master Fund L.P.,ANCH PHYSICALS 31a3639a418d,USD,,1044884.73,1,1044884.73,0,0,0,Cash,1,Cash,USD
+NovaWulf Digital Master Fund L.P.,GSCO PB 065401531,BITO US EQUITY,US74347G4405,-4500,27.07,-121815,1215,6705,3018.41,Equity,1,Long / short public securities,USD
+NovaWulf Digital Master Fund L.P.,GSCO PB 065401531,RIOT US 06/17/22 C30 EQUITY,,-120,0.545,-6540,360,10560,8456.42,Call option on Equity,1,Long / short public securities,USD
+NovaWulf Digital Master Fund L.P.,GSCO PB 065401531,RIOT US 06/17/22 P15 EQUITY,,-120,1.785,-21420,-660,-6183.58,-6183.58,Put option on Equity,1,Long / short public securities,USD
+NovaWulf Digital Master Fund L.P.,GSCO PB 065401531,RIOT US EQUITY,US7672921050,12100,17.42,210782,-2904,-45375,-39366.14,Equity,1,Long / short public securities,USD
+NovaWulf Digital Master Fund L.P.,GSCO PB 065401531,USD,,404918.11,1,404918.11,0,0,0,Cash,1,Cash,USD
+NovaWulf Digital Master Fund L.P.,PRIV CASH 001,Anchor Labs Series D Preferred Stock,,42878,23.3217001725,999987.86,0,0,0,Equity,3,Growth Equity,USD
+NovaWulf Digital Master Fund L.P.,PRIV CASH 001,Katena Computing Technologies SAFE,,1,2000000,2000000,0,0,0,Equity,3,Growth Equity,USD
+NovaWulf Digital Master Fund L.P.,PRIV CASH 001,Lancium Technologies Corporation Series A PFD,,1049748,9.5261000068,10000004.43,0,0,0,Equity,3,Growth Equity,USD
+NovaWulf Digital Master Fund L.P.,PRIV CASH 001,Terawulf 1st Lien TL (12/21),,15000000,86.7768984719,13016534.77,4726.03,33082.2,458424.67,Bond,2,Private Credit,USD
+NovaWulf Digital Master Fund L.P.,PRIV CASH 001,USD,,1592079.86,1,1592079.86,0,0,0,Cash,1,Cash,USD
+NovaWulf Digital Master Fund L.P.,PRIV CASH 001,WULF US EQUITY,US88080T1043,182145,8.09,1473553.05,30964.65,-56464.95,-1267729.2,Equity,1,Long / short public securities,USD
