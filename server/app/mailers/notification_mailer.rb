@@ -2,7 +2,7 @@ class NotificationMailer < ApplicationMailer
   def notification
     @subject = params[:subject]
     @text = Array(params[:text])
-    to_address = Rails.env.production? ? 'all@novawulf.io' : 'iamnader@gmail.com'
+    to_address = Rails.env.production? ? 'reports@novawulf.io' : 'nader@novawulf.com'
     mail(to: to_address, subject: @subject)
   end
 
@@ -10,7 +10,7 @@ class NotificationMailer < ApplicationMailer
     @subject = params[:subject]
     @trades = Array(params[:trades])
     @positions = Array(params[:positions])
-    to_address = Rails.env.production? ? 'all@novawulf.io' : 'iamnader@gmail.com'
+    to_address = Rails.env.production? ? 'reports@novawulf.io' : 'nader@novawulf.com'
     mail(to: to_address, subject: @subject)
   end
 end
