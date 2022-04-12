@@ -19,7 +19,7 @@ module Hedgeserv
         translations = []
         rows.each do |row|
           @row = row
-          translations << "• #{fundname} #{trade_type} #{quantity} #{instrument_type} of #{instrument} for #{cost}"
+          translations << "• #{fundname} #{trade_type} #{quantity} #{instrument_type} of #{instrument} at #{trade_price} for a total of #{cost}"
         end
         translations
       end
@@ -60,7 +60,11 @@ module Hedgeserv
     end
 
     def cost
-      ActionController::Base.helpers.number_to_currency row[15].to_f.abs
+      ActionController::Base.helpers.number_to_currency(row[15].to_f.abs)
+    end
+
+    def trade_price
+      ActionController::Base.helpers.number_to_currency(row[12].to_f)
     end
   end
 end
