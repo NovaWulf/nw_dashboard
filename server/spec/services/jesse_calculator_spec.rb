@@ -1,7 +1,7 @@
 RSpec.describe JesseCalculator do
   subject { described_class.run }
 
-  let!(:jesse_yesterday){ Metric.create(token: 'btc', metric: 'jesse', timestamp: Date.yesterday, value: 1.0).value }
+  let!(:jesse_yesterday) { Metric.create(token: 'btc', metric: 'jesse', timestamp: Date.yesterday, value: 1.0).value }
 
   let!(:s2f) { Metric.create(token: 'btc', metric: 's2f_ratio', timestamp: Date.today, value: 1.0).value }
   let!(:hashrate) do
@@ -27,7 +27,7 @@ RSpec.describe JesseCalculator do
   end
 
   it 'persists' do
-    expect {subject }.to change { Metric.count}.by(1)
+    expect { subject }.to change { Metric.count }.by(1)
     m = Metric.last
     expect(m.token).to eql 'btc'
     expect(m.metric).to eql 'jesse'
@@ -37,21 +37,23 @@ RSpec.describe JesseCalculator do
 
   context 'btc price not in range' do
     let!(:btc_price) do
-      Metric.create(token: 'btc', metric: 'price', timestamp: Date.today, value: jesse_intended_price + JesseCalculator::STD_ERROR - 1)
+      Metric.create(token: 'btc', metric: 'price', timestamp: Date.today,
+                    value: jesse_intended_price + JesseCalculator::STD_ERROR - 1)
     end
 
     it 'does not send email' do
-      expect{subject}.to change { ActionMailer::Base.deliveries.count }.by(0)
+      expect { subject }.to change { ActionMailer::Base.deliveries.count }.by(0)
     end
   end
 
-  context 'btc price  in range' do
+  context 'btc price in range' do
     let!(:btc_price) do
-      Metric.create(token: 'btc', metric: 'price', timestamp: Date.today, value: jesse_intended_price + JesseCalculator::STD_ERROR + 1)
+      Metric.create(token: 'btc', metric: 'price', timestamp: Date.today,
+                    value: jesse_intended_price + JesseCalculator::STD_ERROR + 1)
     end
 
-    it 'does not send email' do
-      expect{subject}.to change { ActionMailer::Base.deliveries.count }.by(1)
+    it 'does send email' do
+      expect { subject }.to change { ActionMailer::Base.deliveries.count }.by(1)
     end
   end
 end
