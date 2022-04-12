@@ -5,6 +5,7 @@ module Hedgeserv
     attr_reader :csv_transactions_text, :csv_positions_text, :transaction_row
 
     def run
+      'Running Daily HS Processor'
       fetch_file
 
       trades_text = trade_parser.run(csv_text: csv_transactions_text).value
@@ -24,7 +25,7 @@ module Hedgeserv
 
     def find_file(sftp, lookup_text)
       remote_filename = nil
-      date_string = Date.yesterday.strftime('%Y%m%d')
+      date_string = Date.today.strftime('%Y%m%d')
       sftp.dir.foreach('/Outgoing') do |entry|
         if entry.name.include?(date_string) && entry.name.include?(lookup_text)
           remote_filename = entry.name
