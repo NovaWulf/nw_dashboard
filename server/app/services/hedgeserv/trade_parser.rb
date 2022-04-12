@@ -50,6 +50,8 @@ module Hedgeserv
       case row[9]
       when 'Buy'
         'bought'
+      when 'BuyCover'
+        'closed the short on'
       when 'SellShort'
         'shorted'
       else

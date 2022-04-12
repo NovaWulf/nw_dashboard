@@ -24,7 +24,8 @@ module Hedgeserv
           daily_p_and_l = sum_p_and_l(positions, 7)
           monthly_p_and_l = sum_p_and_l(positions, 8)
           yearly_p_and_l = sum_p_and_l(positions, 9)
-          translations << [strategy, daily_p_and_l, monthly_p_and_l, yearly_p_and_l]
+          str = !strategy || strategy.strip.blank? ? '[Untagged Strategy]' : strategy
+          translations << [str, daily_p_and_l, monthly_p_and_l, yearly_p_and_l]
         end
 
         translations
