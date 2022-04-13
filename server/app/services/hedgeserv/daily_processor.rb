@@ -2,21 +2,24 @@ require 'net/sftp'
 
 module Hedgeserv
   class DailyProcessor < BaseService
-    attr_reader :csv_transactions_text, :csv_positions_text, :transaction_row
+    attr_reader :csv_transactions_text, :csv_positions_text, :transaction_row, :run_date
+
+    def initialize(run_date: Date.today)
+      @run_date = run_date
+    end
 
     def run
-      'Running Daily HS Processor'
-      fetch_file
-
-      trades_text = trade_parser.run(csv_text: csv_transactions_text).value
-      positions_text = positions_parser.run(csv_text: csv_positions_text).value
+      Rails.logger.info 'Running Daily HS Processor'
+      fetch_files
+      trades_text = csv_transactions_text ? trade_parser.run(csv_text: csv_transactions_text).value : nil
+      positions_text = csv_positions_text ? positions_parser.run(csv_text: csv_positions_text).value : nil
 
       email_notification(trades_text, positions_text)
     end
 
     private
 
-    def fetch_file
+    def fetch_files
       Net::SFTP.start(ENV['HS_FTP_SERVER'], ENV['HS_FTP_USER'], password: ENV['HS_FTP_PW']) do |sftp|
         @csv_transactions_text = find_file(sftp, 'Transactions')
         @csv_positions_text = find_file(sftp, 'Positions')
@@ -25,7 +28,7 @@ module Hedgeserv
 
     def find_file(sftp, lookup_text)
       remote_filename = nil
-      date_string = Date.today.strftime('%Y%m%d')
+      date_string = run_date.strftime('%Y%m%d')
       sftp.dir.foreach('/Outgoing') do |entry|
         if entry.name.include?(date_string) && entry.name.include?(lookup_text)
           remote_filename = entry.name
@@ -45,7 +48,7 @@ module Hedgeserv
 
     def email_notification(trade_text, positions_text)
       NotificationMailer.with(subject: 'Daily Trades and P&L',
-                              trades: trade_text, positions: positions_text).daily_trades.deliver_now
+                              trades: trade_text, positions: positions_text, run_date: run_date).daily_trades.deliver_now
     end
 
     def trade_parser

@@ -7,40 +7,68 @@
   </tr>
 	<tr>
 		<td class="content-block">
-			<h4>Today's Trades</h4>
+			<h4>Trades from <%= @run_date.strftime('%a, %b %-d') %></h4>
 		</td>
   </tr>
 
-  <% @trades.map do |text_line| %>
-    <tr>
-		  <td class="content-block">
-        <%= text_line %>
-		  </td>
-    </tr>
-  <% end %>	
+	<% if @trades.present? %>
+		<% @trades.map do |text_line| %>
+			<tr>
+				<td class="content-block">
+					<%= text_line %>
+				</td>
+			</tr>
+		<% end %>	
+	<% else %>
+		<tr>
+			<td class="content-block">No trades data was available for this day.</td>
+  	</tr>
+	<% end %>
+
 	<tr>
 		<td class="content-block">
 			<h4>NovaWulf P&L by Strategy</h4>
 		</td>
   </tr>
-	<table width="100%" cellpadding="0" cellspacing="0">
-		<tr>
-			<td class="content-block"><b>Strategy</b></td>
-			<td class="content-block"><b>Daily P&L</b></td>
-			<td class="content-block"><b>MTD P&L</b></td>
-			<td class="content-block"><b>YTD P&L</b></td>
-		</tr>
+	<tr>
+		<td class="content-block">
+			<% if @positions.present? %>
+				<table width="100%" cellpadding="0" cellspacing="0" >
+					<tr >
+						<td class="content-block" ><u><b>Strategy</b></u></td>
+						<td class="content-block"><u><b>Daily P&L</b></u></td>
+						<td class="content-block"><u><b>MTD P&L</b></u></td>
+						<td class="content-block"><u><b>YTD P&L</b></u></td>
+					</tr>
+					<% first = true %>
+					<% @positions.map do |position| %>
+						<% if first %>
+							<tr style='font-weight:bold'>
+							<% first = false%>
+						<% else %>
+							<tr>
+						<% end %>					
+							<% position.map do |cell| %>
+								<% if first %>
+									<td class="content-block">
+										<b><%= cell %></b>
+									</td>
+									<% first = false%>
+								<% else %>
+									<td class="content-block">
+										<%= cell %>
+									</td>
+								<% end %>
+							<% end %>	
+						</tr>
+					<% end %>	
+				</table>
+			<% else %>
+				No positions data was available for this day.
+			<% end %>
+		</td>
+  </tr>
 
-		<% @positions.map do |position| %>
-			<tr>
-				<% position.map do |cell| %>
-					<td class="content-block">
-						<%= cell %>
-					</td>
-				<% end %>	
-			</tr>
-		<% end %>	
-	</table>
 	<tr>
 		<td class="content-block">
 			Thanks,<br/>NovaWulf Dashboard

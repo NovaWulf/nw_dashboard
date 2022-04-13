@@ -4,7 +4,7 @@ RSpec.describe Hedgeserv::TradeParser do
   let(:result) { subject.value }
 
   context 'file with transactions' do
-    let(:filename) { 'NWDM_NovawulfTransactions_for_20220325-20220325_run_20220330_at_175321.csv' }
+    let(:filename) { 'sample_trades.csv' }
     it 'returns translated rows' do
       expect(result).to be_an_instance_of(Array)
       expect(result.count).to eql 4 # 4 trades no header
@@ -24,7 +24,7 @@ RSpec.describe Hedgeserv::TradeParser do
   end
 
   context 'empty file' do
-    let(:filename) { 'NWDM_NovawulfTransactions_empty.csv' }
+    let(:filename) { 'sample_trades_empty.csv' }
 
     it 'only returns a header' do
       expect(result).to be_an_instance_of(Array)

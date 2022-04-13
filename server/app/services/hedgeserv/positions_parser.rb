@@ -13,7 +13,7 @@ module Hedgeserv
         ['There are no positions reported.']
       else
         summary = rows.shift # skip the summary
-        translations = [['**Total**', sum_p_and_l([summary], 7), sum_p_and_l([summary], 8), sum_p_and_l([summary], 9)]]
+        translations = [['Total', sum_p_and_l([summary], 7), sum_p_and_l([summary], 8), sum_p_and_l([summary], 9)]]
 
         Rails.logger.info "Found #{rows.count} positions"
 

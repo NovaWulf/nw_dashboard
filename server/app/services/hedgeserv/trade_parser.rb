@@ -39,6 +39,10 @@ module Hedgeserv
         'shares'
       when 'Option'
         'options'
+      when 'Physical'
+        'tokens'
+      else
+        row[3]
       end
     end
 

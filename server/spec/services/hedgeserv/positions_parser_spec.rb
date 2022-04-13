@@ -4,7 +4,7 @@ RSpec.describe Hedgeserv::PositionsParser do
   let(:result) { subject.value }
 
   context 'file with transactions' do
-    let(:filename) { 'NWDM_Positions.csv' }
+    let(:filename) { 'sample_positions.csv' }
     it 'returns grouped by Strategy' do
       expect(result).to be_an_instance_of(Array)
       expect(result.count).to eql 5 # 4 strategies and totals
