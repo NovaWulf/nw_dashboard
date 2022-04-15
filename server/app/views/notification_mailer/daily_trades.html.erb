@@ -7,7 +7,12 @@
   </tr>
 	<tr>
 		<td class="content-block">
-			<h4>Trades from <%= @run_date.strftime('%a, %b %-d') %></h4>
+			Here are the trades and positions on <%= @run_date.strftime('%A, %b %-d') %>
+		</td>
+  </tr>
+	<tr>
+		<td class="content-block">
+			<h3>Trades</h3>
 		</td>
   </tr>
 
@@ -27,9 +32,10 @@
 
 	<tr>
 		<td class="content-block">
-			<h4>NovaWulf P&L by Strategy</h4>
+			<h3>P&L by Strategy</h3>
 		</td>
   </tr>
+	
 	<tr>
 		<td class="content-block">
 			<% if @positions.present? %>

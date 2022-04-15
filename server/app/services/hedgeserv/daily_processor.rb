@@ -30,7 +30,7 @@ module Hedgeserv
       remote_filename = nil
       date_string = run_date.strftime('%Y%m%d')
       sftp.dir.foreach('/Outgoing') do |entry|
-        if entry.name.include?(date_string) && entry.name.include?(lookup_text)
+        if entry.name.include?("for_#{date_string}") && entry.name.include?(lookup_text)
           remote_filename = entry.name
           Rails.logger.info "Found file: #{remote_filename}"
           break
