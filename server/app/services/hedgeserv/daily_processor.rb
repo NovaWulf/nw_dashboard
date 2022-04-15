@@ -28,21 +28,38 @@ module Hedgeserv
 
     def find_file(sftp, lookup_text)
       remote_filename = nil
+      file_date_time = nil
       date_string = run_date.strftime('%Y%m%d')
       sftp.dir.foreach('/Outgoing') do |entry|
         if entry.name.include?("for_#{date_string}") && entry.name.include?(lookup_text)
-          remote_filename = entry.name
-          Rails.logger.info "Found file: #{remote_filename}"
-          break
+          temp_filename = entry.name
+          m = /.*_run_(.*)_at_(.*).csv/.match(temp_filename)
+
+          if m.captures.length != 2
+            Rails.logger.error "Could not regex match #{temp_filename}"
+            next
+          end
+
+          temp_date_time = DateTime.parse("#{m.captures[0]}T#{m.captures[1]}")
+
+          if !remote_filename
+            remote_filename = temp_filename
+            file_date_time = temp_date_time
+          elsif temp_date_time > file_date_time
+            remote_filename = temp_filename
+            file_date_time = temp_date_time
+          end
         end
       end
+      Rails.logger.info "Found file: #{remote_filename}"
 
-      if remote_filename
-        sftp.file.open("Outgoing/#{remote_filename}", 'r') do |f|
-          text = f.read
-          puts text
-          text
-        end
+      unless remote_filename
+        Rails.logger.error "Could not file a file for #{lookup_text}"
+        return
+      end
+
+      sftp.file.open("Outgoing/#{remote_filename}", 'r') do |f|
+        f.read
       end
     end
 
