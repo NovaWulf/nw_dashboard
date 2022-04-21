@@ -38,13 +38,12 @@ Rails.application.configure do
 
   config.action_mailer.perform_caching = false
   config.action_mailer.smtp_settings = {
-    user_name: 'apikey', # This is the string literal 'apikey', NOT the ID of your API key
-    password: ENV['SENDGRID_API_KEY'], # This is the secret sendgrid API key which was issued during API key creation
-    domain: 'novawulf.io',
-    address: 'smtp.sendgrid.net',
+    user_name: ENV['SMTP_USER'],
+    password: ENV['SMTP_PW'],
+    address: 'smtp.office365.com',
     port: 587,
-    authentication: :plain,
-    enable_starttls_auto: true
+    enable_starttls_auto: true,
+    authentication: :login
   }
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log

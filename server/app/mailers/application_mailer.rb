@@ -1,4 +1,4 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: 'NovaWulf Dashboard <dashboard@novawulf.io>'
+  default from: 'NovaWulf Dashboard <reports@novawulf.io>'
   layout 'mailer'
 end
