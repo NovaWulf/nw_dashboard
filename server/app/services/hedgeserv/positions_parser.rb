@@ -33,7 +33,9 @@ module Hedgeserv
 
     def sum_p_and_l(positions, column)
       amount = positions.map { |p| p[column].sub(',', '').to_f }.sum(0.0).to_i
-      ActionController::Base.helpers.number_to_currency(amount, precision: 0)
+      amount /= 1000
+      ActionController::Base.helpers.number_to_currency(amount, precision: 0, format: '%u%n',
+                                                                negative_format: '(%u%n)')
     end
   end
 end

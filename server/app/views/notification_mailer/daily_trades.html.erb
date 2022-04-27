@@ -33,6 +33,7 @@
 	<tr>
 		<td class="content-block">
 			<h3>P&L by Strategy</h3>
+			<i>All values in thousands</i>
 		</td>
   </tr>
 	
@@ -55,13 +56,21 @@
 							<tr>
 						<% end %>					
 							<% position.map do |cell| %>
+								<% 
+								td_class = "content-block"
+									negative = cell.starts_with?("(")
+									if negative
+										td_class = "content-block negative"				
+									end
+								%>
+
 								<% if first %>
 									<td class="content-block">
 										<b><%= cell %></b>
 									</td>
 									<% first = false%>
 								<% else %>
-									<td class="content-block">
+									<td class="<%= td_class %>">
 										<%= cell %>
 									</td>
 								<% end %>

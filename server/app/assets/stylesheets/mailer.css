@@ -179,6 +179,10 @@
   .first {
     margin-top: 0;
   }
+
+  .negative {
+    color: #d0021b;
+  }
   
   .aligncenter {
     text-align: center;
