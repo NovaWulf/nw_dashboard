@@ -12,15 +12,15 @@ RSpec.describe Hedgeserv::PositionsParser do
 
     it 'shows total' do
       expect(result[0][0]).to include 'Total'
-      expect(result[0][3]).to include '-$798,489'
+      expect(result[0][3]).to include '($799)'
     end
 
     it 'groups data' do
       expect(result[1][0]).to include 'Liquid digital assets'
-      expect(result[1][3]).to include '$44,890'
+      expect(result[1][3]).to include '$44'
 
       expect(result[2][0]).to include 'Long / short'
-      expect(result[2][1]).to include '$28,975'
+      expect(result[2][1]).to include '$28'
     end
   end
 end
