@@ -6,16 +6,11 @@ import {
   Legend,
   ResponsiveContainer,
   Tooltip,
-  XAxis,
   YAxis,
 } from 'recharts';
-import {
-  dateFormatter,
-  epochFormatter,
-  nFormatter,
-  percentFormatter,
-} from '../lib/formatters';
+import { dateFormatter, percentFormatter } from '../lib/formatters';
 import DashboardItem from './DashboardItem';
+import TimeAxis from './TimeAxis';
 
 export default function McapDominanceChart({ mcapDominance }) {
   const theme = useTheme();
@@ -38,13 +33,8 @@ export default function McapDominanceChart({ mcapDominance }) {
           />
 
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-          <XAxis
-            dataKey="ts"
-            domain={['dataMin', 'dataMax']}
-            type="number"
-            scale="time"
-            tickFormatter={epochFormatter}
-          />
+          {TimeAxis()}
+
           <YAxis
             tickFormatter={percentFormatter}
             stroke={theme.palette.secondary.main}

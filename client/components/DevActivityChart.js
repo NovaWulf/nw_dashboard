@@ -4,20 +4,14 @@ import {
   ComposedChart,
   Legend,
   Line,
-  LineChart,
   ResponsiveContainer,
   Tooltip,
-  XAxis,
   YAxis,
 } from 'recharts';
-import {
-  dateFormatter,
-  epochFormatter,
-  nFormatter,
-  mergeTimestamps,
-} from '../lib/formatters';
+import { dateFormatter, mergeTimestamps, nFormatter } from '../lib/formatters';
 import DashboardItem from './DashboardItem';
 import PriceArea from './PriceArea';
+import TimeAxis from './TimeAxis';
 
 export default function DevActivityChart({
   devActivity,
@@ -53,13 +47,7 @@ export default function DevActivityChart({
           })}
 
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-          <XAxis
-            dataKey="ts"
-            domain={['dataMin', 'dataMax']}
-            type="number"
-            scale="time"
-            tickFormatter={epochFormatter}
-          />
+          {TimeAxis()}
           <YAxis
             yAxisId="dev"
             tickFormatter={nFormatter}

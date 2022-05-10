@@ -1,27 +1,23 @@
-import {
-  LineChart,
-  Line,
-  Area,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  ComposedChart,
-  Legend,
-  ReferenceLine,
-} from 'recharts';
-import dayjs from 'dayjs';
-import DashboardItem from './DashboardItem';
 import { useTheme } from '@mui/material';
 import {
-  nFormatter,
-  mvrvFormatter,
-  epochFormatter,
+  CartesianGrid,
+  ComposedChart,
+  Legend,
+  Line,
+  ReferenceLine,
+  ResponsiveContainer,
+  Tooltip,
+  YAxis,
+} from 'recharts';
+import {
   dateFormatter,
   mergeTimestamps,
+  mvrvFormatter,
+  nFormatter,
 } from '../lib/formatters';
+import DashboardItem from './DashboardItem';
 import PriceArea from './PriceArea';
+import TimeAxis from './TimeAxis';
 
 export default function MvrvChart({ mvrv, btc }) {
   const theme = useTheme();
@@ -68,13 +64,8 @@ export default function MvrvChart({ mvrv, btc }) {
           />
           {PriceArea({ token: 'btc' })}
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-          <XAxis
-            dataKey="ts"
-            domain={['dataMin', 'dataMax']}
-            type="number"
-            scale="time"
-            tickFormatter={epochFormatter}
-          />
+          {TimeAxis()}
+
           <YAxis yAxisId="mvrv" stroke={theme.palette.secondary.main} />
           <YAxis
             yAxisId="btc"

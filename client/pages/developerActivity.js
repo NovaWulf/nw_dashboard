@@ -3,16 +3,14 @@ import Container from '@mui/material/Container';
 import * as React from 'react';
 import ActivityCharts from '../components/ActivityCharts';
 import ClientOnly from '../components/ClientOnly';
-import Layout from '../components/Layout';
+import Layout from '../components/layouts/Layout';
 
 const DeveloperActivity = () => {
   return (
     <Layout>
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <ClientOnly>
-          <ActivityCharts />
-        </ClientOnly>
-      </Container>
+      <ClientOnly>
+        <ActivityCharts />
+      </ClientOnly>
     </Layout>
   );
 };

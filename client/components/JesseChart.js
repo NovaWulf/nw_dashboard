@@ -1,23 +1,16 @@
-import {
-  LineChart,
-  Line,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-  ReferenceLine,
-} from 'recharts';
-import dayjs from 'dayjs';
-import DashboardItem from './DashboardItem';
 import { useTheme } from '@mui/material';
 import {
-  nFormatter,
-  epochFormatter,
-  dateFormatter,
-  mergeTimestamps,
-} from '../lib/formatters';
+  CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  YAxis,
+} from 'recharts';
+import { dateFormatter, mergeTimestamps, nFormatter } from '../lib/formatters';
+import DashboardItem from './DashboardItem';
+import TimeAxis from './TimeAxis';
 
 export default function JesseChart({ jesse, btc }) {
   const theme = useTheme();
@@ -70,13 +63,8 @@ export default function JesseChart({ jesse, btc }) {
             dot={false}
           />
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-          <XAxis
-            dataKey="ts"
-            domain={['dataMin', 'dataMax']}
-            type="number"
-            scale="time"
-            tickFormatter={epochFormatter}
-          />
+          {TimeAxis()}
+
           <YAxis
             yAxisId="btc"
             orientation="left"

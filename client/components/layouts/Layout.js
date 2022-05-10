@@ -5,6 +5,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import {
   Button,
   CircularProgress,
+  Container,
   Divider,
   Drawer,
   IconButton,
@@ -21,14 +22,14 @@ import Typography from '@mui/material/Typography';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import * as React from 'react';
-import logo from '../images/nw_logo.png';
-import Copyright from '../src/Copyright';
-import Link from '../src/Link';
-import { AvalancheIcon } from './icons/AvalancheIcon';
-import { EthereumIcon } from './icons/EthereumIcon';
-import { NearIcon } from './icons/NearIcon';
-import { SolanaIcon } from './icons/SolanaIcon';
-import { TerraIcon } from './icons/TerraIcon';
+import logo from 'images/nw_logo.png';
+import Copyright from 'src/Copyright';
+import Link from 'src/Link';
+import { AvalancheIcon } from 'components/icons/AvalancheIcon';
+import { EthereumIcon } from 'components/icons/EthereumIcon';
+import { NearIcon } from 'components/icons/NearIcon';
+import { SolanaIcon } from 'components/icons/SolanaIcon';
+import { TerraIcon } from 'components/icons/TerraIcon';
 
 const drawerWidth = 200;
 
@@ -201,7 +202,9 @@ export default function Layout({ children }) {
         }}
       >
         <Toolbar />
-        {children}
+        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+          {children}
+        </Container>
         <Copyright sx={{ pt: 4 }} />
       </Box>
     </Box>

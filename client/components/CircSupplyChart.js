@@ -11,6 +11,7 @@ import {
 } from 'recharts';
 import { dateFormatter, epochFormatter, nFormatter } from '../lib/formatters';
 import DashboardItem from './DashboardItem';
+import TimeAxis from './TimeAxis';
 
 export default function CircSupplyChart({ circSupply }) {
   const theme = useTheme();
@@ -30,13 +31,8 @@ export default function CircSupplyChart({ circSupply }) {
           />
 
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-          <XAxis
-            dataKey="ts"
-            domain={['dataMin', 'dataMax']}
-            type="number"
-            scale="time"
-            tickFormatter={epochFormatter}
-          />
+          {TimeAxis()}
+
           <YAxis
             tickFormatter={nFormatter}
             stroke={theme.palette.secondary.main}

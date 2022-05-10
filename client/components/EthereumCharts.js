@@ -5,6 +5,7 @@ import * as React from 'react';
 import ActiveAddressesChart from './ActiveAddressesChart';
 import CircSupplyChart from './CircSupplyChart';
 import DevActivityChart from './DevActivityChart';
+import GithubCommitChart from './GithubCommitChart';
 import McapDominanceChart from './McapDominanceChart';
 import VolumeChart from './VolumeChart';
 
@@ -87,7 +88,7 @@ export default function EthereumCharts() {
       </LoadingGridItem>
 
       <LoadingGridItem loading={loading}>
-        <DevActivityChart
+        <GithubCommitChart
           devActivity={devActivity}
           price={tokenPrice}
           tokenName="ETH"

@@ -6,17 +6,12 @@ import {
   Line,
   ResponsiveContainer,
   Tooltip,
-  XAxis,
   YAxis,
 } from 'recharts';
-import {
-  dateFormatter,
-  epochFormatter,
-  mergeTimestamps,
-  nFormatter,
-} from '../lib/formatters';
-import PriceArea from './PriceArea';
+import { dateFormatter, mergeTimestamps, nFormatter } from '../lib/formatters';
 import DashboardItem from './DashboardItem';
+import PriceArea from './PriceArea';
+import TimeAxis from './TimeAxis';
 
 export default function ActiveAddressesChart({
   activeAddresses,
@@ -44,13 +39,8 @@ export default function ActiveAddressesChart({
           />
           {PriceArea({ token: token, name: `${token.toUpperCase()} Price` })}
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-          <XAxis
-            dataKey="ts"
-            domain={['dataMin', 'dataMax']}
-            type="number"
-            scale="time"
-            tickFormatter={epochFormatter}
-          />
+          {TimeAxis()}
+
           <YAxis
             yAxisId="aa"
             tickFormatter={nFormatter}

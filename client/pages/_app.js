@@ -9,6 +9,7 @@ import createEmotionCache from '../src/createEmotionCache';
 import { UserProvider } from '@auth0/nextjs-auth0';
 import { ApolloProvider } from '@apollo/client';
 import client from '../apollo-client';
+import { TimespanProvider } from 'components/timespan/TimespanContext';
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -26,7 +27,9 @@ export default function MyApp(props) {
         <CssBaseline />
         <UserProvider>
           <ApolloProvider client={client}>
-            <Component {...pageProps} />
+            <TimespanProvider value="5y">
+              <Component {...pageProps} />
+            </TimespanProvider>
           </ApolloProvider>
         </UserProvider>
       </ThemeProvider>
