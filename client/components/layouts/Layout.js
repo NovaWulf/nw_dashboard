@@ -30,6 +30,7 @@ import { EthereumIcon } from 'components/icons/EthereumIcon';
 import { NearIcon } from 'components/icons/NearIcon';
 import { SolanaIcon } from 'components/icons/SolanaIcon';
 import { TerraIcon } from 'components/icons/TerraIcon';
+import { CardanoIcon } from 'components/icons/CardanoIcon';
 
 const drawerWidth = 200;
 
@@ -103,6 +104,18 @@ export default function Layout({ children }) {
               <TerraIcon />
             </ListItemIcon>
             <ListItemText primary="Terra" />
+          </ListItem>
+        </Link>
+        <Link href="/cardano">
+          <ListItem
+            button
+            selected={router.pathname == '/cardano'}
+            key="Cardano"
+          >
+            <ListItemIcon>
+              <CardanoIcon />
+            </ListItemIcon>
+            <ListItemText primary="Cardano" />
           </ListItem>
         </Link>
       </List>
