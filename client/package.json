@@ -23,6 +23,7 @@
     "next": "latest",
     "prop-types": "latest",
     "react": "latest",
+    "react-csv": "^2.2.2",
     "react-dom": "latest",
     "recharts": "^2.1.8",
     "trendline": "^0.3.1"

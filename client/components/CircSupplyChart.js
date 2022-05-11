@@ -12,12 +12,18 @@ import {
 import { dateFormatter, epochFormatter, nFormatter } from '../lib/formatters';
 import DashboardItem from './DashboardItem';
 import TimeAxis from './TimeAxis';
+import CsvDownloadLink from './CsvDownloadLink';
 
 export default function CircSupplyChart({ circSupply }) {
   const theme = useTheme();
 
   return (
-    <DashboardItem title={`Circulating Supply`}>
+    <DashboardItem
+      title={`Circulating Supply`}
+      downloadButton={
+        <CsvDownloadLink data={circSupply} title="Circulating Supply" />
+      }
+    >
       <ResponsiveContainer width="99%" height={300}>
         <AreaChart
           data={circSupply}

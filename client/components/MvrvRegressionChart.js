@@ -11,6 +11,7 @@ import {
 import { nFormatter } from '../lib/formatters';
 import { linearRegression } from '../lib/regression';
 import DashboardItem from './DashboardItem';
+import CsvDownloadLink from './CsvDownloadLink';
 
 export default function MvrvRegressionChart({ mvrv, btc }) {
   const theme = useTheme();

@@ -11,6 +11,7 @@ import {
 import { dateFormatter, mergeTimestamps, nFormatter } from '../lib/formatters';
 import DashboardItem from './DashboardItem';
 import TimeAxis from './TimeAxis';
+import CsvDownloadLink from './CsvDownloadLink';
 
 export default function JesseChart({ jesse, btc }) {
   const theme = useTheme();
@@ -22,7 +23,7 @@ export default function JesseChart({ jesse, btc }) {
   const updatedData = data.map(d => {
     return {
       ts: d.ts,
-      btc: d.btc,
+      v: d.btc,
       jesseLow: d.v - STD_ERROR,
       jesseHigh: d.v + STD_ERROR,
     };
@@ -32,6 +33,9 @@ export default function JesseChart({ jesse, btc }) {
     <DashboardItem
       title="Jesse's Indicator"
       helpText="Jesse's Indicator looks at a regression of Stock To Flow Ratio, Hashrate, Metcalfe's Law and Google Trends for Bitcoin"
+      downloadButton={
+        <CsvDownloadLink data={updatedData} title="Jesse Indicator" />
+      }
     >
       <ResponsiveContainer width="99%" height={300}>
         <LineChart
@@ -56,7 +60,7 @@ export default function JesseChart({ jesse, btc }) {
           />
           <Line
             type="monotone"
-            dataKey="btc"
+            dataKey="v"
             name="BTC Price"
             stroke={theme.palette.secondary.secondary}
             yAxisId="btc"

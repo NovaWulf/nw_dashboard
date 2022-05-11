@@ -9,6 +9,7 @@ import {
   YAxis,
 } from 'recharts';
 import { dateFormatter, mergeTimestamps, nFormatter } from '../lib/formatters';
+import CsvDownloadLink from './CsvDownloadLink';
 import DashboardItem from './DashboardItem';
 import PriceArea from './PriceArea';
 import TimeAxis from './TimeAxis';
@@ -23,7 +24,16 @@ export default function ActiveAddressesChart({
   const data = mergeTimestamps(activeAddresses, price, token);
 
   return (
-    <DashboardItem title="Active Addresses" helpText="Weekly Active Addresses">
+    <DashboardItem
+      title="Active Addresses"
+      helpText="Weekly Active Addresses"
+      downloadButton={
+        <CsvDownloadLink
+          data={activeAddresses}
+          title="Daily Active Addresses"
+        />
+      }
+    >
       <ResponsiveContainer width="99%" height={300}>
         <ComposedChart
           data={data}

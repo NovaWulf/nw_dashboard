@@ -12,6 +12,7 @@ import { dateFormatter, mergeTimestamps, nFormatter } from '../lib/formatters';
 import DashboardItem from './DashboardItem';
 import PriceArea from './PriceArea';
 import TimeAxis from './TimeAxis';
+import CsvDownloadLink from './CsvDownloadLink';
 
 export default function VolumeChart({ volume, price, token }) {
   const theme = useTheme();
@@ -22,6 +23,7 @@ export default function VolumeChart({ volume, price, token }) {
     <DashboardItem
       title="Volume"
       helpText="Real Volume, eg exchange volume minus wash trades"
+      downloadButton={<CsvDownloadLink data={volume} title="Volume Dollars" />}
     >
       <ResponsiveContainer width="99%" height={300}>
         <ComposedChart

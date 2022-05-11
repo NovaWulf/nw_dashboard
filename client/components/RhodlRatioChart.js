@@ -18,6 +18,7 @@ import {
 } from '../lib/formatters';
 import DashboardItem from './DashboardItem';
 import PriceArea from './PriceArea';
+import CsvDownloadLink from './CsvDownloadLink';
 
 export default function RhodlRatioChart({ rhodlRatio, btc }) {
   const theme = useTheme();
@@ -33,6 +34,7 @@ export default function RhodlRatioChart({ rhodlRatio, btc }) {
     <DashboardItem
       title="RHODL Ratio"
       helpText="The RHODL Ratio takes the ratio between the 1 week and the 1-2 years RCap HODL bands. In addition, it accounts for increased supply by weighting the ratio by the total market age. A high ratio is an indication of an overheated market and can be used to time cycle tops."
+      downloadButton={<CsvDownloadLink data={rhodlRatio} title="Rhodl Ratio" />}
     >
       <ResponsiveContainer width="99%" height={300}>
         <ComposedChart

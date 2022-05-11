@@ -12,6 +12,7 @@ import { dateFormatter, mergeTimestamps, nFormatter } from '../lib/formatters';
 import DashboardItem from './DashboardItem';
 import PriceArea from './PriceArea';
 import TimeAxis from './TimeAxis';
+import CsvDownloadLink from './CsvDownloadLink';
 
 export default function MetcalfeChart({ activeAddresses, btcMarketCap }) {
   const theme = useTheme();
@@ -27,6 +28,12 @@ export default function MetcalfeChart({ activeAddresses, btcMarketCap }) {
     <DashboardItem
       title="Metcalfe's Law"
       helpText="Weekly Active Addresses Squared"
+      downloadButton={
+        <CsvDownloadLink
+          data={activeAddressesSquared}
+          title="Active Addresses Squared"
+        />
+      }
     >
       <ResponsiveContainer width="99%" height={300}>
         <ComposedChart

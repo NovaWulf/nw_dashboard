@@ -11,6 +11,7 @@ import {
 import { dateFormatter, percentFormatter } from '../lib/formatters';
 import DashboardItem from './DashboardItem';
 import TimeAxis from './TimeAxis';
+import CsvDownloadLink from './CsvDownloadLink';
 
 export default function McapDominanceChart({ mcapDominance }) {
   const theme = useTheme();
@@ -19,6 +20,9 @@ export default function McapDominanceChart({ mcapDominance }) {
     <DashboardItem
       title="Market Cap Dominance"
       helpText="The asset's percentage share of total crypto circulating marketcap"
+      downloadButton={
+        <CsvDownloadLink data={mcapDominance} title="Market Cap Dominance" />
+      }
     >
       <ResponsiveContainer width="99%" height={300}>
         <AreaChart

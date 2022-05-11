@@ -12,6 +12,7 @@ import { dateFormatter, mergeTimestamps, nFormatter } from '../lib/formatters';
 import DashboardItem from './DashboardItem';
 import PriceArea from './PriceArea';
 import TimeAxis from './TimeAxis';
+import CsvDownloadLink from './CsvDownloadLink';
 
 export default function DevActivityChart({
   devActivity,
@@ -27,6 +28,9 @@ export default function DevActivityChart({
     <DashboardItem
       title={`Dev Activity - ${chainName} Org`}
       helpText="Dev Activity includes commits, but also comments, follows, issue creation, etc"
+      downloadButton={
+        <CsvDownloadLink data={devActivity} title="Dev Activity" />
+      }
     >
       <ResponsiveContainer width="99%" height={300}>
         <ComposedChart

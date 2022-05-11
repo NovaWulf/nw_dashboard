@@ -12,6 +12,7 @@ import { dateFormatter, mergeTimestamps, nFormatter } from '../lib/formatters';
 import DashboardItem from './DashboardItem';
 import PriceArea from './PriceArea';
 import TimeAxis from './TimeAxis';
+import CsvDownloadLink from './CsvDownloadLink';
 
 export default function GithubCommitChart({
   devActivity,
@@ -27,6 +28,9 @@ export default function GithubCommitChart({
     <DashboardItem
       title={`Github Commits - ${chainName} Ecosystem`}
       helpText="This chart is showing commits across projects in the ecosystem as tracked by Electric Capital"
+      downloadButton={
+        <CsvDownloadLink data={devActivity} title="Github Commits" />
+      }
     >
       <ResponsiveContainer width="99%" height={300}>
         <ComposedChart

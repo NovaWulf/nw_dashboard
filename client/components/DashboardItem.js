@@ -9,7 +9,13 @@ import {
 } from '@mui/material';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
-const DashboardItem = ({ children, title, subtitle, helpText }) => (
+const DashboardItem = ({
+  children,
+  title,
+  subtitle,
+  helpText,
+  downloadButton,
+}) => (
   <Card
     style={{
       display: 'flex',
@@ -28,7 +34,12 @@ const DashboardItem = ({ children, title, subtitle, helpText }) => (
         }}
       >
         {title && (
-          <Typography component="h2" variant="h6" color="primary">
+          <Typography
+            component="h2"
+            variant="h6"
+            color="primary"
+            style={{ marginLeft: '2em' }}
+          >
             {title}
           </Typography>
         )}
@@ -38,6 +49,11 @@ const DashboardItem = ({ children, title, subtitle, helpText }) => (
               <HelpOutlineIcon />
             </IconButton>
           </Tooltip>
+        )}
+        {downloadButton && (
+          <Box style={{ marginLeft: 'auto', marginRight: '3em' }}>
+            {downloadButton}
+          </Box>
         )}
       </Box>
 
