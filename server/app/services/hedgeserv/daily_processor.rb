@@ -14,7 +14,7 @@ module Hedgeserv
       trades_text = csv_transactions_text ? trade_parser.run(csv_text: csv_transactions_text).value : nil
       positions_text = csv_positions_text ? positions_parser.run(csv_text: csv_positions_text).value : nil
 
-      return if trade_text.blank? && positions_text.blank?
+      return if trades_text.blank? && positions_text.blank?
 
       email_notification(trades_text, positions_text)
     end
