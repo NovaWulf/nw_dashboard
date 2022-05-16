@@ -14,6 +14,7 @@ task get_recent_data: :environment do
   RhodlFetcher.run
   MvrvCalculator.run
   JesseCalculator.run
+  SolanaActiveAddressesFetcher.run
 end
 
 task backfill_github_data: :environment do

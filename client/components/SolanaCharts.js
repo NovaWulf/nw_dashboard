@@ -70,13 +70,13 @@ export default function SolanaCharts() {
 
   return (
     <Grid container spacing={3}>
-      {/* <LoadingGridItem loading={loading}>
+      <LoadingGridItem loading={loading}>
         <ActiveAddressesChart
           activeAddresses={activeAddresses}
           price={tokenPrice}
           token="sol"
         />
-      </LoadingGridItem> */}
+      </LoadingGridItem>
       <LoadingGridItem loading={loading}>
         <VolumeChart volume={volume} price={tokenPrice} token="sol" />
       </LoadingGridItem>

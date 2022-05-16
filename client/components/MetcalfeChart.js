@@ -27,7 +27,7 @@ export default function MetcalfeChart({ activeAddresses, btcMarketCap }) {
   return (
     <DashboardItem
       title="Metcalfe's Law"
-      helpText="Weekly Active Addresses Squared"
+      helpText="Daily Active Addresses Squared"
       downloadButton={
         <CsvDownloadLink
           data={activeAddressesSquared}
@@ -43,7 +43,7 @@ export default function MetcalfeChart({ activeAddresses, btcMarketCap }) {
           <Line
             type="monotone"
             dataKey="v"
-            name="Weekly Active Addresses Squared"
+            name="Daily Active Addresses Squared"
             stroke={theme.palette.secondary.main}
             dot={false}
             yAxisId="aa"

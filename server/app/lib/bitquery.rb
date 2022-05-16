@@ -39,6 +39,36 @@ class Bitquery
     response.dig('data', repo, 'smartContractCalls')
   end
 
+  def active_solana_addresses(start_day:)
+    start_day ||= Date.new(2021, 1, 1)
+    end_day = start_day.at_end_of_month
+    query = '
+     query($startDay: ISO8601DateTime, $endDay: ISO8601DateTime) {
+    solana(network: solana) {
+      transfers(
+        date: {since: $startDay, till: $endDay}
+        transferType: {notIn: vote}
+      ) {
+        date {
+          date
+        }
+        count(uniq: sender_address)
+      }
+    }
+  }
+    '
+
+    body = {
+      query: query,
+      variables: {
+        "startDay": start_day.to_date.to_s,
+        "endDay": end_day.to_date.to_s
+      }
+    }.to_json
+    response = run_query(body)
+    response.dig('data', 'solana', 'transfers')
+  end
+
   private
 
   def run_query(body)

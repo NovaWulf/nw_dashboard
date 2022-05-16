@@ -26,7 +26,7 @@ export default function ActiveAddressesChart({
   return (
     <DashboardItem
       title="Active Addresses"
-      helpText="Weekly Active Addresses"
+      helpText="Daily Active Addresses"
       downloadButton={
         <CsvDownloadLink
           data={activeAddresses}
