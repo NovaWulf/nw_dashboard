@@ -4,6 +4,7 @@ task get_recent_data: :environment do
     EcosystemRepoFetcher.run(token: t)
     PriceDataFetcher.run(token: t)
     ActiveAddressesFetcher.run(token: t)
+    TransactionCountFetcher.run(token: t)
     VolumeFetcher.run(token: t)
     DevActivityFetcher.run(token: t)
     CirculatingSupplyFetcher.run(token: t)
@@ -15,6 +16,7 @@ task get_recent_data: :environment do
   MvrvCalculator.run
   JesseCalculator.run
   SolanaActiveAddressesFetcher.run
+  SolanaTransactionCountFetcher.run
 end
 
 task backfill_github_data: :environment do

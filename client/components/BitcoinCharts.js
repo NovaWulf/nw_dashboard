@@ -15,6 +15,7 @@ import GithubCommitChart from './GithubCommitChart';
 import CircMcapChart from './CircSupplyChart';
 import CircSupplyChart from './CircSupplyChart';
 import McapDominanceChart from './McapDominanceChart';
+import TransactionCountChart from './TransactionCountChart';
 
 const QUERY = gql`
   query Metrics {
@@ -31,6 +32,10 @@ const QUERY = gql`
       v
     }
     btcActiveAddresses: activeAddresses(token: "btc") {
+      ts
+      v
+    }
+    transactionCount(token: "btc") {
       ts
       v
     }
@@ -93,6 +98,7 @@ export default function BitcoinCharts() {
     santimentDevActivity,
     circSupply,
     mcapDominance,
+    transactionCount,
   } = data || {};
 
   return (
@@ -113,6 +119,13 @@ export default function BitcoinCharts() {
       <LoadingGridItem loading={loading}>
         <ActiveAddressesChart
           activeAddresses={btcActiveAddresses}
+          price={btcPrice}
+          token="btc"
+        />
+      </LoadingGridItem>
+      <LoadingGridItem loading={loading}>
+        <TransactionCountChart
+          transactionCount={transactionCount}
           price={btcPrice}
           token="btc"
         />
