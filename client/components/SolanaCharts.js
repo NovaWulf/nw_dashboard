@@ -7,6 +7,7 @@ import CircSupplyChart from './CircSupplyChart';
 import DevActivityChart from './DevActivityChart';
 import GithubCommitChart from './GithubCommitChart';
 import McapDominanceChart from './McapDominanceChart';
+import TransactionCountChart from './TransactionCountChart';
 import VolumeChart from './VolumeChart';
 
 const QUERY = gql`
@@ -16,6 +17,10 @@ const QUERY = gql`
       v
     }
     activeAddresses(token: "sol") {
+      ts
+      v
+    }
+    transactionCount(token: "sol") {
       ts
       v
     }
@@ -61,6 +66,7 @@ export default function SolanaCharts() {
   const {
     tokenPrice,
     activeAddresses,
+    transactionCount,
     devActivity,
     santimentDevActivity,
     volume,
@@ -73,6 +79,13 @@ export default function SolanaCharts() {
       <LoadingGridItem loading={loading}>
         <ActiveAddressesChart
           activeAddresses={activeAddresses}
+          price={tokenPrice}
+          token="sol"
+        />
+      </LoadingGridItem>
+      <LoadingGridItem loading={loading}>
+        <TransactionCountChart
+          transactionCount={transactionCount}
           price={tokenPrice}
           token="sol"
         />

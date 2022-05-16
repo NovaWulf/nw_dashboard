@@ -20,6 +20,10 @@ class Messari
     daily_response("/assets/#{slug(token)}/metrics/mcap-circ/time-series", start_date || DEFAULT_START_DATE)
   end
 
+  def transaction_count(token:, start_date: DEFAULT_START_DATE)
+    daily_response("/assets/#{slug(token)}/metrics/txn-cnt/time-series", start_date || DEFAULT_START_DATE)
+  end
+
   def circ_supply(token:, start_date: DEFAULT_START_DATE)
     daily_response("/assets/#{slug(token)}/metrics/sply-circ/time-series", start_date || DEFAULT_START_DATE)
   end
