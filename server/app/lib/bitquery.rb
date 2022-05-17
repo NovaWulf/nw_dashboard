@@ -7,17 +7,18 @@ class Bitquery
                  "X-API-KEY": ENV['BITQUERY_TOKEN'] }
   end
 
-  def smart_contract_usage(repo:, day:)
-    start_day = day.to_date.to_s
+  def eth_smart_contract_usage(day:)
+    start_day = (day || DEFAULT_START_DATE)
+    end_day = start_day.at_end_of_month
+
     query = '
-    query ($network: EthereumNetwork!, $dateFormat: String!, $from: ISO8601DateTime, $till: ISO8601DateTime) {
-      ethereum(network: $network) {
+    query ( $from: ISO8601DateTime, $till: ISO8601DateTime) {
+      ethereum(network: ethereum) {
         smartContractCalls(
-          options: {asc: "date.date"}
           date: {since: $from, till: $till}
         ) {
           date: date {
-            date(format: $dateFormat)
+            date
           }
           contracts: countBigInt(uniq: smart_contracts)
           callers: countBigInt(uniq: senders)
@@ -29,14 +30,12 @@ class Bitquery
     body = {
       query: query,
       variables: {
-        "network": repo,
-        "from": start_day,
-        "till": Time.now.utc.iso8601,
-        "dateFormat": '%Y-%m-%d'
+        "from": start_day.to_date.to_s,
+        "till": end_day.to_date.to_s
       }
     }.to_json
     response = run_query(body)
-    response.dig('data', repo, 'smartContractCalls')
+    response.dig('data', 'ethereum', 'smartContractCalls')
   end
 
   def sol_transaction_count(start_day:)

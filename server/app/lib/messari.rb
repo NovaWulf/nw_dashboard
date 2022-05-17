@@ -36,6 +36,10 @@ class Messari
     daily_response("/assets/#{slug(token)}/metrics/mcap-dom/time-series", start_date || DEFAULT_START_DATE)
   end
 
+  def smart_contract_txn_count(token:, start_date: DEFAULT_START_DATE)
+    daily_response("/assets/#{slug(token)}/metrics/txn-cont-cnt/time-series", start_date || DEFAULT_START_DATE)
+  end
+
   # def active_addresses(token:, start_date: DEFAULT_START_DATE)
   #   weekly_response("/assets/#{slug(token)}/metrics/act-addr-cnt/time-series", start_date || DEFAULT_START_DATE)
   # end

@@ -10,6 +10,8 @@ import McapDominanceChart from 'components/charts/McapDominanceChart';
 import TransactionCountChart from 'components/charts/TransactionCountChart';
 import TransactionFeeChart from 'components/charts/TransactionFeeChart';
 import VolumeChart from 'components/charts/VolumeChart';
+import SmartContractContractsChart from 'components/charts/SmartContractContractsChart';
+import SmartContractActiveAddressesChart from 'components/charts/SmartContractActiveAddressesChart';
 
 const QUERY = gql`
   query Metrics {
@@ -49,6 +51,14 @@ const QUERY = gql`
       ts
       v
     }
+    smartContractContracts(token: "eth") {
+      ts
+      v
+    }
+    smartContractActiveUsers(token: "eth") {
+      ts
+      v
+    }
   }
 `;
 
@@ -78,6 +88,8 @@ export default function EthereumCharts() {
     transactionFees,
     circSupply,
     mcapDominance,
+    smartContractContracts,
+    smartContractActiveUsers,
   } = data || {};
 
   return (
@@ -128,6 +140,20 @@ export default function EthereumCharts() {
           price={tokenPrice}
           tokenName="ETH"
           chainName="Ethereum"
+        />
+      </LoadingGridItem>
+      <LoadingGridItem loading={loading}>
+        <SmartContractContractsChart
+          smartContractContracts={smartContractContracts}
+          price={tokenPrice}
+          token="eth"
+        />
+      </LoadingGridItem>
+      <LoadingGridItem loading={loading}>
+        <SmartContractActiveAddressesChart
+          smartContractActiveUsers={smartContractActiveUsers}
+          price={tokenPrice}
+          token="eth"
         />
       </LoadingGridItem>
     </Grid>

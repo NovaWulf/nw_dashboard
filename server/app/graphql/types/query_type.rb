@@ -8,6 +8,14 @@ module Types
     field :rhodl_ratio, [Types::MetricType], null: false
     field :jesse, [Types::MetricType], null: false
 
+    field :smart_contract_active_users, [Types::MetricType], null: false do
+      argument :token, String
+    end
+
+    field :smart_contract_contracts, [Types::MetricType], null: false do
+      argument :token, String
+    end
+
     field :active_addresses, [Types::MetricType], null: false do
       argument :token, String
     end
@@ -97,7 +105,15 @@ module Types
     end
 
     def jesse
-      Displayers::WeeklyValueDisplayer.run(token: 'btc', metric: 'jesse')
+      Displayers::WeeklyValueDisplayer.run(token: 'btc', metric: 'jesse').value
+    end
+
+    def smart_contract_contracts(token:)
+      Displayers::WeeklyValueDisplayer.run(token: token, metric: 'smart_contract_contracts').value
+    end
+
+    def smart_contract_active_users(token:)
+      Displayers::WeeklyValueDisplayer.run(token: token, metric: 'smart_contract_active_users').value
     end
   end
 end

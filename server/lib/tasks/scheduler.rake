@@ -24,6 +24,7 @@ task get_recent_data: :environment do
   %w[sol avax near].each do |t|
     Fetchers::TransactionFeeTokenTerminalFetcher.run(token: t)
   end
+  Fetchers::EthereumSmartContractUsageFetcher.run
 end
 
 task backfill_github_data: :environment do
