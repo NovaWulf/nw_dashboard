@@ -17,6 +17,7 @@ task get_recent_data: :environment do
   Fetchers::JesseCalculator.run
   Fetchers::SolanaActiveAddressesFetcher.run
   Fetchers::SolanaTransactionCountFetcher.run
+  Fetchers::AvalancheTransactionFetcher.run
   %w[btc eth].each do |t|
     Fetchers::TransactionFeeFetcher.run(token: t)
   end

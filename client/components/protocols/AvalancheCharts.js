@@ -9,6 +9,7 @@ import GithubCommitChart from 'components/charts/GithubCommitChart';
 import McapDominanceChart from 'components/charts/McapDominanceChart';
 import VolumeChart from 'components/charts/VolumeChart';
 import TransactionFeeChart from 'components/charts/TransactionFeeChart';
+import TransactionCountChart from 'components/charts/TransactionCountChart';
 
 const QUERY = gql`
   query Metrics {
@@ -44,6 +45,11 @@ const QUERY = gql`
       ts
       v
     }
+
+    transactionCount(token: "eth") {
+      ts
+      v
+    }
   }
 `;
 
@@ -66,6 +72,7 @@ export default function AvalancheCharts() {
   const {
     tokenPrice,
     activeAddresses,
+    transactionCount,
     devActivity,
     santimentDevActivity,
     volume,
@@ -83,6 +90,13 @@ export default function AvalancheCharts() {
           token="avax"
         />
       </LoadingGridItem> */}
+      <LoadingGridItem loading={loading}>
+        <TransactionCountChart
+          transactionCount={transactionCount}
+          price={tokenPrice}
+          token="avax"
+        />
+      </LoadingGridItem>
       <LoadingGridItem loading={loading}>
         <VolumeChart volume={volume} price={tokenPrice} token="avax" />
       </LoadingGridItem>
