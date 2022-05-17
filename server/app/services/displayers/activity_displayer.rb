@@ -1,4 +1,5 @@
-class ActivityDisplayer < BaseService
+module Displayers
+  class ActivityDisplayer < BaseService
   attr_reader :token
 
   def initialize(token:)
@@ -11,4 +12,5 @@ class ActivityDisplayer < BaseService
       OpenStruct.new(timestamp: m[0], value: m[1])
     end
   end
+end
 end

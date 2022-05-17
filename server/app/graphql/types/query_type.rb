@@ -49,23 +49,23 @@ module Types
     end
 
     def btc_mvrv
-      Metric.by_token('btc').by_metric('mvrv').sundays.oldest_first
+      Displayers::WeeklyValueDisplayer.run(token: 'btc', metric: 'mvrv')
     end
 
     def rhodl_ratio
-      Metric.by_token('btc').by_metric('rhodl_ratio').sundays.oldest_first
+      Displayers::WeeklyValueDisplayer.run(token: 'btc', metric: 'rhodl_ratio')
     end
 
     def token_price(token:)
-      PriceDisplayer.run(token: token).value
+      Displayers::PriceDisplayer.run(token: token).value
     end
 
     def volume(token:)
-      VolumeDisplayer.run(token: token).value
+      Displayers::VolumeDisplayer.run(token: token).value
     end
 
     def transaction_fees(token:)
-      TransactionFeeDisplayer.run(token: token).value
+      Displayers::TransactionFeeDisplayer.run(token: token).value
     end
 
     def active_addresses(token:)
@@ -73,31 +73,31 @@ module Types
     end
 
     def transaction_count(token:)
-      TransactionCountDisplayer.run(token: token).value
+      Displayers::TransactionCountDisplayer.run(token: token).value
     end
 
     def market_cap(token:)
-      MarketCapDisplayer.run(token: token).value
+      Displayers::MarketCapDisplayer.run(token: token).value
     end
 
     def mcap_dominance(token:)
-      MarketCapDominanceDisplayer.run(token: token).value
+      Displayers::MarketCapDominanceDisplayer.run(token: token).value
     end
 
     def circ_supply(token:)
-      CirculatingSupplyDisplayer.run(token: token).value
+      Displayers::CirculatingSupplyDisplayer.run(token: token).value
     end
 
     def dev_activity(token:)
-      ActivityDisplayer.run(token: token).value
+      Displayers::ActivityDisplayer.run(token: token).value
     end
 
     def santiment_dev_activity(token:)
-      SantimentActivityDisplayer.run(token: token).value
+      Displayers::SantimentActivityDisplayer.run(token: token).value
     end
 
     def jesse
-      Metric.by_token('btc').by_metric('jesse').sundays.oldest_first
+      Displayers::WeeklyValueDisplayer.run(token: 'btc', metric: 'jesse')
     end
   end
 end

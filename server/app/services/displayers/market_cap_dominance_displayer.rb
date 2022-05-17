@@ -1,4 +1,5 @@
-class MarketCapDominanceDisplayer < BaseService
+module Displayers
+  class MarketCapDominanceDisplayer < BaseService
   attr_reader :token
 
   def initialize(token:)
@@ -8,4 +9,5 @@ class MarketCapDominanceDisplayer < BaseService
   def run
     Metric.by_token(token).by_metric('mcap_dominance').sundays.oldest_first
   end
+end
 end

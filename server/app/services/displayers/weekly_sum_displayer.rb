@@ -1,4 +1,5 @@
-class WeeklySumDisplayer < BaseService
+module Displayers
+  class WeeklySumDisplayer < BaseService
   attr_reader :token, :metric
 
   def initialize(token:, metric:)
@@ -12,4 +13,5 @@ class WeeklySumDisplayer < BaseService
       OpenStruct.new(timestamp: m[0], value: m[1])
     end
   end
+end
 end

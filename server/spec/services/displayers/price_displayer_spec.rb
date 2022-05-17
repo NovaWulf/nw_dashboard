@@ -1,4 +1,4 @@
-RSpec.describe PriceDisplayer do
+RSpec.describe Displayers::PriceDisplayer do
   subject { described_class.run(token: 'btc') }
 
   before(:each) do
