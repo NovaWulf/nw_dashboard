@@ -47,3 +47,14 @@ RSpec.shared_context 'github rest client' do
     allow_any_instance_of(described_class).to receive(:github_client).and_return(github_double)
   end
 end
+
+RSpec.shared_context 'token terminal client' do
+  let(:token_terminal_double) do
+    double('token terminal client',
+           transaction_fees: [[Date.today, 50_000]])
+  end
+
+  before(:each) do
+    allow_any_instance_of(described_class).to receive(:token_terminal_client).and_return(token_terminal_double)
+  end
+end

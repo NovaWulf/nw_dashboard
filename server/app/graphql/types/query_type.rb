@@ -36,6 +36,10 @@ module Types
       argument :token, String
     end
 
+    field :transaction_fees, [Types::MetricType], null: false do
+      argument :token, String
+    end
+
     field :dev_activity, [Types::MetricType], null: false do
       argument :token, String
     end
@@ -58,6 +62,10 @@ module Types
 
     def volume(token:)
       VolumeDisplayer.run(token: token).value
+    end
+
+    def transaction_fees(token:)
+      TransactionFeeDisplayer.run(token: token).value
     end
 
     def active_addresses(token:)

@@ -17,6 +17,12 @@ task get_recent_data: :environment do
   JesseCalculator.run
   SolanaActiveAddressesFetcher.run
   SolanaTransactionCountFetcher.run
+  %w[btc eth].each do |t|
+    TransactionFeeFetcher.run(token: t)
+  end
+  %w[sol avax near].each do |t|
+    TransactionFeeTokenTerminalFetcher.run(token: t)
+  end
 end
 
 task backfill_github_data: :environment do
