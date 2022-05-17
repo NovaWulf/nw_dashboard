@@ -52,9 +52,9 @@ class JesseCalculator < BaseService
   end
 
   def fetch_required_data
-    S2fFetcher.run
-    HashRateFetcher.run
-    NonZeroAddressFetcher.run
+    Fetchers::S2fFetcher.run
+    Fetchers::HashRateFetcher.run
+    Fetchers::NonZeroAddressFetcher.run
     TrendsImporter.run(path: 'https://gist.githubusercontent.com/iamnader/03b2da71d50c3cdeee4772ba66aeff2e/raw/bitcoin_trends')
   end
 

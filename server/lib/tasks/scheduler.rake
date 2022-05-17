@@ -1,27 +1,27 @@
 task get_recent_data: :environment do
   tracked_tokens = %w[btc eth sol luna avax near ada]
   tracked_tokens.each do |t|
-    EcosystemRepoFetcher.run(token: t)
-    PriceDataFetcher.run(token: t)
-    ActiveAddressesFetcher.run(token: t)
-    TransactionCountFetcher.run(token: t)
-    VolumeFetcher.run(token: t)
-    DevActivityFetcher.run(token: t)
-    CirculatingSupplyFetcher.run(token: t)
-    MarketCapDominanceFetcher.run(token: t)
+    Fetchers::EcosystemRepoFetcher.run(token: t)
+    Fetchers::PriceDataFetcher.run(token: t)
+    Fetchers::ActiveAddressesFetcher.run(token: t)
+    Fetchers::TransactionCountFetcher.run(token: t)
+    Fetchers::VolumeFetcher.run(token: t)
+    Fetchers::DevActivityFetcher.run(token: t)
+    Fetchers::CirculatingSupplyFetcher.run(token: t)
+    Fetchers::MarketCapDominanceFetcher.run(token: t)
   end
 
   # GithubActivityFetcher.run
-  RhodlFetcher.run
-  MvrvCalculator.run
-  JesseCalculator.run
-  SolanaActiveAddressesFetcher.run
-  SolanaTransactionCountFetcher.run
+  Fetchers::RhodlFetcher.run
+  Fetchers::MvrvCalculator.run
+  Fetchers::JesseCalculator.run
+  Fetchers::SolanaActiveAddressesFetcher.run
+  Fetchers::SolanaTransactionCountFetcher.run
   %w[btc eth].each do |t|
-    TransactionFeeFetcher.run(token: t)
+    Fetchers::TransactionFeeFetcher.run(token: t)
   end
   %w[sol avax near].each do |t|
-    TransactionFeeTokenTerminalFetcher.run(token: t)
+    Fetchers::TransactionFeeTokenTerminalFetcher.run(token: t)
   end
 end
 

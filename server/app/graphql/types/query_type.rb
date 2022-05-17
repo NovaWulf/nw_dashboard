@@ -69,7 +69,7 @@ module Types
     end
 
     def active_addresses(token:)
-      ActiveAddressDisplayer.run(token: token).value
+      Displayers::ActiveAddressDisplayer.run(token: token).value
     end
 
     def transaction_count(token:)
