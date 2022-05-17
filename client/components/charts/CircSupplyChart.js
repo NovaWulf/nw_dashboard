@@ -6,32 +6,32 @@ import {
   Legend,
   ResponsiveContainer,
   Tooltip,
+  XAxis,
   YAxis,
 } from 'recharts';
-import { dateFormatter, percentFormatter } from '../lib/formatters';
-import DashboardItem from './DashboardItem';
-import TimeAxis from './TimeAxis';
-import CsvDownloadLink from './CsvDownloadLink';
+import { dateFormatter, epochFormatter, nFormatter } from 'lib/formatters';
+import DashboardItem from 'components/DashboardItem';
+import TimeAxis from 'components/TimeAxis';
+import CsvDownloadLink from 'components/CsvDownloadLink';
 
-export default function McapDominanceChart({ mcapDominance }) {
+export default function CircSupplyChart({ circSupply }) {
   const theme = useTheme();
 
   return (
     <DashboardItem
-      title="Market Cap Dominance"
-      helpText="The asset's percentage share of total crypto circulating marketcap"
+      title={`Circulating Supply`}
       downloadButton={
-        <CsvDownloadLink data={mcapDominance} title="Market Cap Dominance" />
+        <CsvDownloadLink data={circSupply} title="Circulating Supply" />
       }
     >
       <ResponsiveContainer width="99%" height={300}>
         <AreaChart
-          data={mcapDominance}
+          data={circSupply}
           margin={{ top: 5, right: 15, bottom: 5, left: 10 }}
         >
           <Area
             dataKey="v"
-            name="Market Cap Dominance"
+            name="Circulating Supply"
             fill={theme.palette.primary.main}
             stroke={theme.palette.primary.main}
           />
@@ -40,7 +40,7 @@ export default function McapDominanceChart({ mcapDominance }) {
           {TimeAxis()}
 
           <YAxis
-            tickFormatter={percentFormatter}
+            tickFormatter={nFormatter}
             stroke={theme.palette.secondary.main}
           />
 

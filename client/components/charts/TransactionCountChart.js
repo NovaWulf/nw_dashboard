@@ -8,22 +8,31 @@ import {
   Tooltip,
   YAxis,
 } from 'recharts';
-import { dateFormatter, mergeTimestamps, nFormatter } from '../lib/formatters';
-import DashboardItem from './DashboardItem';
-import PriceArea from './PriceArea';
-import TimeAxis from './TimeAxis';
-import CsvDownloadLink from './CsvDownloadLink';
+import { dateFormatter, mergeTimestamps, nFormatter } from 'lib/formatters';
+import CsvDownloadLink from 'components/CsvDownloadLink';
+import DashboardItem from 'components/DashboardItem';
+import PriceArea from 'components/PriceArea';
+import TimeAxis from 'components/TimeAxis';
 
-export default function VolumeChart({ volume, price, token }) {
+export default function TransactionCountChart({
+  transactionCount,
+  price,
+  token,
+}) {
   const theme = useTheme();
 
-  const data = mergeTimestamps(volume, price, token);
+  const data = mergeTimestamps(transactionCount, price, token);
 
   return (
     <DashboardItem
-      title="Volume"
-      helpText="Real Volume, eg exchange volume minus wash trades"
-      downloadButton={<CsvDownloadLink data={volume} title="Volume Dollars" />}
+      title="Transaction Counts"
+      helpText="Daily Transaction Counts"
+      downloadButton={
+        <CsvDownloadLink
+          data={transactionCount}
+          title="Daily Transaction Counts"
+        />
+      }
     >
       <ResponsiveContainer width="99%" height={300}>
         <ComposedChart
@@ -33,17 +42,17 @@ export default function VolumeChart({ volume, price, token }) {
           <Line
             type="monotone"
             dataKey="v"
-            name="Volume ($)"
+            name="Transaction Count"
             stroke={theme.palette.secondary.main}
             dot={false}
-            yAxisId="vol"
+            yAxisId="aa"
           />
           {PriceArea({ token: token, name: `${token.toUpperCase()} Price` })}
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
           {TimeAxis()}
 
           <YAxis
-            yAxisId="vol"
+            yAxisId="aa"
             tickFormatter={nFormatter}
             stroke={theme.palette.secondary.main}
           />

@@ -1,7 +1,7 @@
 import { withPageAuthRequired } from '@auth0/nextjs-auth0';
 import ChartsLayout from 'components/layouts/ChartsLayout';
 import * as React from 'react';
-import AvalancheCharts from '../components/AvalancheCharts';
+import AvalancheCharts from '../components/protocols/AvalancheCharts';
 import ClientOnly from '../components/ClientOnly';
 
 const Avalanche = () => {

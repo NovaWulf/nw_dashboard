@@ -8,10 +8,10 @@ import {
   Tooltip,
   YAxis,
 } from 'recharts';
-import { dateFormatter, mergeTimestamps, nFormatter } from '../lib/formatters';
-import DashboardItem from './DashboardItem';
-import TimeAxis from './TimeAxis';
-import CsvDownloadLink from './CsvDownloadLink';
+import { dateFormatter, mergeTimestamps, nFormatter } from 'lib/formatters';
+import DashboardItem from 'components/DashboardItem';
+import TimeAxis from 'components/TimeAxis';
+import CsvDownloadLink from 'components/CsvDownloadLink';
 
 export default function JesseChart({ jesse, btc }) {
   const theme = useTheme();

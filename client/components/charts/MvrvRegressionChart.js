@@ -8,49 +8,46 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { nFormatter } from '../lib/formatters';
+import { nFormatter } from 'lib/formatters';
 import { linearRegression } from '../lib/regression';
-import DashboardItem from './DashboardItem';
+import DashboardItem from 'components/DashboardItem';
+import CsvDownloadLink from 'components/CsvDownloadLink';
 
-export default function ActiveAddressRegressionChart({ activeAddresses, btc }) {
+export default function MvrvRegressionChart({ mvrv, btc }) {
   const theme = useTheme();
 
-  const data = activeAddresses.map((aa, idx) => {
-    return { activeAddresses: aa.v, btc: btc[idx].v };
+  const data = mvrv.map((mv, idx) => {
+    return { mvrv: mv.v, btc: btc[idx].v };
   });
-  const activeAddressess = activeAddresses.map(aa => aa.v);
+  const mvrvs = mvrv.map(m => m.v);
   const btcs = btc.map(b => b.v);
   const yMax = Math.max(...btcs);
   const yMin = Math.min(...btcs);
-  const xMax = Math.max(...activeAddressess);
-  const xMin = Math.min(...activeAddressess);
+  const xMax = Math.max(...mvrvs);
+  const xMin = Math.min(...mvrvs);
 
-  const trend = linearRegression(data, 'activeAddresses', 'btc');
+  const trend = linearRegression(data, 'mvrv', 'btc');
 
   const trendData = [
-    { btc: trend.calcY(xMin), activeAddresses: xMin },
-    { btc: trend.calcY(xMax), activeAddresses: xMax },
+    { btc: trend.calcY(xMin), mvrv: xMin },
+    { btc: trend.calcY(xMax), mvrv: xMax },
   ];
 
   return (
-    <DashboardItem title="Active Address / BTC Regression">
+    <DashboardItem title="MVRV / BTC Regression">
       <ResponsiveContainer width="99%" height={300}>
         <ComposedChart
           data={data}
           margin={{ top: 5, right: 0, bottom: 10, left: 15 }}
         >
           <XAxis
-            name="Active Addresses"
-            dataKey="activeAddresses"
+            name="MVRV"
+            dataKey="mvrv"
             domain={['dataMin', 'dataMax']}
             type="number"
             allowDecimals={false}
             tickFormatter={nFormatter}
-            label={{
-              value: 'ActiveAddresses',
-              position: 'insideBottom',
-              offset: '-5',
-            }}
+            label={{ value: 'MVRV', position: 'insideBottom', offset: '-5' }}
           />
           <YAxis
             dataKey="btc"
@@ -71,6 +68,7 @@ export default function ActiveAddressRegressionChart({ activeAddresses, btc }) {
             shape="cross"
             fill={theme.palette.primary.main}
           />
+
           <Line
             data={trendData}
             dataKey="btc"

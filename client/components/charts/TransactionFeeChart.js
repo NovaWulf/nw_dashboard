@@ -8,30 +8,22 @@ import {
   Tooltip,
   YAxis,
 } from 'recharts';
-import { dateFormatter, mergeTimestamps, nFormatter } from '../lib/formatters';
-import CsvDownloadLink from './CsvDownloadLink';
-import DashboardItem from './DashboardItem';
-import PriceArea from './PriceArea';
-import TimeAxis from './TimeAxis';
+import { dateFormatter, mergeTimestamps, nFormatter } from 'lib/formatters';
+import DashboardItem from 'components/DashboardItem';
+import PriceArea from 'components/PriceArea';
+import TimeAxis from 'components/TimeAxis';
+import CsvDownloadLink from 'components/CsvDownloadLink';
 
-export default function ActiveAddressesChart({
-  activeAddresses,
-  price,
-  token,
-}) {
+export default function TransactionFeeChart({ transactionFees, price, token }) {
   const theme = useTheme();
 
-  const data = mergeTimestamps(activeAddresses, price, token);
+  const data = mergeTimestamps(transactionFees, price, token);
 
   return (
     <DashboardItem
-      title="Active Addresses"
-      helpText="Daily Active Addresses"
+      title="Transaction Fees"
       downloadButton={
-        <CsvDownloadLink
-          data={activeAddresses}
-          title="Daily Active Addresses"
-        />
+        <CsvDownloadLink data={transactionFees} title="Transaction Fees" />
       }
     >
       <ResponsiveContainer width="99%" height={300}>
@@ -42,17 +34,17 @@ export default function ActiveAddressesChart({
           <Line
             type="monotone"
             dataKey="v"
-            name="Active Addresses"
+            name="Transaction Fees ($)"
             stroke={theme.palette.secondary.main}
             dot={false}
-            yAxisId="aa"
+            yAxisId="fees"
           />
           {PriceArea({ token: token, name: `${token.toUpperCase()} Price` })}
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
           {TimeAxis()}
 
           <YAxis
-            yAxisId="aa"
+            yAxisId="fees"
             tickFormatter={nFormatter}
             stroke={theme.palette.secondary.main}
           />

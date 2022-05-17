@@ -2,40 +2,39 @@ import { gql, useQuery } from '@apollo/client';
 import { Skeleton } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import * as React from 'react';
-import ActiveAddressesChart from './ActiveAddressesChart';
-import CircSupplyChart from './CircSupplyChart';
-import DevActivityChart from './DevActivityChart';
-import GithubCommitChart from './GithubCommitChart';
-import McapDominanceChart from './McapDominanceChart';
-import VolumeChart from './VolumeChart';
+import CircSupplyChart from 'components/charts/CircSupplyChart';
+import DevActivityChart from 'components/charts/DevActivityChart';
+import GithubCommitChart from 'components/charts/GithubCommitChart';
+import McapDominanceChart from 'components/charts/McapDominanceChart';
+import VolumeChart from 'components/charts/VolumeChart';
 
 const QUERY = gql`
   query Metrics {
-    tokenPrice(token: "near") {
+    tokenPrice(token: "luna") {
       ts
       v
     }
-    activeAddresses(token: "near") {
+    activeAddresses(token: "luna") {
       ts
       v
     }
-    volume(token: "near") {
+    devActivity(token: "luna") {
       ts
       v
     }
-    devActivity(token: "near") {
+    santimentDevActivity(token: "luna") {
       ts
       v
     }
-    santimentDevActivity(token: "near") {
+    volume(token: "luna") {
       ts
       v
     }
-    circSupply(token: "near") {
+    circSupply(token: "luna") {
       ts
       v
     }
-    mcapDominance(token: "near") {
+    mcapDominance(token: "luna") {
       ts
       v
     }
@@ -50,7 +49,7 @@ const LoadingGridItem = ({ loading, children }) => {
   );
 };
 
-export default function NearCharts() {
+export default function TerraCharts() {
   const { data, loading, error } = useQuery(QUERY);
 
   if (error) {
@@ -74,11 +73,12 @@ export default function NearCharts() {
         <ActiveAddressesChart
           activeAddresses={activeAddresses}
           price={tokenPrice}
-          token="near"
+          token="luna"
         />
+        
       </LoadingGridItem> */}
       <LoadingGridItem loading={loading}>
-        <VolumeChart volume={volume} price={tokenPrice} token="near" />
+        <VolumeChart volume={volume} price={tokenPrice} token="luna" />
       </LoadingGridItem>
       <LoadingGridItem loading={loading}>
         <CircSupplyChart circSupply={circSupply} />
@@ -90,17 +90,16 @@ export default function NearCharts() {
         <GithubCommitChart
           devActivity={devActivity}
           price={tokenPrice}
-          tokenName="NEAR"
-          chainName="Near"
+          tokenName="LUNA"
+          chainName="Terra"
         />
       </LoadingGridItem>
-
       <LoadingGridItem loading={loading}>
         <DevActivityChart
           devActivity={santimentDevActivity}
           price={tokenPrice}
-          tokenName="NEAR"
-          chainName="Near"
+          tokenName="LUNA"
+          chainName="Terra"
         />
       </LoadingGridItem>
     </Grid>

@@ -1,5 +1,5 @@
 import { withPageAuthRequired } from '@auth0/nextjs-auth0';
-import CardanoCharts from 'components/CardanoCharts';
+import CardanoCharts from 'components/protocols/CardanoCharts';
 import ChartsLayout from 'components/layouts/ChartsLayout';
 import * as React from 'react';
 import ClientOnly from '../components/ClientOnly';

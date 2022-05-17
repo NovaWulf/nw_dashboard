@@ -2,39 +2,45 @@ import { gql, useQuery } from '@apollo/client';
 import { Skeleton } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import * as React from 'react';
-import CircSupplyChart from './CircSupplyChart';
-import DevActivityChart from './DevActivityChart';
-import GithubCommitChart from './GithubCommitChart';
-import McapDominanceChart from './McapDominanceChart';
-import VolumeChart from './VolumeChart';
+import ActiveAddressesChart from 'components/charts/ActiveAddressesChart';
+import CircSupplyChart from 'components/charts/CircSupplyChart';
+import DevActivityChart from 'components/charts/DevActivityChart';
+import GithubCommitChart from 'components/charts/GithubCommitChart';
+import McapDominanceChart from 'components/charts/McapDominanceChart';
+import TransactionCountChart from 'components/charts/TransactionCountChart';
+import VolumeChart from 'components/charts/VolumeChart';
 
 const QUERY = gql`
   query Metrics {
-    tokenPrice(token: "luna") {
+    tokenPrice(token: "ada") {
       ts
       v
     }
-    activeAddresses(token: "luna") {
+    activeAddresses(token: "ada") {
       ts
       v
     }
-    devActivity(token: "luna") {
+    transactionCount(token: "ada") {
       ts
       v
     }
-    santimentDevActivity(token: "luna") {
+    devActivity(token: "ada") {
       ts
       v
     }
-    volume(token: "luna") {
+    santimentDevActivity(token: "ada") {
       ts
       v
     }
-    circSupply(token: "luna") {
+    volume(token: "ada") {
       ts
       v
     }
-    mcapDominance(token: "luna") {
+    circSupply(token: "ada") {
+      ts
+      v
+    }
+    mcapDominance(token: "ada") {
       ts
       v
     }
@@ -49,7 +55,7 @@ const LoadingGridItem = ({ loading, children }) => {
   );
 };
 
-export default function TerraCharts() {
+export default function CardanoCharts() {
   const { data, loading, error } = useQuery(QUERY);
 
   if (error) {
@@ -60,6 +66,7 @@ export default function TerraCharts() {
   const {
     tokenPrice,
     activeAddresses,
+    transactionCount,
     devActivity,
     santimentDevActivity,
     volume,
@@ -69,16 +76,22 @@ export default function TerraCharts() {
 
   return (
     <Grid container spacing={3}>
-      {/* <LoadingGridItem loading={loading}>
+      <LoadingGridItem loading={loading}>
         <ActiveAddressesChart
           activeAddresses={activeAddresses}
           price={tokenPrice}
-          token="luna"
+          token="ada"
         />
-        
-      </LoadingGridItem> */}
+      </LoadingGridItem>
       <LoadingGridItem loading={loading}>
-        <VolumeChart volume={volume} price={tokenPrice} token="luna" />
+        <TransactionCountChart
+          transactionCount={transactionCount}
+          price={tokenPrice}
+          token="ada"
+        />
+      </LoadingGridItem>
+      <LoadingGridItem loading={loading}>
+        <VolumeChart volume={volume} price={tokenPrice} token="ada" />
       </LoadingGridItem>
       <LoadingGridItem loading={loading}>
         <CircSupplyChart circSupply={circSupply} />
@@ -90,16 +103,16 @@ export default function TerraCharts() {
         <GithubCommitChart
           devActivity={devActivity}
           price={tokenPrice}
-          tokenName="LUNA"
-          chainName="Terra"
+          tokenName="AVAX"
+          chainName="Cardano"
         />
       </LoadingGridItem>
       <LoadingGridItem loading={loading}>
         <DevActivityChart
           devActivity={santimentDevActivity}
           price={tokenPrice}
-          tokenName="LUNA"
-          chainName="Terra"
+          tokenName="AVAX"
+          chainName="Cardano"
         />
       </LoadingGridItem>
     </Grid>

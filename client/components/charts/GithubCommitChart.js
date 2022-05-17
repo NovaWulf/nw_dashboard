@@ -8,30 +8,28 @@ import {
   Tooltip,
   YAxis,
 } from 'recharts';
-import { dateFormatter, mergeTimestamps, nFormatter } from '../lib/formatters';
-import CsvDownloadLink from './CsvDownloadLink';
-import DashboardItem from './DashboardItem';
-import PriceArea from './PriceArea';
-import TimeAxis from './TimeAxis';
+import { dateFormatter, mergeTimestamps, nFormatter } from 'lib/formatters';
+import DashboardItem from 'components/DashboardItem';
+import PriceArea from 'components/PriceArea';
+import TimeAxis from 'components/TimeAxis';
+import CsvDownloadLink from 'components/CsvDownloadLink';
 
-export default function TransactionCountChart({
-  transactionCount,
+export default function GithubCommitChart({
+  devActivity,
   price,
-  token,
+  tokenName,
+  chainName,
 }) {
   const theme = useTheme();
 
-  const data = mergeTimestamps(transactionCount, price, token);
+  const data = mergeTimestamps(devActivity, price, 'price');
 
   return (
     <DashboardItem
-      title="Transaction Counts"
-      helpText="Daily Transaction Counts"
+      title={`Github Commits - ${chainName} Ecosystem`}
+      helpText="This chart is showing commits across projects in the ecosystem as tracked by Electric Capital"
       downloadButton={
-        <CsvDownloadLink
-          data={transactionCount}
-          title="Daily Transaction Counts"
-        />
+        <CsvDownloadLink data={devActivity} title="Github Commits" />
       }
     >
       <ResponsiveContainer width="99%" height={300}>
@@ -42,27 +40,31 @@ export default function TransactionCountChart({
           <Line
             type="monotone"
             dataKey="v"
-            name="Transaction Count"
+            name="Github Commits"
             stroke={theme.palette.secondary.main}
             dot={false}
-            yAxisId="aa"
+            yAxisId="dev"
           />
-          {PriceArea({ token: token, name: `${token.toUpperCase()} Price` })}
+          {PriceArea({
+            token: 'price',
+            name: `${tokenName.toUpperCase()} Price`,
+          })}
+
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
           {TimeAxis()}
 
           <YAxis
-            yAxisId="aa"
+            yAxisId="dev"
             tickFormatter={nFormatter}
             stroke={theme.palette.secondary.main}
           />
           <YAxis
-            yAxisId={token}
+            yAxisId="price"
             orientation="right"
             tickFormatter={nFormatter}
             stroke={theme.palette.primary.main}
           />
-          <Tooltip labelFormatter={dateFormatter} formatter={nFormatter} />
+          <Tooltip labelFormatter={dateFormatter} />
           <Legend />
         </ComposedChart>
       </ResponsiveContainer>

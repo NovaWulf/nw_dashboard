@@ -2,45 +2,45 @@ import { gql, useQuery } from '@apollo/client';
 import { Skeleton } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import * as React from 'react';
-import ActiveAddressesChart from './ActiveAddressesChart';
-import CircSupplyChart from './CircSupplyChart';
-import DevActivityChart from './DevActivityChart';
-import GithubCommitChart from './GithubCommitChart';
-import McapDominanceChart from './McapDominanceChart';
-import TransactionCountChart from './TransactionCountChart';
-import VolumeChart from './VolumeChart';
+import ActiveAddressesChart from 'components/charts/ActiveAddressesChart';
+import CircSupplyChart from 'components/charts/CircSupplyChart';
+import DevActivityChart from 'components/charts/DevActivityChart';
+import GithubCommitChart from 'components/charts/GithubCommitChart';
+import McapDominanceChart from 'components/charts/McapDominanceChart';
+import VolumeChart from 'components/charts/VolumeChart';
+import TransactionFeeChart from 'components/charts/TransactionFeeChart';
 
 const QUERY = gql`
   query Metrics {
-    tokenPrice(token: "eth") {
+    tokenPrice(token: "near") {
       ts
       v
     }
-    activeAddresses(token: "eth") {
+    activeAddresses(token: "near") {
       ts
       v
     }
-    transactionCount(token: "eth") {
+    volume(token: "near") {
       ts
       v
     }
-    devActivity(token: "eth") {
+    transactionFees(token: "near") {
       ts
       v
     }
-    santimentDevActivity(token: "eth") {
+    devActivity(token: "near") {
       ts
       v
     }
-    volume(token: "eth") {
+    santimentDevActivity(token: "near") {
       ts
       v
     }
-    circSupply(token: "eth") {
+    circSupply(token: "near") {
       ts
       v
     }
-    mcapDominance(token: "eth") {
+    mcapDominance(token: "near") {
       ts
       v
     }
@@ -55,7 +55,7 @@ const LoadingGridItem = ({ loading, children }) => {
   );
 };
 
-export default function EthereumCharts() {
+export default function NearCharts() {
   const { data, loading, error } = useQuery(QUERY);
 
   if (error) {
@@ -66,32 +66,32 @@ export default function EthereumCharts() {
   const {
     tokenPrice,
     activeAddresses,
-    transactionCount,
     devActivity,
     santimentDevActivity,
     volume,
+    transactionFees,
     circSupply,
     mcapDominance,
   } = data || {};
 
   return (
     <Grid container spacing={3}>
-      <LoadingGridItem loading={loading}>
+      {/* <LoadingGridItem loading={loading}>
         <ActiveAddressesChart
           activeAddresses={activeAddresses}
           price={tokenPrice}
-          token="eth"
+          token="near"
         />
+      </LoadingGridItem> */}
+      <LoadingGridItem loading={loading}>
+        <VolumeChart volume={volume} price={tokenPrice} token="near" />
       </LoadingGridItem>
       <LoadingGridItem loading={loading}>
-        <TransactionCountChart
-          transactionCount={transactionCount}
+        <TransactionFeeChart
+          transactionFees={transactionFees}
           price={tokenPrice}
-          token="eth"
+          token="near"
         />
-      </LoadingGridItem>
-      <LoadingGridItem loading={loading}>
-        <VolumeChart volume={volume} price={tokenPrice} token="eth" />
       </LoadingGridItem>
       <LoadingGridItem loading={loading}>
         <CircSupplyChart circSupply={circSupply} />
@@ -99,21 +99,21 @@ export default function EthereumCharts() {
       <LoadingGridItem loading={loading}>
         <McapDominanceChart mcapDominance={mcapDominance} />
       </LoadingGridItem>
-
       <LoadingGridItem loading={loading}>
         <GithubCommitChart
           devActivity={devActivity}
           price={tokenPrice}
-          tokenName="ETH"
-          chainName="Ethereum"
+          tokenName="NEAR"
+          chainName="Near"
         />
       </LoadingGridItem>
+
       <LoadingGridItem loading={loading}>
         <DevActivityChart
           devActivity={santimentDevActivity}
           price={tokenPrice}
-          tokenName="ETH"
-          chainName="Ethereum"
+          tokenName="NEAR"
+          chainName="Near"
         />
       </LoadingGridItem>
     </Grid>

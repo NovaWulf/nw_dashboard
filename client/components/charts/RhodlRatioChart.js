@@ -15,10 +15,10 @@ import {
   epochFormatter,
   mergeTimestamps,
   nFormatter,
-} from '../lib/formatters';
-import DashboardItem from './DashboardItem';
-import PriceArea from './PriceArea';
-import CsvDownloadLink from './CsvDownloadLink';
+} from 'lib/formatters';
+import DashboardItem from 'components/DashboardItem';
+import PriceArea from 'components/PriceArea';
+import CsvDownloadLink from 'components/CsvDownloadLink';
 
 export default function RhodlRatioChart({ rhodlRatio, btc }) {
   const theme = useTheme();

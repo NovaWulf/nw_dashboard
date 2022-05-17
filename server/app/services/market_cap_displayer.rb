@@ -1,11 +1,5 @@
-class MarketCapDisplayer < BaseService
-  attr_reader :token
-
+class MarketCapDisplayer < WeeklyValueDisplayer
   def initialize(token:)
-    @token = token
-  end
-
-  def run
-    Metric.by_token(token).by_metric('circ_mcap').sundays.oldest_first
+    super(token: token, metric: 'circ_mcap')
   end
 end

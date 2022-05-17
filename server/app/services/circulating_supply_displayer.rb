@@ -1,11 +1,5 @@
-class CirculatingSupplyDisplayer < BaseService
-  attr_reader :token
-
+class CirculatingSupplyDisplayer < WeeklyValueDisplayer
   def initialize(token:)
-    @token = token
-  end
-
-  def run
-    Metric.by_token(token).by_metric('circ_supply').sundays.oldest_first
+    super(token: token, metric: 'circ_supply')
   end
 end

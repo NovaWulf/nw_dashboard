@@ -2,45 +2,51 @@ import { gql, useQuery } from '@apollo/client';
 import { Skeleton } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import * as React from 'react';
-import ActiveAddressesChart from './ActiveAddressesChart';
-import CircSupplyChart from './CircSupplyChart';
-import DevActivityChart from './DevActivityChart';
-import GithubCommitChart from './GithubCommitChart';
-import McapDominanceChart from './McapDominanceChart';
-import TransactionCountChart from './TransactionCountChart';
-import VolumeChart from './VolumeChart';
+import ActiveAddressesChart from 'components/charts/ActiveAddressesChart';
+import CircSupplyChart from 'components/charts/CircSupplyChart';
+import DevActivityChart from 'components/charts/DevActivityChart';
+import GithubCommitChart from 'components/charts/GithubCommitChart';
+import McapDominanceChart from 'components/charts/McapDominanceChart';
+import TransactionCountChart from 'components/charts/TransactionCountChart';
+import VolumeChart from 'components/charts/VolumeChart';
+import TransactionFeeChart from 'components/charts/TransactionFeeChart';
 
 const QUERY = gql`
   query Metrics {
-    tokenPrice(token: "ada") {
+    tokenPrice(token: "sol") {
       ts
       v
     }
-    activeAddresses(token: "ada") {
+    activeAddresses(token: "sol") {
       ts
       v
     }
-    transactionCount(token: "ada") {
+    transactionCount(token: "sol") {
       ts
       v
     }
-    devActivity(token: "ada") {
+    volume(token: "sol") {
       ts
       v
     }
-    santimentDevActivity(token: "ada") {
+
+    transactionFees(token: "sol") {
       ts
       v
     }
-    volume(token: "ada") {
+    devActivity(token: "sol") {
       ts
       v
     }
-    circSupply(token: "ada") {
+    santimentDevActivity(token: "sol") {
       ts
       v
     }
-    mcapDominance(token: "ada") {
+    circSupply(token: "sol") {
+      ts
+      v
+    }
+    mcapDominance(token: "sol") {
       ts
       v
     }
@@ -55,7 +61,7 @@ const LoadingGridItem = ({ loading, children }) => {
   );
 };
 
-export default function CardanoCharts() {
+export default function SolanaCharts() {
   const { data, loading, error } = useQuery(QUERY);
 
   if (error) {
@@ -70,6 +76,8 @@ export default function CardanoCharts() {
     devActivity,
     santimentDevActivity,
     volume,
+    transactionFees,
+
     circSupply,
     mcapDominance,
   } = data || {};
@@ -80,18 +88,25 @@ export default function CardanoCharts() {
         <ActiveAddressesChart
           activeAddresses={activeAddresses}
           price={tokenPrice}
-          token="ada"
+          token="sol"
         />
       </LoadingGridItem>
       <LoadingGridItem loading={loading}>
         <TransactionCountChart
           transactionCount={transactionCount}
           price={tokenPrice}
-          token="ada"
+          token="sol"
         />
       </LoadingGridItem>
       <LoadingGridItem loading={loading}>
-        <VolumeChart volume={volume} price={tokenPrice} token="ada" />
+        <VolumeChart volume={volume} price={tokenPrice} token="sol" />
+      </LoadingGridItem>
+      <LoadingGridItem loading={loading}>
+        <TransactionFeeChart
+          transactionFees={transactionFees}
+          price={tokenPrice}
+          token="sol"
+        />
       </LoadingGridItem>
       <LoadingGridItem loading={loading}>
         <CircSupplyChart circSupply={circSupply} />
@@ -103,16 +118,16 @@ export default function CardanoCharts() {
         <GithubCommitChart
           devActivity={devActivity}
           price={tokenPrice}
-          tokenName="AVAX"
-          chainName="Cardano"
+          tokenName="SOL"
+          chainName="Solana"
         />
       </LoadingGridItem>
       <LoadingGridItem loading={loading}>
         <DevActivityChart
           devActivity={santimentDevActivity}
           price={tokenPrice}
-          tokenName="AVAX"
-          chainName="Cardano"
+          tokenName="SOL"
+          chainName="Solana"
         />
       </LoadingGridItem>
     </Grid>

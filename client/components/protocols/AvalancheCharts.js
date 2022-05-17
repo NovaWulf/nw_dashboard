@@ -2,12 +2,13 @@ import { gql, useQuery } from '@apollo/client';
 import { Skeleton } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import * as React from 'react';
-import ActiveAddressesChart from './ActiveAddressesChart';
-import CircSupplyChart from './CircSupplyChart';
-import DevActivityChart from './DevActivityChart';
-import GithubCommitChart from './GithubCommitChart';
-import McapDominanceChart from './McapDominanceChart';
-import VolumeChart from './VolumeChart';
+import ActiveAddressesChart from 'components/charts/ActiveAddressesChart';
+import CircSupplyChart from 'components/charts/CircSupplyChart';
+import DevActivityChart from 'components/charts/DevActivityChart';
+import GithubCommitChart from 'components/charts/GithubCommitChart';
+import McapDominanceChart from 'components/charts/McapDominanceChart';
+import VolumeChart from 'components/charts/VolumeChart';
+import TransactionFeeChart from 'components/charts/TransactionFeeChart';
 
 const QUERY = gql`
   query Metrics {
@@ -28,6 +29,10 @@ const QUERY = gql`
       v
     }
     volume(token: "avax") {
+      ts
+      v
+    }
+    transactionFees(token: "avax") {
       ts
       v
     }
@@ -64,6 +69,7 @@ export default function AvalancheCharts() {
     devActivity,
     santimentDevActivity,
     volume,
+    transactionFees,
     circSupply,
     mcapDominance,
   } = data || {};
@@ -80,6 +86,14 @@ export default function AvalancheCharts() {
       <LoadingGridItem loading={loading}>
         <VolumeChart volume={volume} price={tokenPrice} token="avax" />
       </LoadingGridItem>
+      <LoadingGridItem loading={loading}>
+        <TransactionFeeChart
+          transactionFees={transactionFees}
+          price={tokenPrice}
+          token="avax"
+        />
+      </LoadingGridItem>
+
       <LoadingGridItem loading={loading}>
         <CircSupplyChart circSupply={circSupply} />
       </LoadingGridItem>

@@ -14,11 +14,11 @@ import {
   mergeTimestamps,
   mvrvFormatter,
   nFormatter,
-} from '../lib/formatters';
-import DashboardItem from './DashboardItem';
-import PriceArea from './PriceArea';
-import TimeAxis from './TimeAxis';
-import CsvDownloadLink from './CsvDownloadLink';
+} from 'lib/formatters';
+import DashboardItem from 'components/DashboardItem';
+import PriceArea from 'components/PriceArea';
+import TimeAxis from 'components/TimeAxis';
+import CsvDownloadLink from 'components/CsvDownloadLink';
 
 export default function MvrvChart({ mvrv, btc }) {
   const theme = useTheme();

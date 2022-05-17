@@ -8,13 +8,13 @@ import {
   Tooltip,
   YAxis,
 } from 'recharts';
-import { dateFormatter, mergeTimestamps, nFormatter } from '../lib/formatters';
-import DashboardItem from './DashboardItem';
-import PriceArea from './PriceArea';
-import TimeAxis from './TimeAxis';
-import CsvDownloadLink from './CsvDownloadLink';
+import { dateFormatter, mergeTimestamps, nFormatter } from 'lib/formatters';
+import DashboardItem from 'components/DashboardItem';
+import PriceArea from 'components/PriceArea';
+import TimeAxis from 'components/TimeAxis';
+import CsvDownloadLink from 'components/CsvDownloadLink';
 
-export default function GithubCommitChart({
+export default function DevActivityChart({
   devActivity,
   price,
   tokenName,
@@ -26,10 +26,10 @@ export default function GithubCommitChart({
 
   return (
     <DashboardItem
-      title={`Github Commits - ${chainName} Ecosystem`}
-      helpText="This chart is showing commits across projects in the ecosystem as tracked by Electric Capital"
+      title={`Dev Activity - ${chainName} Org`}
+      helpText="Dev Activity includes commits, but also comments, follows, issue creation, etc"
       downloadButton={
-        <CsvDownloadLink data={devActivity} title="Github Commits" />
+        <CsvDownloadLink data={devActivity} title="Dev Activity" />
       }
     >
       <ResponsiveContainer width="99%" height={300}>
@@ -40,7 +40,7 @@ export default function GithubCommitChart({
           <Line
             type="monotone"
             dataKey="v"
-            name="Github Commits"
+            name="Dev Activity"
             stroke={theme.palette.secondary.main}
             dot={false}
             yAxisId="dev"
@@ -52,7 +52,6 @@ export default function GithubCommitChart({
 
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
           {TimeAxis()}
-
           <YAxis
             yAxisId="dev"
             tickFormatter={nFormatter}

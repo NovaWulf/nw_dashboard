@@ -2,20 +2,18 @@ import { gql, useQuery } from '@apollo/client';
 import { Skeleton } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import * as React from 'react';
-import ActiveAddressesChart from './ActiveAddressesChart';
-import ActiveAddressRegressionChart from './ActiveAddressRegressionChart';
-import MvrvChart from './MvrvChart';
-import MvrvRegressionChart from './MvrvRegressionChart';
-import MetcalfeChart from './MetcalfeChart';
-import RhodlRatioChart from './RhodlRatioChart';
-import JesseChart from './JesseChart';
-import DevActivityChart from './DevActivityChart';
-import VolumeChart from './VolumeChart';
-import GithubCommitChart from './GithubCommitChart';
-import CircMcapChart from './CircSupplyChart';
-import CircSupplyChart from './CircSupplyChart';
-import McapDominanceChart from './McapDominanceChart';
-import TransactionCountChart from './TransactionCountChart';
+import ActiveAddressesChart from 'components/charts/ActiveAddressesChart';
+import CircSupplyChart from 'components/charts/CircSupplyChart';
+import DevActivityChart from 'components/charts/DevActivityChart';
+import GithubCommitChart from 'components/charts/GithubCommitChart';
+import JesseChart from 'components/charts/JesseChart';
+import McapDominanceChart from 'components/charts/McapDominanceChart';
+import MetcalfeChart from 'components/charts/MetcalfeChart';
+import MvrvChart from 'components/charts/MvrvChart';
+import RhodlRatioChart from 'components/charts/RhodlRatioChart';
+import TransactionCountChart from 'components/charts/TransactionCountChart';
+import VolumeChart from 'components/charts/VolumeChart';
+import TransactionFeeChart from 'components/charts/TransactionFeeChart';
 
 const QUERY = gql`
   query Metrics {
@@ -48,6 +46,10 @@ const QUERY = gql`
       v
     }
     volume(token: "btc") {
+      ts
+      v
+    }
+    transactionFees(token: "btc") {
       ts
       v
     }
@@ -94,6 +96,8 @@ export default function BitcoinCharts() {
     btcMarketCap,
     jesse,
     volume,
+    transactionFees,
+
     btcDevActivity,
     santimentDevActivity,
     circSupply,
@@ -137,13 +141,13 @@ export default function BitcoinCharts() {
       <LoadingGridItem loading={loading}>
         <VolumeChart volume={volume} price={btcPrice} token="btc" />
       </LoadingGridItem>
-      {/* 
       <LoadingGridItem loading={loading}>
-        <ActiveAddressRegressionChart
-          activeAddresses={btcActiveAddresses}
-          btc={btcPrice}
+        <TransactionFeeChart
+          transactionFees={transactionFees}
+          price={btcPrice}
+          token="btc"
         />
-      </LoadingGridItem> */}
+      </LoadingGridItem>
 
       <LoadingGridItem loading={loading}>
         <RhodlRatioChart rhodlRatio={rhodlRatio} btc={btcPrice} />

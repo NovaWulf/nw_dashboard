@@ -2,45 +2,50 @@ import { gql, useQuery } from '@apollo/client';
 import { Skeleton } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import * as React from 'react';
-import ActiveAddressesChart from './ActiveAddressesChart';
-import CircSupplyChart from './CircSupplyChart';
-import DevActivityChart from './DevActivityChart';
-import GithubCommitChart from './GithubCommitChart';
-import McapDominanceChart from './McapDominanceChart';
-import TransactionCountChart from './TransactionCountChart';
-import VolumeChart from './VolumeChart';
+import ActiveAddressesChart from 'components/charts/ActiveAddressesChart';
+import CircSupplyChart from 'components/charts/CircSupplyChart';
+import DevActivityChart from 'components/charts/DevActivityChart';
+import GithubCommitChart from 'components/charts/GithubCommitChart';
+import McapDominanceChart from 'components/charts/McapDominanceChart';
+import TransactionCountChart from 'components/charts/TransactionCountChart';
+import TransactionFeeChart from 'components/charts/TransactionFeeChart';
+import VolumeChart from 'components/charts/VolumeChart';
 
 const QUERY = gql`
   query Metrics {
-    tokenPrice(token: "sol") {
+    tokenPrice(token: "eth") {
       ts
       v
     }
-    activeAddresses(token: "sol") {
+    activeAddresses(token: "eth") {
       ts
       v
     }
-    transactionCount(token: "sol") {
+    transactionCount(token: "eth") {
       ts
       v
     }
-    volume(token: "sol") {
+    devActivity(token: "eth") {
       ts
       v
     }
-    devActivity(token: "sol") {
+    santimentDevActivity(token: "eth") {
       ts
       v
     }
-    santimentDevActivity(token: "sol") {
+    volume(token: "eth") {
       ts
       v
     }
-    circSupply(token: "sol") {
+    transactionFees(token: "eth") {
       ts
       v
     }
-    mcapDominance(token: "sol") {
+    circSupply(token: "eth") {
+      ts
+      v
+    }
+    mcapDominance(token: "eth") {
       ts
       v
     }
@@ -55,7 +60,7 @@ const LoadingGridItem = ({ loading, children }) => {
   );
 };
 
-export default function SolanaCharts() {
+export default function EthereumCharts() {
   const { data, loading, error } = useQuery(QUERY);
 
   if (error) {
@@ -70,6 +75,7 @@ export default function SolanaCharts() {
     devActivity,
     santimentDevActivity,
     volume,
+    transactionFees,
     circSupply,
     mcapDominance,
   } = data || {};
@@ -80,39 +86,48 @@ export default function SolanaCharts() {
         <ActiveAddressesChart
           activeAddresses={activeAddresses}
           price={tokenPrice}
-          token="sol"
+          token="eth"
         />
       </LoadingGridItem>
       <LoadingGridItem loading={loading}>
         <TransactionCountChart
           transactionCount={transactionCount}
           price={tokenPrice}
-          token="sol"
+          token="eth"
         />
       </LoadingGridItem>
       <LoadingGridItem loading={loading}>
-        <VolumeChart volume={volume} price={tokenPrice} token="sol" />
+        <VolumeChart volume={volume} price={tokenPrice} token="eth" />
       </LoadingGridItem>
+      <LoadingGridItem loading={loading}>
+        <TransactionFeeChart
+          transactionFees={transactionFees}
+          price={tokenPrice}
+          token="eth"
+        />
+      </LoadingGridItem>
+
       <LoadingGridItem loading={loading}>
         <CircSupplyChart circSupply={circSupply} />
       </LoadingGridItem>
       <LoadingGridItem loading={loading}>
         <McapDominanceChart mcapDominance={mcapDominance} />
       </LoadingGridItem>
+
       <LoadingGridItem loading={loading}>
         <GithubCommitChart
           devActivity={devActivity}
           price={tokenPrice}
-          tokenName="SOL"
-          chainName="Solana"
+          tokenName="ETH"
+          chainName="Ethereum"
         />
       </LoadingGridItem>
       <LoadingGridItem loading={loading}>
         <DevActivityChart
           devActivity={santimentDevActivity}
           price={tokenPrice}
-          tokenName="SOL"
-          chainName="Solana"
+          tokenName="ETH"
+          chainName="Ethereum"
         />
       </LoadingGridItem>
     </Grid>

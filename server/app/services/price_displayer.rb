@@ -1,11 +1,5 @@
-class PriceDisplayer < BaseService
-  attr_reader :token
-
+class PriceDisplayer < WeeklyValueDisplayer
   def initialize(token:)
-    @token = token
-  end
-
-  def run
-    Metric.by_token(token).by_metric('price').sundays.oldest_first
+    super(token: token, metric: 'price')
   end
 end

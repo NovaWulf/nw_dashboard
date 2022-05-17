@@ -8,29 +8,22 @@ import {
   Tooltip,
   YAxis,
 } from 'recharts';
-import { dateFormatter, mergeTimestamps, nFormatter } from '../lib/formatters';
-import DashboardItem from './DashboardItem';
-import PriceArea from './PriceArea';
-import TimeAxis from './TimeAxis';
-import CsvDownloadLink from './CsvDownloadLink';
+import { dateFormatter, mergeTimestamps, nFormatter } from 'lib/formatters';
+import DashboardItem from 'components/DashboardItem';
+import PriceArea from 'components/PriceArea';
+import TimeAxis from 'components/TimeAxis';
+import CsvDownloadLink from 'components/CsvDownloadLink';
 
-export default function DevActivityChart({
-  devActivity,
-  price,
-  tokenName,
-  chainName,
-}) {
+export default function VolumeChart({ volume, price, token }) {
   const theme = useTheme();
 
-  const data = mergeTimestamps(devActivity, price, 'price');
+  const data = mergeTimestamps(volume, price, token);
 
   return (
     <DashboardItem
-      title={`Dev Activity - ${chainName} Org`}
-      helpText="Dev Activity includes commits, but also comments, follows, issue creation, etc"
-      downloadButton={
-        <CsvDownloadLink data={devActivity} title="Dev Activity" />
-      }
+      title="Volume"
+      helpText="Real Volume, eg exchange volume minus wash trades"
+      downloadButton={<CsvDownloadLink data={volume} title="Volume Dollars" />}
     >
       <ResponsiveContainer width="99%" height={300}>
         <ComposedChart
@@ -40,30 +33,27 @@ export default function DevActivityChart({
           <Line
             type="monotone"
             dataKey="v"
-            name="Dev Activity"
+            name="Volume ($)"
             stroke={theme.palette.secondary.main}
             dot={false}
-            yAxisId="dev"
+            yAxisId="vol"
           />
-          {PriceArea({
-            token: 'price',
-            name: `${tokenName.toUpperCase()} Price`,
-          })}
-
+          {PriceArea({ token: token, name: `${token.toUpperCase()} Price` })}
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
           {TimeAxis()}
+
           <YAxis
-            yAxisId="dev"
+            yAxisId="vol"
             tickFormatter={nFormatter}
             stroke={theme.palette.secondary.main}
           />
           <YAxis
-            yAxisId="price"
+            yAxisId={token}
             orientation="right"
             tickFormatter={nFormatter}
             stroke={theme.palette.primary.main}
           />
-          <Tooltip labelFormatter={dateFormatter} />
+          <Tooltip labelFormatter={dateFormatter} formatter={nFormatter} />
           <Legend />
         </ComposedChart>
       </ResponsiveContainer>
