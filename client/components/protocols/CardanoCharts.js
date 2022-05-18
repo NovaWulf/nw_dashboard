@@ -103,7 +103,7 @@ export default function CardanoCharts() {
         <GithubCommitChart
           devActivity={devActivity}
           price={tokenPrice}
-          tokenName="AVAX"
+          tokenName="ADA"
           chainName="Cardano"
         />
       </LoadingGridItem>
@@ -111,7 +111,7 @@ export default function CardanoCharts() {
         <DevActivityChart
           devActivity={santimentDevActivity}
           price={tokenPrice}
-          tokenName="AVAX"
+          tokenName="ADA"
           chainName="Cardano"
         />
       </LoadingGridItem>
