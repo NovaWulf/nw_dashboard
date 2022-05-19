@@ -12,6 +12,7 @@ import TransactionFeeChart from 'components/charts/TransactionFeeChart';
 import VolumeChart from 'components/charts/VolumeChart';
 import SmartContractContractsChart from 'components/charts/SmartContractContractsChart';
 import SmartContractActiveAddressesChart from 'components/charts/SmartContractActiveAddressesChart';
+import LoadingGridItem from 'components/LoadingGridItem';
 
 const QUERY = gql`
   query Metrics {
@@ -61,14 +62,6 @@ const QUERY = gql`
     }
   }
 `;
-
-const LoadingGridItem = ({ loading, children }) => {
-  return (
-    <Grid item sx={{ display: 'flex' }} xs={12} md={6}>
-      {loading ? <Skeleton variant="rectangular" /> : children}
-    </Grid>
-  );
-};
 
 export default function EthereumCharts() {
   const { data, loading, error } = useQuery(QUERY);

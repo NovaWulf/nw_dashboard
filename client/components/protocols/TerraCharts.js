@@ -7,6 +7,7 @@ import DevActivityChart from 'components/charts/DevActivityChart';
 import GithubCommitChart from 'components/charts/GithubCommitChart';
 import McapDominanceChart from 'components/charts/McapDominanceChart';
 import VolumeChart from 'components/charts/VolumeChart';
+import LoadingGridItem from 'components/LoadingGridItem';
 
 const QUERY = gql`
   query Metrics {
@@ -40,14 +41,6 @@ const QUERY = gql`
     }
   }
 `;
-
-const LoadingGridItem = ({ loading, children }) => {
-  return (
-    <Grid item sx={{ display: 'flex' }} xs={12} md={6}>
-      {loading ? <Skeleton variant="rectangular" /> : children}
-    </Grid>
-  );
-};
 
 export default function TerraCharts() {
   const { data, loading, error } = useQuery(QUERY);

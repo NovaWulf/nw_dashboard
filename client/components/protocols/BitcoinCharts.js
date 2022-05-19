@@ -14,6 +14,7 @@ import RhodlRatioChart from 'components/charts/RhodlRatioChart';
 import TransactionCountChart from 'components/charts/TransactionCountChart';
 import VolumeChart from 'components/charts/VolumeChart';
 import TransactionFeeChart from 'components/charts/TransactionFeeChart';
+import LoadingGridItem from 'components/LoadingGridItem';
 
 const QUERY = gql`
   query Metrics {
@@ -71,14 +72,6 @@ const QUERY = gql`
     }
   }
 `;
-
-const LoadingGridItem = ({ loading, children }) => {
-  return (
-    <Grid item sx={{ display: 'flex' }} xs={12} md={6}>
-      {loading ? <Skeleton variant="rectangular" /> : children}
-    </Grid>
-  );
-};
 
 export default function BitcoinCharts() {
   const { data, loading, error } = useQuery(QUERY);
