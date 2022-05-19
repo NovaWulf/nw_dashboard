@@ -57,11 +57,11 @@ module Types
     end
 
     def btc_mvrv
-      Displayers::WeeklyValueDisplayer.run(token: 'btc', metric: 'mvrv')
+      Displayers::WeeklyValueDisplayer.run(token: 'btc', metric: 'mvrv').value
     end
 
     def rhodl_ratio
-      Displayers::WeeklyValueDisplayer.run(token: 'btc', metric: 'rhodl_ratio')
+      Displayers::WeeklyValueDisplayer.run(token: 'btc', metric: 'rhodl_ratio').value
     end
 
     def token_price(token:)
