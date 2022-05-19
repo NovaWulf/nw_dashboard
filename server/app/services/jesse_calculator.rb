@@ -2,7 +2,7 @@ class JesseCalculator < BaseService
   S2F_COEFF = 0.36
   HASHRATE_COEFF = 0.00000000000000000847
   GOOGLE_TRENDS_COEFF = 209.6
-  NON_ZERO_COEFF = -0.000000000000552
+  ACTIVE_ADDRESSES_COEFF = -0.000000000000552
   Y_INTERCEPT = -360.53
   STD_ERROR = 3540
 
@@ -27,9 +27,9 @@ class JesseCalculator < BaseService
         next
       end
 
-      non_zero_count = Metric.by_token('btc').by_metric('non_zero_count').by_day(day).first
-      unless non_zero_count&.value
-        Rails.logger.error "can't generate Jesse metric, no non_zero_count for #{day}"
+      active_addresses = Metric.by_token('btc').by_metric('active_addresses').by_day(day).first
+      unless active_addresses&.value
+        Rails.logger.error "can't generate Jesse metric, no active_addresses for #{day}"
         next
       end
 
@@ -42,7 +42,7 @@ class JesseCalculator < BaseService
       value = s2f.value * S2F_COEFF +
               hash_rate.value * HASHRATE_COEFF +
               google_trends.value * GOOGLE_TRENDS_COEFF +
-              (non_zero_count.value * non_zero_count.value) * NON_ZERO_COEFF +
+              (active_addresses.value * active_addresses.value) * ACTIVE_ADDRESSES_COEFF +
               Y_INTERCEPT
 
       m = Metric.create(timestamp: day, value: value, token: 'btc', metric: 'jesse')
@@ -54,7 +54,7 @@ class JesseCalculator < BaseService
   def fetch_required_data
     Fetchers::S2fFetcher.run
     Fetchers::HashRateFetcher.run
-    Fetchers::NonZeroAddressFetcher.run
+    Fetchers::ActiveAddressesFetcher.run(token: 'btc')
     TrendsImporter.run(path: 'https://gist.githubusercontent.com/iamnader/03b2da71d50c3cdeee4772ba66aeff2e/raw/bitcoin_trends')
   end
 
