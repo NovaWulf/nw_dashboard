@@ -18,7 +18,7 @@ export default function JesseChart({ jesse, btc }) {
 
   const data = mergeTimestamps(jesse, btc, 'btc');
 
-  const STD_ERROR = 3540;
+  const STD_ERROR = 3985;
 
   const updatedData = data.map(d => {
     return {
