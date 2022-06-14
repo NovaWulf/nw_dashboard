@@ -31,8 +31,8 @@ class MvrvCalculator < BaseService
   end
 
   def fetch_required_data
-    CirculatingMcapDataFetcher.run(token: 'btc')
-    BtcRealizedMcapDataFetcher.run
+    Fetchers::CirculatingMcapDataFetcher.run(token: 'btc')
+    Fetchers::BtcRealizedMcapDataFetcher.run
   end
 
   def email_notification(mvrv_value)
