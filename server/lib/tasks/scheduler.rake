@@ -13,7 +13,7 @@ task get_recent_data: :environment do
 
   # GithubActivityFetcher.run
   Fetchers::RhodlFetcher.run
-  Fetchers::MvrvCalculator.run
+  MvrvCalculator.run
   Fetchers::JesseCalculator.run
   Fetchers::SolanaActiveAddressesFetcher.run
   Fetchers::SolanaTransactionCountFetcher.run
