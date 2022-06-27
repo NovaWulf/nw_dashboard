@@ -7,6 +7,7 @@ RSpec.describe Hedgeserv::TradeParser do
     let(:filename) { 'sample_trades.csv' }
     it 'returns translated rows' do
       expect(result).to be_an_instance_of(Array)
+      # this is implicitly test EXP as it does not add a trade
       expect(result.count).to eql 4 # 4 trades no header
     end
 

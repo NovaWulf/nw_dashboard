@@ -19,6 +19,8 @@ module Hedgeserv
         translations = []
         rows.each do |row|
           @row = row
+          next if trade_type == 'EXP'
+
           translations << "• #{fundname} #{trade_type} #{quantity} #{instrument_type} of #{instrument} at #{trade_price} for a total of #{cost}"
         end
         translations
