@@ -54,6 +54,8 @@ module Hedgeserv
       case row[9]
       when 'Buy'
         'bought'
+      when 'Sell'
+        'sold'
       when 'BuyCover'
         'closed the short on'
       when 'SellShort'
@@ -64,7 +66,7 @@ module Hedgeserv
     end
 
     def cost
-      ActionController::Base.helpers.number_to_currency(row[15].to_f.abs)
+      ActionController::Base.helpers.number_to_currency(row[22].to_f.abs)
     end
 
     def trade_price
