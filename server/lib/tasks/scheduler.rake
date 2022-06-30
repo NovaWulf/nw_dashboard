@@ -25,6 +25,13 @@ task get_recent_data: :environment do
     Fetchers::TransactionFeeTokenTerminalFetcher.run(token: t)
   end
   Fetchers::EthereumSmartContractUsageFetcher.run
+
+  tracked_dapps = %w[aave uni crv]
+  tracked_dapps.each do |t|
+    Fetchers::PriceDataFetcher.run(token: t)
+    Fetchers::ActiveAddressesFetcher.run(token: t)
+    Fetchers::TransactionCountFetcher.run(token: t)
+  end
 end
 
 task backfill_github_data: :environment do

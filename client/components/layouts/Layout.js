@@ -13,6 +13,7 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  ListSubheader,
 } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -31,6 +32,9 @@ import { NearIcon } from 'components/icons/NearIcon';
 import { SolanaIcon } from 'components/icons/SolanaIcon';
 import { TerraIcon } from 'components/icons/TerraIcon';
 import { CardanoIcon } from 'components/icons/CardanoIcon';
+import { AaveIcon } from 'components/icons/AaveIcon';
+import { CurveIcon } from 'components/icons/CurveIcon';
+import { UniswapIcon } from 'components/icons/UniswapIcon';
 
 const drawerWidth = 200;
 
@@ -50,6 +54,7 @@ export default function Layout({ children }) {
       <Toolbar />
       <Divider />
       <List>
+        <ListSubheader>Layer 1s</ListSubheader>
         <Link href="/">
           <ListItem button selected={router.pathname == '/'} key="Bitcoin">
             <ListItemIcon>
@@ -116,6 +121,39 @@ export default function Layout({ children }) {
               <CardanoIcon />
             </ListItemIcon>
             <ListItemText primary="Cardano" />
+          </ListItem>
+        </Link>
+      </List>
+      <Divider />
+      <List>
+        <ListSubheader>Ethereum dApps</ListSubheader>
+
+        <Link href="/uniswap">
+          <ListItem
+            button
+            selected={router.pathname == '/uniswap'}
+            key="Uniswap"
+          >
+            <ListItemIcon>
+              <UniswapIcon />
+            </ListItemIcon>
+            <ListItemText primary="Uniswap" />
+          </ListItem>
+        </Link>
+        <Link href="/curve">
+          <ListItem button selected={router.pathname == '/curve'} key="Curve">
+            <ListItemIcon>
+              <CurveIcon />
+            </ListItemIcon>
+            <ListItemText primary="Curve" />
+          </ListItem>
+        </Link>
+        <Link href="/aave">
+          <ListItem button selected={router.pathname == '/aave'} key="Aave">
+            <ListItemIcon>
+              <AaveIcon />
+            </ListItemIcon>
+            <ListItemText primary="Aave" />
           </ListItem>
         </Link>
       </List>
