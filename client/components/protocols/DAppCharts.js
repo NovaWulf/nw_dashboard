@@ -2,6 +2,7 @@ import { gql, useQuery } from '@apollo/client';
 import Grid from '@mui/material/Grid';
 import ActiveAddressesChart from 'components/charts/ActiveAddressesChart';
 import TransactionCountChart from 'components/charts/TransactionCountChart';
+import TransactionFeeChart from 'components/charts/TransactionFeeChart';
 import LoadingGridItem from 'components/LoadingGridItem';
 
 const QUERY = gql`
@@ -18,6 +19,10 @@ const QUERY = gql`
       ts
       v
     }
+    transactionFees(token: $token) {
+      ts
+      v
+    }
   }
 `;
 
@@ -29,7 +34,8 @@ export default function DAppCharts({ token }) {
     return null;
   }
 
-  const { tokenPrice, activeAddresses, transactionCount } = data || {};
+  const { tokenPrice, activeAddresses, transactionCount, transactionFees } =
+    data || {};
 
   return (
     <Grid container spacing={3}>
@@ -43,6 +49,13 @@ export default function DAppCharts({ token }) {
       <LoadingGridItem loading={loading}>
         <TransactionCountChart
           transactionCount={transactionCount}
+          price={tokenPrice}
+          token={token}
+        />
+      </LoadingGridItem>
+      <LoadingGridItem loading={loading}>
+        <TransactionFeeChart
+          transactionFees={transactionFees}
           price={tokenPrice}
           token={token}
         />

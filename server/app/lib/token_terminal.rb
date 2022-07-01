@@ -1,6 +1,6 @@
 class TokenTerminal
   include HTTParty
-  base_uri 'https://api.tokenterminal.com/v1/'
+  base_uri 'https://api.tokenterminal.com/v2/'
 
   DEFAULT_START_DATE = Date.new(2017, 1, 1)
 
@@ -9,14 +9,14 @@ class TokenTerminal
   end
 
   def transaction_fees(token:, start_date: DEFAULT_START_DATE)
-    result = daily_response("/projects/#{project(token)}/metrics")
-    result.map { |r| [DateTime.parse(r['datetime']).to_date, r['revenue_protocol']] }.reverse
+    result = daily_response("/projects/#{project(token)}/metrics", start_date)
+    result.map { |r| [DateTime.parse(r['timestamp']).to_date, r['revenue_protocol']] }.reverse
   end
 
   private
 
-  def daily_response(path)
-    JSON.parse self.class.get(path, @options).body
+  def daily_response(path, start_date)
+    JSON.parse self.class.get("#{path}?since=#{start_date || DEFAULT_START_DATE}", @options).body
   end
 
   def project(token)
@@ -29,6 +29,12 @@ class TokenTerminal
       'avalanche'
     when 'near'
       'near-protocol'
+    when 'uni'
+      'uniswap'
+    when 'crv'
+      'curve'
+    when 'aave'
+      'aave'
     end
   end
 end
