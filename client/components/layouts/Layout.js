@@ -35,6 +35,7 @@ import { CardanoIcon } from 'components/icons/CardanoIcon';
 import { AaveIcon } from 'components/icons/AaveIcon';
 import { CurveIcon } from 'components/icons/CurveIcon';
 import { UniswapIcon } from 'components/icons/UniswapIcon';
+import { SynthetixIcon } from 'components/icons/SynthetixIcon';
 
 const drawerWidth = 200;
 
@@ -154,6 +155,14 @@ export default function Layout({ children }) {
               <AaveIcon />
             </ListItemIcon>
             <ListItemText primary="Aave" />
+          </ListItem>
+        </Link>
+        <Link href="/synthetix">
+          <ListItem button selected={router.pathname == '/aave'} key="Aave">
+            <ListItemIcon>
+              <SynthetixIcon />
+            </ListItemIcon>
+            <ListItemText primary="Synthetix" />
           </ListItem>
         </Link>
       </List>

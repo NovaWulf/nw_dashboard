@@ -26,7 +26,7 @@ task get_recent_data: :environment do
   end
   Fetchers::EthereumSmartContractUsageFetcher.run
 
-  tracked_dapps = %w[aave uni crv]
+  tracked_dapps = %w[aave uni crv snx]
   tracked_dapps.each do |t|
     Fetchers::PriceDataFetcher.run(token: t)
     Fetchers::ActiveAddressesFetcher.run(token: t)
