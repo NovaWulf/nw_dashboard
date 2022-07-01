@@ -35,6 +35,8 @@ class TokenTerminal
       'curve'
     when 'aave'
       'aave'
+    when 'snx'
+      'synthetix'
     end
   end
 end
