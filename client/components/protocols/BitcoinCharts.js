@@ -38,7 +38,7 @@ const QUERY = gql`
       ts
       v
     }
-    btcMarketCap: marketCap(token: "btc") {
+    btcMarketCap: circMarketCap(token: "btc") {
       ts
       v
     }

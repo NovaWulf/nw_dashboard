@@ -13,6 +13,11 @@ class TokenTerminal
     result.map { |r| [DateTime.parse(r['timestamp']).to_date, r['revenue_protocol']] }.reverse
   end
 
+  def tvl(token:, start_date: DEFAULT_START_DATE)
+    result = daily_response("/projects/#{project(token)}/metrics", start_date)
+    result.map { |r| [DateTime.parse(r['timestamp']).to_date, r['tvl']] }.reverse
+  end
+
   private
 
   def daily_response(path, start_date)

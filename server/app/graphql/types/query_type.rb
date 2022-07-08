@@ -24,7 +24,11 @@ module Types
       argument :token, String
     end
 
-    field :market_cap, [Types::MetricType], null: false do
+    field :circ_market_cap, [Types::MetricType], null: false do
+      argument :token, String
+    end
+
+    field :fully_diluted_market_cap, [Types::MetricType], null: false do
       argument :token, String
     end
 
@@ -41,6 +45,10 @@ module Types
     end
 
     field :volume, [Types::MetricType], null: false do
+      argument :token, String
+    end
+
+    field :tvl, [Types::MetricType], null: false do
       argument :token, String
     end
 
@@ -84,8 +92,12 @@ module Types
       Displayers::TransactionCountDisplayer.run(token: token).value
     end
 
-    def market_cap(token:)
-      Displayers::MarketCapDisplayer.run(token: token).value
+    def circ_market_cap(token:)
+      Displayers::CircMarketCapDisplayer.run(token: token).value
+    end
+
+    def fully_diluted_market_cap(token:)
+      Displayers::FullyDilutedMarketCapDisplayer.run(token: token).value
     end
 
     def mcap_dominance(token:)
@@ -94,6 +106,10 @@ module Types
 
     def circ_supply(token:)
       Displayers::CirculatingSupplyDisplayer.run(token: token).value
+    end
+
+    def tvl(token:)
+      Displayers::TvlDisplayer.run(token: token).value
     end
 
     def dev_activity(token:)

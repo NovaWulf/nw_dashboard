@@ -1,8 +1,11 @@
 import { gql, useQuery } from '@apollo/client';
 import Grid from '@mui/material/Grid';
 import ActiveAddressesChart from 'components/charts/ActiveAddressesChart';
+import CircSupplyChart from 'components/charts/CircSupplyChart';
+import FullyDilutedMarketCapChart from 'components/charts/FullyDilutedMarketCapChart';
 import TransactionCountChart from 'components/charts/TransactionCountChart';
 import TransactionFeeChart from 'components/charts/TransactionFeeChart';
+import TvlChart from 'components/charts/TvlChart';
 import LoadingGridItem from 'components/LoadingGridItem';
 
 const QUERY = gql`
@@ -23,6 +26,18 @@ const QUERY = gql`
       ts
       v
     }
+    tvl(token: $token) {
+      ts
+      v
+    }
+    circSupply(token: $token) {
+      ts
+      v
+    }
+    fullyDilutedMarketCap(token: $token) {
+      ts
+      v
+    }
   }
 `;
 
@@ -34,8 +49,15 @@ export default function DAppCharts({ token }) {
     return null;
   }
 
-  const { tokenPrice, activeAddresses, transactionCount, transactionFees } =
-    data || {};
+  const {
+    tokenPrice,
+    activeAddresses,
+    transactionCount,
+    transactionFees,
+    tvl,
+    circSupply,
+    fullyDilutedMarketCap,
+  } = data || {};
 
   return (
     <Grid container spacing={3}>
@@ -59,6 +81,15 @@ export default function DAppCharts({ token }) {
           price={tokenPrice}
           token={token}
         />
+      </LoadingGridItem>
+      <LoadingGridItem loading={loading}>
+        <TvlChart tvl={tvl} price={tokenPrice} token={token} />
+      </LoadingGridItem>
+      <LoadingGridItem loading={loading}>
+        <CircSupplyChart circSupply={circSupply} />
+      </LoadingGridItem>
+      <LoadingGridItem loading={loading}>
+        <FullyDilutedMarketCapChart marketCap={fullyDilutedMarketCap} />
       </LoadingGridItem>
     </Grid>
   );

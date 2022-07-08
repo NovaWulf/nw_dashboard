@@ -32,6 +32,9 @@ task get_recent_data: :environment do
     Fetchers::ActiveAddressesFetcher.run(token: t)
     Fetchers::TransactionCountFetcher.run(token: t)
     Fetchers::TransactionFeeTokenTerminalFetcher.run(token: t)
+    Fetchers::TvlFetcher.run(token: t)
+    Fetchers::CirculatingSupplyFetcher.run(token: t)
+    Fetchers::FullyDilutedMarketCapFetcher.run(token: t)
   end
 end
 

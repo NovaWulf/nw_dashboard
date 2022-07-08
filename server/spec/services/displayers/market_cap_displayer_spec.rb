@@ -1,4 +1,4 @@
-RSpec.describe Displayers::MarketCapDisplayer do
+RSpec.describe Displayers::CircMarketCapDisplayer do
   subject { described_class.run(token: 'btc') }
 
   before(:each) do
