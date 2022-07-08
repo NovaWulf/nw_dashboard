@@ -13,7 +13,10 @@ module Hedgeserv
         ['There are no positions reported.']
       else
         summary = rows.shift # skip the summary
-        translations = [['Total', sum_p_and_l([summary], 7), sum_p_and_l([summary], 8), sum_p_and_l([summary], 9)]]
+        translations = [['Total',
+                         format_header_cell(summary, 7, 17),
+                         format_header_cell(summary, 8, 18),
+                         format_header_cell(summary, 9, 19)]]
 
         Rails.logger.info "Found #{rows.count} positions"
 
@@ -29,6 +32,14 @@ module Hedgeserv
 
         translations
       end
+    end
+
+    def ror(row, col)
+      ActionController::Base.helpers.number_to_percentage(row[col].to_f * 100.0, precision: 2)
+    end
+
+    def format_header_cell(row, pnl_col, ror_col)
+      "#{sum_p_and_l([row], pnl_col)} [#{ror(row, ror_col)}]"
     end
 
     def sum_p_and_l(positions, column)
