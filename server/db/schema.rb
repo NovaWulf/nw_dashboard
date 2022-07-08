@@ -10,10 +10,25 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_04_04_134949) do
+ActiveRecord::Schema.define(version: 2022_07_08_232131) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "candles", force: :cascade do |t|
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "starttime", null: false
+    t.string "pair", null: false
+    t.string "exchange", null: false
+    t.integer "resolution", null: false
+    t.float "open", null: false
+    t.float "close", null: false
+    t.float "high", null: false
+    t.float "low", null: false
+    t.float "volume", null: false
+    t.index ["exchange", "starttime", "pair", "resolution"], name: "index_candles_on_exchange_and_starttime_and_pair_and_resolution", unique: true
+  end
 
   create_table "metrics", force: :cascade do |t|
     t.date "timestamp"
