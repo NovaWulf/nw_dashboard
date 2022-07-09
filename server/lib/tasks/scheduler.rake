@@ -58,3 +58,10 @@ end
 task hedgeserv_email: :environment do
   Hedgeserv::DailyProcessor.run
 end
+
+task download_candles: :environment do
+  tracked_pairs = %w[eth-usd op-usd]
+  tracked_pairs.each do |p|
+    Fetchers::CoinbaseFetcher.run(resolution: 3600, pair: p)
+  end
+end
