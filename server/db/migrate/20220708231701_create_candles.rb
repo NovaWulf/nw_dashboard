@@ -3,7 +3,7 @@ class CreateCandles < ActiveRecord::Migration[6.1]
     create_table :candles do |t|
 
       t.timestamps
-      t.datetime :starttime, null: false
+      t.integer :starttime, null: false
       t.string :pair, null: false
       t.string :exchange, null: false
       t.integer :resolution, null: false

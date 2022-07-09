@@ -1,4 +1,24 @@
-    # Candle Table Schema:
+# == Schema Information
+#
+# Table name: candles
+#
+#  id         :bigint           not null, primary key
+#  close      :float            not null
+#  exchange   :string           not null
+#  high       :float            not null
+#  low        :float            not null
+#  open       :float            not null
+#  pair       :string           not null
+#  resolution :integer          not null
+#  starttime  :integer          not null
+#  volume     :float            not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+# Indexes
+#
+#  index_candles_on_exchange_and_starttime_and_pair_and_resolution  (exchange,starttime,pair,resolution) UNIQUE
+#
     #   t.timestamps
     #   t.datetime :starttime, null: false
     #   t.string :pair, null: false

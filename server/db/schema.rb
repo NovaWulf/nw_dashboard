@@ -18,7 +18,7 @@ ActiveRecord::Schema.define(version: 2022_07_08_232131) do
   create_table "candles", force: :cascade do |t|
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.datetime "starttime", null: false
+    t.integer "starttime", null: false
     t.string "pair", null: false
     t.string "exchange", null: false
     t.integer "resolution", null: false
