@@ -62,6 +62,6 @@ end
 task download_candles: :environment do
   tracked_pairs = %w[eth-usd op-usd]
   tracked_pairs.each do |p|
-    Fetchers::CoinbaseFetcher.run(resolution: 3600, pair: p)
+    Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
   end
 end

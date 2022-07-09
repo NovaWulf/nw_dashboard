@@ -21,7 +21,7 @@ module Fetchers
       return if response.blank?
       
       response.each do |m|
-        puts m[0]
+        #puts m[0]
         Candle.create(starttime: m[0], pair: pair,exchange: "Coinbase",resolution: resolution,low: m[1],high: m[2],open: m[3],close: m[4],volume: m[5] )
       end
     end

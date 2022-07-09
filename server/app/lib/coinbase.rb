@@ -40,12 +40,39 @@ class Coinbase
         }
     end
     def response(path, start_time, resolution)
-      time_now =  Time.now.getutc.to_i.to_s
-      start_timestamp= start_time.to_i.to_s
+      time_now =  Time.now.getutc.to_i
+      start_timestamp= start_time.to_i
       
-      puts "time now: " + time_now + " start timestamp: " + start_timestamp + " resolution: " + resolution.to_s  
-      response = self.class.get("#{path}?start=#{start_timestamp}&end=#{time_now}&granularity=#{resolution}", headers: generate_headers(path))
-      response.parsed_response
+      numCandles = (time_now-start_timestamp.to_i).div(resolution)
+      
+      if numCandles>300
+        responses=[]
+        Rails.logger.info "#{numCandles} candles exceeds maximum amount of 300, using pagination..."
+        newStartTime = time_now - 298*resolution
+        responses.concat self.class.get("#{path}?start=#{newStartTime.to_s}&end=#{time_now}&granularity=#{resolution}", headers: generate_headers(path)).parsed_response
+        
+        firstTime = responses.last()[0]
+        puts "time now: "+time_now.to_s+" most recent time: " +responses[0][0].to_s+ " last time: " +firstTime.to_s
+        newEndTime=firstTime-resolution
+        while newEndTime>start_timestamp 
+            newStartTime=newEndTime-299*resolution
+            responses.concat self.class.get("#{path}?start=#{newStartTime.to_s}&end=#{newEndTime.to_s}&granularity=#{resolution}", headers: generate_headers(path))
+            .parsed_response
+            newEndTime=newEndTime-300*resolution
+            newEndTime2=responses.last()[0]-resolution
+            puts "newEndTime: "+newEndTime.to_s+ " newEndTime2: "+ newEndTime2.to_s
+            if newEndTime<start_timestamp
+                newEndTime=start_timestamp
+            end
+        end
+      else
+        puts "time now: " + time_now.to_s + " start timestamp: " + start_timestamp.to_s + " resolution: " + resolution.to_s  
+        responses = self.class.get("#{path}?start=#{start_timestamp.to_s}&end=#{time_now.to_s}&granularity=#{resolution}", headers: generate_headers(path))
+        responses = responses.parsed_response
+        #puts responses
+      end
+      responses
+      
     end
   
   end
