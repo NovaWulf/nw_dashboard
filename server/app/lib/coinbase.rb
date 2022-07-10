@@ -4,7 +4,7 @@ class Coinbase
     require 'json'
     base_uri 'https://api.exchange.coinbase.com/products'
   
-    DEFAULT_START_TIME = DateTime.new(2022, 7, 8,0,0,0).to_i.to_s
+    DEFAULT_START_TIME = DateTime.new(2022, 6, 01,0,0,0).to_i.to_s
   
     def initialize
       @key = ENV['COINBASE_API_KEY']
@@ -21,12 +21,12 @@ class Coinbase
 
     private
     def get_signature(request_path='', timestamp=nil, method='GET')
-        puts "timestamp: " + timestamp + " method: " + method + " request_path: " + request_path
+        # puts "timestamp: " + timestamp + " method: " + method + " request_path: " + request_path
         message = "#{timestamp}#{method}#{request_path}"
         # create a sha256 hmac with the secret
         secret = Base64.decode64(@secret)
         hash = Base64.strict_encode64(OpenSSL::HMAC.hexdigest('sha256', secret, message))
-        puts "hash: " + hash
+        #puts "hash: " + hash
         return hash
     end
 
@@ -60,7 +60,6 @@ class Coinbase
             .parsed_response
             newEndTime=newEndTime-300*resolution
             newEndTime2=responses.last()[0]-resolution
-            puts "newEndTime: "+newEndTime.to_s+ " newEndTime2: "+ newEndTime2.to_s
             if newEndTime<start_timestamp
                 newEndTime=start_timestamp
             end
