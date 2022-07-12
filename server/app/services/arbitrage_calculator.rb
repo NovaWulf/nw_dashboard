@@ -4,32 +4,35 @@ class ArbitrageCalculator < BaseService
     OP_WEIGHT = -2174.7378
     CONST_WEIGHT = 37.531326
     MODEL_ID = "adb21bd1-2204-ba24-07ac-36b78eb7dfc4"
+
     def run
     #   tracked_pairs = ["eth-usd","op-usd"]
     #   tracked_pairs.each do |p|
     #     Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
     #   end
-      res= 60
-      last_timestamp = ModeledSignal.by_model(MODEL_ID).last&.starttime
+    mostRecentModelID = CointegrationModels.newest_first.first&.uuid
+    puts "mostRecentModelID: " + mostRecentModelID.to_s
+    #   res= 60
+    #   last_timestamp = ModeledSignal.by_model(MODEL_ID).last&.starttime
       
-      start_time = last_timestamp ? last_timestamp + res : Date.new(2022, 6, 13).to_time.to_i
-      puts "start time: " + start_time.to_s
+    #   start_time = last_timestamp ? last_timestamp + res : Date.new(2022, 6, 13).to_time.to_i
+    #   puts "start time: " + start_time.to_s
 
-      starttimes = Candle.by_resolution(res).where("starttime> " + start_time.to_s).pluck(:starttime)
-      puts "length of start times: " + starttimes.length().to_s
-      starttimes = starttimes.uniq.sort
-      puts "length of uniq start times: " + starttimes.length().to_s
+    #   starttimes = Candle.by_resolution(res).where("starttime> " + start_time.to_s).pluck(:starttime)
+    #   puts "length of start times: " + starttimes.length().to_s
+    #   starttimes = starttimes.uniq.sort
+    #   puts "length of uniq start times: " + starttimes.length().to_s
 
-      counter=0
-      starttimes.each do |time|
-        counter = counter+1
-        if counter<10
-            puts time.to_s
-        end
-      end
+    #   counter=0
+    #   starttimes.each do |time|
+    #     counter = counter+1
+    #     if counter<10
+    #         puts time.to_s
+    #     end
+    #   end
     #   opCandles = Candle.by_resolution(res).where("starttime > "+start_time.to_s).by_pair("op-usd")
     #   ethCandles = Candle.by_resolution(res).where("starttime > "+start_time.to_s).by_pair("eth-usd")
-      
+    
 
 
     #   puts "length of candles: " + ethCandles.length().to_s + " length of op candles: " + opCandles.length().to_s
@@ -52,7 +55,7 @@ class ArbitrageCalculator < BaseService
   
     #  email_notification m if m
     end
-  
+    
   
     # def email_notification(jesse_metric)
     #   btc_price = Metric.by_token('btc').by_metric('price').by_day(jesse_metric.timestamp).first
