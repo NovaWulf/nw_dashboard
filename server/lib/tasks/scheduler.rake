@@ -65,3 +65,7 @@ task download_candles: :environment do
     Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
   end
 end
+
+task update_arb_signal: :environment do
+  ArbitrageCalculator.run
+end

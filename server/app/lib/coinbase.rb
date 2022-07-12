@@ -10,7 +10,6 @@ class Coinbase
       @key = ENV['COINBASE_API_KEY']
       @secret = ENV['COINBASE_API_SECRET']     
       @pass = ENV['COINBASE_PASS']
-      puts "key: " + @key + " secret: " + @secret + " pass: " + @pass     
     end
 
     
