@@ -165,6 +165,19 @@ export default function Layout({ children }) {
             <ListItemText primary="Synthetix" />
           </ListItem>
         </Link>
+        <ListSubheader>other</ListSubheader>
+        <Link href="/arbitrage">
+          <ListItem
+            button
+            selected={router.pathname == '/arbitrage'}
+            key="Arbitrage"
+          >
+            <ListItemIcon>
+              <EthereumIcon />
+            </ListItemIcon>
+            <ListItemText primary="Arbitrage" />
+          </ListItem>
+        </Link>
       </List>
     </div>
   );
