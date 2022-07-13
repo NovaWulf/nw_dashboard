@@ -7,7 +7,6 @@ module Types
     field :btc_mvrv, [Types::MetricType], null: false
     field :rhodl_ratio, [Types::MetricType], null: false
     field :jesse, [Types::MetricType], null: false
-    field :arb_signal, [Types::ModeledSignalType], null: false
 
     field :smart_contract_active_users, [Types::MetricType], null: false do
       argument :token, String
@@ -31,6 +30,10 @@ module Types
 
     field :fully_diluted_market_cap, [Types::MetricType], null: false do
       argument :token, String
+    end
+
+    field :arb_signal, [Types::ModeledSignalType], null: false do
+      argument :model, String
     end
 
     field :circ_supply, [Types::MetricType], null: false do
