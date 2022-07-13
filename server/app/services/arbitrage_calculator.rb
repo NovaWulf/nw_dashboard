@@ -45,14 +45,14 @@ class ArbitrageCalculator < BaseService
             ethNotNull=1
             currentEthVal = thisEthCandle.pluck(:close)[0]
         end
-        if ethNotNull and opNotNull
-            break
+        if ethNotNull==1 and opNotNull==1
+          break
         end
         index = index+1
       end
       puts "index: " + index.to_s 
       counter=0
-      lengthStartTimes =starttimes.length()
+      lengthStartTimes = starttimes.length()
       starttimes = starttimes[index..(lengthStartTimes-1)]
       m=nil
       starttimes.each do |time|
@@ -88,10 +88,10 @@ class ArbitrageCalculator < BaseService
   
       if signal_value > upper 
         NotificationMailer.with(subject: 'Statistical Arbitrage Indicator Alert',
-                                text: "OP-ETH spread value (#{signal_value.round(2)}) is above the high band of Paul's indicator (#{(upper).round(2)})").notification.deliver_now
+                                text: "OP-ETH spread value (#{signal_value.round(2)}) is above the high band of Paul's indicator (#{(upper).round(2)}). Recommend buying OP and shorting ETH").notification.deliver_now
       elsif signal_value < lower
         NotificationMailer.with(subject: 'Statistical Arbitrage Indicator Alert',
-                                text: "OP-ETH (#{signal_value.round(2)}) is below the low band of Paul's indicator (#{(lower).round(2)})").notification.deliver_now
+                                text: "OP-ETH (#{signal_value.round(2)}) is below the low band of Paul's indicator (#{(lower).round(2)}). Recommend buying ETH and shorting OP").notification.deliver_now
       end
 
     end
