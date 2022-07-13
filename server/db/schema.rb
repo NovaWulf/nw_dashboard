@@ -47,6 +47,8 @@ ActiveRecord::Schema.define(version: 2022_07_12_133110) do
     t.float "cv_1_pct"
     t.float "test_stat"
     t.float "top_eig"
+    t.float "in_sample_mean"
+    t.float "in_sample_sd"
     t.integer "resolution"
     t.integer "model_starttime"
     t.integer "model_endtime"
@@ -68,10 +70,6 @@ ActiveRecord::Schema.define(version: 2022_07_12_133110) do
     t.string "model_id", null: false
     t.integer "resolution", null: false
     t.float "value", null: false
-    t.float "sigma"
-    t.float "in_sample_mean"
-    t.float "in_sample_sd_plus"
-    t.float "in_sample_sd_minus"
   end
 
   create_table "repo_commits", force: :cascade do |t|

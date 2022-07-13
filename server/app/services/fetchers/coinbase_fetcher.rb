@@ -8,14 +8,15 @@ module Fetchers
     end
   
     def run
-      last_timestamp = Candle.by_exchange("coinbase").by_pair(pair).by_resolution(resolution).last&.timestamp
+      last_timestamp = Candle.by_exchange("Coinbase").by_pair(pair).by_resolution(resolution).oldest_first.last&.starttime
       
-      if last_timestamp && last_timestamp >= Date.today
+      if last_timestamp &&  Time.now.to_i-last_timestamp<=resolution
         Rails.logger.info "have recent data, returning"
         return
       end
-  
+      puts "last timestamp: " +last_timestamp.to_s
       start_timestamp = last_timestamp ? last_timestamp + resolution : nil
+      puts "start timestamp: " + start_timestamp.to_s
       Rails.logger.info "fetching #{pair}, start date: #{start_timestamp}"
       response = coinbase_client.getPrices(pair: pair, start_time: start_timestamp, resolution:resolution )
       return if response.blank?

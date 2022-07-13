@@ -1,12 +1,12 @@
 class ArbitrageCalculator < BaseService
     
-
     def run
-    #   tracked_pairs = ["eth-usd","op-usd"]
-    #   tracked_pairs.each do |p|
-    #     Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
-    #   end
+      tracked_pairs = ["eth-usd","op-usd"]
+      tracked_pairs.each do |p|
+        Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
+      end
       mostRecentModelID = CointegrationModel.newest_first.first&.uuid
+
       opWeight = CointegrationModelWeight.where("uuid = '#{mostRecentModelID}' and asset_name = 'op-usd'").pluck(:weight)[0]
       ethWeight = CointegrationModelWeight.where("uuid = '#{mostRecentModelID}' and asset_name = 'eth-usd'").pluck(:weight)[0]
       constWeight = CointegrationModelWeight.where("uuid = '#{mostRecentModelID}' and asset_name = 'det'").pluck(:weight)[0]
@@ -17,60 +17,83 @@ class ArbitrageCalculator < BaseService
       start_time = last_timestamp ? last_timestamp + res : Date.new(2022, 6, 13).to_time.to_i
       puts "start time: " + start_time.to_s
 
-      starttimes = Candle.by_resolution(res).where("starttime> " + start_time.to_s).pluck(:starttime)
+      starttimes = Candle.by_resolution(res).where("starttime> #{start_time}").pluck(:starttime)
       puts "length of start times: " + starttimes.length().to_s
       starttimes = starttimes.uniq.sort
       puts "length of uniq start times: " + starttimes.length().to_s
+    #   minOPTime = Candle.by_resolution(res).by_pair("op-usd").where("starttime> #{starttime}").minimum(:starttime)
+    #   minETHTime = Candle.by_resolution(res).by_pair("eth-usd").where("starttime> #{starttime}").minimum(:starttime)
+      
+      ethNotNull=0
+      opNotNull=0
+      index = 0
+      currentEthVal = nil
+      currentOpVal = nil
+      #this code block cycles through the candles until we have a record from each of OP and ETH
+      #so that we can start the forward-filling of missing timesteps using most recent values
+      while true
+        thisStartTime = starttimes[index]
+        thisOpCandle = Candle.by_resolution(res).by_pair("op-usd").where("starttime = #{thisStartTime}")
+        thisEthCandle = Candle.by_resolution(res).by_pair("eth-usd").where("starttime = #{thisStartTime}")
+        puts "eth candle: " + thisEthCandle.count.to_s
+        puts "op candle: " + thisOpCandle.count.to_s
+        if thisOpCandle.count >0
+            opNotNull=1
+            currentOpVal = thisOpCandle.pluck(:close)[0]
+        end
+        if thisEthCandle.count>0
+            ethNotNull=1
+            currentEthVal = thisEthCandle.pluck(:close)[0]
+        end
+        if ethNotNull and opNotNull
+            break
+        end
+        index = index+1
+      end
+      puts "index: " + index.to_s 
+      counter=0
+      lengthStartTimes =starttimes.length()
+      starttimes = starttimes[index..(lengthStartTimes-1)]
+      m=nil
+      starttimes.each do |time|
+        thisOpCandle = Candle.by_resolution(res).by_pair("op-usd").where("starttime = #{time}")
+        thisEthCandle = Candle.by_resolution(res).by_pair("eth-usd").where("starttime = #{time}")
+        
+        # update current candle value if not null, otherwise, use most recent non-null value (flat-forward interpolation)
+        if thisOpCandle.count >0
+            currentOpVal = thisOpCandle.pluck(:close)[0]
+        end
+        if thisEthCandle.count>0
+            currentEthVal = thisEthCandle.pluck(:close)[0]
+        end
+        puts "currentOpVal: " + currentOpVal.to_s + " opWeight: " + opWeight.to_s + " currentEthVal: " + currentEthVal.to_s + " ethWeight: " + ethWeight.to_s + " constWeight: " + constWeight.to_s
+        signalValue = currentOpVal*opWeight + currentEthVal*ethWeight + constWeight
+        
+        m=ModeledSignal.create(starttime: time, model_id: mostRecentModelID, resolution: res, value: signalValue)
+      end
 
-    #   counter=0
-    #   starttimes.each do |time|
-    #     counter = counter+1
-    #     if counter<10
-    #         puts time.to_s
-    #     end
-    #   end
-    #   opCandles = Candle.by_resolution(res).where("starttime > "+start_time.to_s).by_pair("op-usd")
-    #   ethCandles = Candle.by_resolution(res).where("starttime > "+start_time.to_s).by_pair("eth-usd")
-    
-
-
-    #   puts "length of candles: " + ethCandles.length().to_s + " length of op candles: " + opCandles.length().to_s
-    #   m = nil
-    #   (start_date..Date.today).each do |day|
-    #     s2f = Metric.by_token('btc').by_metric('s2f_ratio').by_day(day).first
-    #     unless s2f&.value
-    #       Rails.logger.error "can't generate Jesse metric, no s2f for #{day}"
-    #       next
-    #     end
-  
-    #     value = s2f.value * S2F_COEFF +
-    #             hash_rate.value * HASHRATE_COEFF +
-    #             google_trends.value * GOOGLE_TRENDS_COEFF +
-    #             (active_addresses.value * active_addresses.value) * ACTIVE_ADDRESSES_COEFF +
-    #             Y_INTERCEPT
-  
-    #     m = Metric.create(timestamp: day, value: value, token: 'btc', metric: 'jesse')
-    #   end
-  
-    #  email_notification m if m
+    email_notification(m) if m
     end
     
   
-    # def email_notification(jesse_metric)
-    #   btc_price = Metric.by_token('btc').by_metric('price').by_day(jesse_metric.timestamp).first
+    def email_notification(arb_signal,sigma = 1)
+      mostRecentModel =   CointegrationModel.newest_first.first
+      in_sample_mean = mostRecentModel&.in_sample_mean
+      in_sample_sd  = mostRecentModel&.in_sample_sd 
+      return unless arb_signal && mostRecentModel
+      puts "sending email!"
+      signal_value = arb_signal.value
+      upper = in_sample_mean + sigma*in_sample_sd
+      lower = in_sample_mean - sigma*in_sample_sd
   
-    #   return unless btc_price && jesse_metric
-  
-    #   btc_value = btc_price.value
-    #   jesse_value = jesse_metric.value
-  
-    #   if btc_value > jesse_value + STD_ERROR
-    #     NotificationMailer.with(subject: 'Jesse Indicator Alert',
-    #                             text: "BTC (#{btc_value.round(2)}) is above the high band of Jesse's indicator (#{(jesse_value + STD_ERROR).round(2)})").notification.deliver_now
-    #   elsif btc_value < jesse_value - STD_ERROR
-    #     NotificationMailer.with(subject: 'Jesse Indicator Alert',
-    #                             text: "BTC (#{btc_value.round(2)}) is below the low band of Jesse's indicator (#{(jesse_value - STD_ERROR).round(2)})").notification.deliver_now
-    #   end
-    # end
+      if signal_value > upper 
+        NotificationMailer.with(subject: 'Statistical Arbitrage Indicator Alert',
+                                text: "OP-ETH spread value (#{signal_value.round(2)}) is above the high band of Paul's indicator (#{(upper).round(2)})").notification.deliver_now
+      elsif signal_value < lower
+        NotificationMailer.with(subject: 'Statistical Arbitrage Indicator Alert',
+                                text: "OP-ETH (#{signal_value.round(2)}) is below the low band of Paul's indicator (#{(lower).round(2)})").notification.deliver_now
+      end
+
+    end
   end
   

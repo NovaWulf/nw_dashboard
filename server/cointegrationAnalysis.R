@@ -25,6 +25,15 @@ spec = "transitory"
 type = "trace"
 jo=ca.jo(dataMat,type= type,ecdet = ecdet,spec=spec)
 summary(jo)
+
+
+vecs = jo@V
+
+spread = vecs[1,1]*bothDat$close.x + vecs[2,1]*bothDat$close.y+vecs[3,1]
+
+meanSpread= mean(spread)
+sdSpread = sd(spread)
+
 plot1 = xyplot(close.x~start_datetime,bothDat,type="l", auto.key = TRUE, main = "double axis plot of OP vs ETH futures")
 plot2 = xyplot(close.y~start_datetime,bothDat,type="l",auto.key = TRUE)
 doubleYScale(plot1, plot2)
@@ -54,20 +63,20 @@ valueVec = c(
         jo@lambda[1],
         resolution,
         realStartDate,
-        realEndDate
+        realEndDate,
+        meanSpread,
+        sdSpread
         )
 
-colNameString = "(id, timestamp,ecdet,spec,cv_10_pct,cv_5_pct,cv_1_pct,test_stat,top_eig,resolution,start_model,end_model)"
+colNameString = "(uuid, timestamp,ecdet,spec,cv_10_pct,cv_5_pct,cv_1_pct,test_stat,top_eig,resolution,model_starttime,model_endtime,in_sample_mean,in_sample_sd)"
 valueString = paste0(c("(",paste0(valueVec,collapse = ","),")"),collapse = "")
 queryString = paste0("insert into cointegration_models " , colNameString," values",valueString)
 sqlQuery(dbhandle,queryString)
 
-vecs = jo@V
-
 assetNames = c("'eth-usd'","'op-usd'","'det'")
 assetWeights=c(vecs[1,1],vecs[2,1],vecs[3,1])
 
-colNamesString2 = "(id,timestamp,asset_name,weight)"
+colNamesString2 = "(uuid,timestamp,asset_name,weight)"
 
 valStrings=rep("",3)
 for (i in 1:3){
@@ -76,3 +85,5 @@ for (i in 1:3){
 totalValString = paste0(valStrings,collapse=",")
 
 sqlQuery(dbhandle,paste0("insert into cointegration_model_weights ",colNamesString2," values ",totalValString))
+
+

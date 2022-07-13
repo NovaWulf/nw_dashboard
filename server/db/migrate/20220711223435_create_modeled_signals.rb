@@ -7,11 +7,7 @@ class CreateModeledSignals < ActiveRecord::Migration[6.1]
       t.string :model_id, null: false
       t.integer :resolution, null: false
       t.float :value, null: false
-      t.float :sigma
-      t.float :in_sample_mean
-      t.float :in_sample_sd_plus
-      t.float :in_sample_sd_minus
-
+      
     end
   end
 end

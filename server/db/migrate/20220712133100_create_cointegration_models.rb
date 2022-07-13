@@ -11,6 +11,8 @@ class CreateCointegrationModels < ActiveRecord::Migration[6.1]
       t.float :cv_1_pct
       t.float :test_stat
       t.float :top_eig
+      t.float :in_sample_mean
+      t.float :in_sample_sd
       t.integer :resolution
       t.integer :model_starttime
       t.integer :model_endtime
