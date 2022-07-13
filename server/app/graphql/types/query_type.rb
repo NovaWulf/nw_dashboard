@@ -7,6 +7,7 @@ module Types
     field :btc_mvrv, [Types::MetricType], null: false
     field :rhodl_ratio, [Types::MetricType], null: false
     field :jesse, [Types::MetricType], null: false
+    field :arb_signal, [Types::ModeledSignalType], null: false
 
     field :smart_contract_active_users, [Types::MetricType], null: false do
       argument :token, String
@@ -122,6 +123,10 @@ module Types
 
     def jesse
       Displayers::WeeklyValueDisplayer.run(token: 'btc', metric: 'jesse').value
+    end
+
+    def arb_signal(model:)
+      Displayers::DailyValueDisplayer.run(model: model).value
     end
 
     def smart_contract_contracts(token:)
