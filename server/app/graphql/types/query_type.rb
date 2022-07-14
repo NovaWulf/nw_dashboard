@@ -137,7 +137,7 @@ module Types
       CointegrationModel.newest_first.first
     end
 
-    def cointegration_model_info(:model)
+    def cointegration_model_info(model:)
       CointegrationModel.where("uuid = '#{model}'")
     end
 
