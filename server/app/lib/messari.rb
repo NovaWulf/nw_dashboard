@@ -2,13 +2,14 @@ class Messari
   include HTTParty
   base_uri 'data.messari.io/api/v1'
 
-  DEFAULT_START_DATE = Date.new(2017, 1, 1)
+  DEFAULT_START_DATE = Date.new(2017, 1, 10)
 
   def initialize
     @options = { headers: { "x-messari-api-key": ENV['MESSARI_API_KEY'] } }
   end
 
   def price(token:, start_date: DEFAULT_START_DATE)
+    puts "start date: " + (start_date|| DEFAULT_START_DATE).to_s
     daily_response("/assets/#{slug(token)}/metrics/price/time-series", start_date || DEFAULT_START_DATE)
   end
 

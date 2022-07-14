@@ -17,6 +17,7 @@ module Fetchers
       start_date = last_date ? last_date + 1.day : nil
       Rails.logger.info "fetching #{metric_display_name}, start date: #{start_date}"
       response = messari_client.send(metric.to_sym, **{ token: token, start_date: start_date })
+      puts response.to_s
       mc_vals = response['data']['values']
       return unless mc_vals
 

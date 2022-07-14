@@ -6,31 +6,37 @@ import ActiveAddressesChart from 'components/charts/ActiveAddressesChart';
 
 
 const QUERY = gql`
-  query Metrics {
+  query ModeledSignals {
    
     arb_signal {
       ts
       v
     }
+  }
+`;
 
-    latest_cointegration_model {
-      in_sample_mean, 
-      in_sample_sd
+const QUERY2 = gql`
+  query CointegationModels {
+    latestCointegrationModelInfo {
+      id,
+      uuid,
+      inSampleMean, 
+      inSampleSd
     }
   }
 `;
 
 export default function ArbitrageCharts() {
-  const { data, loading, error } = useQuery(QUERY);
+  const { data, loading, error } = useQuery(QUERY2);
 
   if (error) {
     console.error(error);
     return null;
   }
-
+  console.error( "data: "  + data)
   const {
     arb_signal,
-    latest_cointegration_model
+    latest_cointegration_model_info
   } = data || {};
 
   return (

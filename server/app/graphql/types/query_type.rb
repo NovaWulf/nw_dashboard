@@ -134,14 +134,18 @@ module Types
     end
 
     def latest_cointegration_model_info
-      CointegrationModel.newest_first.first
+      puts "received query for latest cointegration model info"
+      [CointegrationModel.newest_first.first]
     end
 
     def cointegration_model_info(model:)
-      CointegrationModel.where("uuid = '#{model}'")
+      thing = CointegrationModel.where("uuid = '#{model}'").first
+      puts "thing: " + thing.to_s
+      return [thing]
     end
 
     def arb_signal(model:)
+      puts "received query for arb_signal"
       Displayers::DailyValueDisplayer.run(model: model).value
     end
 
