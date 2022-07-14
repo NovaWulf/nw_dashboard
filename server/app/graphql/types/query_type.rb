@@ -8,6 +8,7 @@ module Types
     field :rhodl_ratio, [Types::MetricType], null: false
     field :jesse, [Types::MetricType], null: false
     field :latest_cointegration_model_info, [Types::CointegrationModelType], null: false
+    field :arb_signal_latest_model, [Types::ModeledSignalType], null: false
 
     field :cointegration_model_info, [Types::CointegrationModelType], null: false do
       argument :model, String
@@ -35,10 +36,6 @@ module Types
 
     field :fully_diluted_market_cap, [Types::MetricType], null: false do
       argument :token, String
-    end
-
-    field :arb_signal, [Types::ModeledSignalType], null: false do
-      argument :model, String
     end
 
     field :circ_supply, [Types::MetricType], null: false do
@@ -134,19 +131,15 @@ module Types
     end
 
     def latest_cointegration_model_info
-      puts "received query for latest cointegration model info"
       [CointegrationModel.newest_first.first]
     end
 
     def cointegration_model_info(model:)
-      thing = CointegrationModel.where("uuid = '#{model}'").first
-      puts "thing: " + thing.to_s
-      return [thing]
+      [CointegrationModel.where("uuid = '#{model}'").first]
     end
 
-    def arb_signal(model:)
-      puts "received query for arb_signal"
-      Displayers::DailyValueDisplayer.run(model: model).value
+    def arb_signal_latest_model()      
+      Displayers::DailyValueDisplayer.run(model: nil).value
     end
 
     def smart_contract_contracts(token:)

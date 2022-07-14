@@ -4,9 +4,9 @@ module Types
       field :model, String, null: false
       field :ts, Integer, null: false
       field :v, Float, null: false
-  
+      
       def ts
-        object.timestamp.to_time.utc.to_i
+        object.starttime
       end
   
       def v

@@ -6,46 +6,41 @@ import ArbitrageSignalChart from 'components/charts/ArbitrageSignalChart';
 
 
 const QUERY = gql`
-  query ModeledSignals {
-   
-    arb_signal {
-      ts
-      v
-    }
+query {
+  latestCointegrationModelInfo {
+    inSampleMean,
+    inSampleSd,
+    uuid, 
+    id
   }
-`;
 
-const QUERY2 = gql`
-  query CointegationModels {
-    latestCointegrationModelInfo {
-      id,
-      uuid,
-      inSampleMean, 
-      inSampleSd
-    }
+  arbSignalLatestModel {
+    ts
+    v
   }
+}
 `;
 
 export default function ArbitrageCharts() {
-  const { data, loading, error } = useQuery(QUERY2);
+  const { data, loading, error } = useQuery(QUERY);
+  const {
+    latestCointegrationModelInfo,
+    arbSignalLatestModel
+  } = data || {};
+  console.log("latest cointegration model info: " + JSON.stringify(data))
 
   if (error) {
     console.error(error);
     return null;
   }
-  console.error( "data: "  + data)
-  const {
-    arb_signal,
-    latest_cointegration_model_info
-  } = data || {};
-
+  
   return (
     <Grid container spacing={3}>
       <Grid item sx={{ display: 'flex' }} xs={12} md={12}>
         {loading ? (
           <Skeleton variant="rectangular" />
         ) : (
-          <ArbitrageSignalChart arb_signal={arb_signal} mean = {latest_cointegration_model.in_sample_mean} sd={latest_cointegration_model.in_sampel_sd} />
+          <ArbitrageSignalChart arb_signal={arbSignalLatestModel} mean = {latestCointegrationModelInfo.inSampleMean} sd={latestCointegrationModelInfo.inSampleSd} />
         )}
       </Grid>
     </Grid>

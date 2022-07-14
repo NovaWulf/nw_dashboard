@@ -17,5 +17,5 @@ class ModeledSignal < ApplicationRecord
     scope :by_starttime, ->(t) { where(starttime: t) }
     scope :on_the_hour, -> { where('extract(minute from to_timestamp(starttime)) = ?', 0) }
     scope :at_noon, -> { where('extract(hour from to_timestamp(starttime)) = ?', 12) }
-    scope :oldest_first, -> { order(timestamp: :asc) }
+    scope :oldest_first, -> { order(starttime: :asc) }
 end
