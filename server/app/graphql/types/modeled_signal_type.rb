@@ -1,7 +1,7 @@
 module Types
     class ModeledSignalType < Types::BaseObject
       field :id, ID, null: false
-      field :model String, null: false
+      field :model, String, null: false
       field :ts, Integer, null: false
       field :v, Float, null: false
   
