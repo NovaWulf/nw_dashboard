@@ -2,7 +2,7 @@ import { gql, useQuery } from '@apollo/client';
 import { Skeleton } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import * as React from 'react';
-import ActiveAddressesChart from 'components/charts/ActiveAddressesChart';
+import ArbitrageSignalChart from 'components/charts/ArbitrageSignalChart';
 
 
 const QUERY = gql`
