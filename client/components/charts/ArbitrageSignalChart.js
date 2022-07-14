@@ -16,6 +16,7 @@ import CsvDownloadLink from 'components/CsvDownloadLink';
 export default function ArbitrageSignalChart({ arb_signal, mean, sd }) {
   const theme = useTheme();
   const SIGMA = 1
+  console.log("mean: " + mean+ ", sd: " + sd)
   const updatedData = arb_signal.map(d => {
     return {
       ts: d.ts,
