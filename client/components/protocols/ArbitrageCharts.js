@@ -27,7 +27,7 @@ export default function ArbitrageCharts() {
     latestCointegrationModelInfo,
     arbSignalLatestModel
   } = data || {};
-  console.log("latest cointegration model info: " + JSON.stringify(data))
+  console.log("in sample mean: " + JSON.stringify(arbSignalLatestModel))
 
   if (error) {
     console.error(error);
@@ -40,7 +40,7 @@ export default function ArbitrageCharts() {
         {loading ? (
           <Skeleton variant="rectangular" />
         ) : (
-          <ArbitrageSignalChart arb_signal={arbSignalLatestModel} mean = {latestCointegrationModelInfo.inSampleMean} sd={latestCointegrationModelInfo.inSampleSd} />
+          <ArbitrageSignalChart arb_signal={arbSignalLatestModel} mean = {latestCointegrationModelInfo[0].inSampleMean} sd={latestCointegrationModelInfo[0].inSampleSd} />
         )}
       </Grid>
     </Grid>

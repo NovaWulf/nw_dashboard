@@ -10,7 +10,7 @@ import {
 } from 'recharts';
 import { dateFormatter, mergeTimestamps, nFormatter } from 'lib/formatters';
 import DashboardItem from 'components/DashboardItem';
-import TimeAxis from 'components/TimeAxis';
+import TimeAxis2 from 'components/TimeAxis2';
 import CsvDownloadLink from 'components/CsvDownloadLink';
 
 export default function ArbitrageSignalChart({ arb_signal, mean, sd }) {
@@ -64,14 +64,14 @@ export default function ArbitrageSignalChart({ arb_signal, mean, sd }) {
             dot={false}
           />
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-          {TimeAxis()}
+          {TimeAxis2()}
 
           <YAxis
             yAxisId="spread"
             orientation="left"
             tickFormatter={nFormatter}
             stroke={theme.palette.primary.main}
-            domain={[-3000, 'dataMax']}
+            domain={[-150, 150]}
           />
 
           <Tooltip labelFormatter={dateFormatter} />

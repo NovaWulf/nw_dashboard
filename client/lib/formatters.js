@@ -36,6 +36,11 @@ export function epochFormatter(time) {
   return dayjs(time * 1000).format('MMM YY');
 }
 
+export function epochFormatter2(time) {
+  return dayjs(time * 1000).format('MMM DD');
+}
+
+
 export function dateFormatter(time) {
   return dayjs(time * 1000).format('MM/DD/YY');
 }
