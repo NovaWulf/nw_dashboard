@@ -15,20 +15,7 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #
-# Indexes
-#
-#  index_candles_on_exchange_and_starttime_and_pair_and_resolution  (exchange,starttime,pair,resolution) UNIQUE
-#
-    #   t.timestamps
-    #   t.datetime :starttime, null: false
-    #   t.string :pair, null: false
-    #   t.string :exchange, null: false
-    #   t.integer :resolution, null: false
-    #   t.float :open, null: false
-    #   t.float :close, null: false
-    #   t.float :high, null: false
-    #   t.float :low, null: false
-    #   t.float :volume, null: false
+
 class Candle < ApplicationRecord
     self.filter_attributes = []
     scope :by_exchange, ->(m) { where(exchange: m) }

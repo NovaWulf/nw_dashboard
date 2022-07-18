@@ -1,10 +1,7 @@
 class ArbitrageCalculator < BaseService
     
     def run
-      tracked_pairs = ["eth-usd","op-usd"]
-      tracked_pairs.each do |p|
-        Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
-      end
+      fetch_coinbase_data
       mostRecentModelID = CointegrationModel.newest_first.first&.uuid
 
       opWeight = CointegrationModelWeight.where("uuid = '#{mostRecentModelID}' and asset_name = 'op-usd'").pluck(:weight)[0]
@@ -13,12 +10,13 @@ class ArbitrageCalculator < BaseService
       puts "OP weight: " + opWeight.to_s + " ETH_WEIGHT: " + ethWeight.to_s + " CONST_WEIGHT: " + constWeight.to_s
       res= 60
       last_timestamp = ModeledSignal.by_model(mostRecentModelID).last&.starttime
-      
+      return if last_timestamp && last_timestamp > Time.now.to_i - res
+
+      puts "last timestamp of arb signal: " + last_timestamp.to_s
       start_time = last_timestamp ? last_timestamp + res : Date.new(2022, 6, 13).to_time.to_i
       puts "start time: " + start_time.to_s
 
-      starttimes = Candle.by_resolution(res).where("starttime> #{start_time}").pluck(:starttime)
-      puts "length of start times: " + starttimes.length().to_s
+      starttimes = Candle.by_resolution(res).where("starttime>= #{start_time}").pluck(:starttime)
       starttimes = starttimes.uniq.sort
       puts "length of uniq start times: " + starttimes.length().to_s
     #   minOPTime = Candle.by_resolution(res).by_pair("op-usd").where("starttime> #{starttime}").minimum(:starttime)
@@ -66,7 +64,7 @@ class ArbitrageCalculator < BaseService
         if thisEthCandle.count>0
             currentEthVal = thisEthCandle.pluck(:close)[0]
         end
-        puts "currentOpVal: " + currentOpVal.to_s + " opWeight: " + opWeight.to_s + " currentEthVal: " + currentEthVal.to_s + " ethWeight: " + ethWeight.to_s + " constWeight: " + constWeight.to_s
+        puts "in arb calc! currentOpVal: " + currentOpVal.to_s + " opWeight: " + opWeight.to_s + " currentEthVal: " + currentEthVal.to_s + " ethWeight: " + ethWeight.to_s + " constWeight: " + constWeight.to_s
         signalValue = currentOpVal*opWeight + currentEthVal*ethWeight + constWeight
         
         m=ModeledSignal.create(starttime: time, model_id: mostRecentModelID, resolution: res, value: signalValue)
@@ -94,6 +92,12 @@ class ArbitrageCalculator < BaseService
                                 text: "OP-ETH (#{signal_value.round(2)}) is below the low band of Paul's indicator (#{(lower).round(2)}). Recommend buying ETH and shorting OP").notification.deliver_now
       end
 
+    end
+    def fetch_coinbase_data 
+      tracked_pairs = ["eth-usd","op-usd"]
+      tracked_pairs.each do |p|
+        Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
+      end
     end
   end
   

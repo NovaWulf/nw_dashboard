@@ -7,7 +7,6 @@ export default function TimeAxis2() {
 
   startDate.setMonth((startDate.getMonth() + 11) % 12);
 
-
   return (
     <XAxis
       allowDataOverflow

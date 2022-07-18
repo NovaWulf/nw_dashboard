@@ -20,5 +20,6 @@
 #
 class CointegrationModel < ApplicationRecord
     #has_many :cointegration_model_weight
+    scope :by_asset, ->(p) { where(asset_name: p) }
     scope :newest_first, -> { order(model_endtime: :desc) }
-  end
+end

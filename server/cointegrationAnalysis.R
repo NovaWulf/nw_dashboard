@@ -20,7 +20,7 @@ head(bothDat)
 ct = coint.test(bothDat$close.x,bothDat$close.y,d=0)
 summary(ct)
 dataMat = as.matrix(bothDat[,c("close.x","close.y")])
-ecdet = "const"
+ecdet = "none"
 spec = "transitory"
 type = "trace"
 jo=ca.jo(dataMat,type= type,ecdet = ecdet,spec=spec)
