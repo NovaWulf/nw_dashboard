@@ -19,13 +19,13 @@ RSpec.describe ArbitrageCalculator do
 
     before(:each) do
 
-        Candle.create(starttime: Time.now.to_i,
+        Candle.create(starttime: Time.now.to_i-60,
          pair: "op-usd",
          exchange: "Coinbase",
          resolution: 60,
          low: 1,high: 1,open: 1,close: 1,volume: 1 )
 
-        Candle.create(starttime: Time.now.to_i,
+        Candle.create(starttime: Time.now.to_i-60,
          pair: "eth-usd",
          exchange: "Coinbase",
          resolution: 60,
@@ -35,20 +35,20 @@ RSpec.describe ArbitrageCalculator do
             uuid: "id1", 
             timestamp: 1800000000,
             asset_name: "op-usd", 
-            weight: 90 ) 
+            weight: -1 ) 
         thing= CointegrationModelWeight.last
 
         CointegrationModelWeight.create(
             uuid: "id1", 
             timestamp: 1800000000,
             asset_name: "eth-usd", 
-            weight: 1000 
+            weight: 1 
         ) 
         CointegrationModelWeight.create(
             uuid: "id1", 
             timestamp: 1800000000,
             asset_name: "det", 
-            weight: 50 
+            weight: 0 
         ) 
 
         CointegrationModel.create(
@@ -64,12 +64,12 @@ RSpec.describe ArbitrageCalculator do
         resolution: 60,
         model_starttime: 1600000000,
         model_endtime: 1700000000,
-        in_sample_mean: -10,
+        in_sample_mean: 0,
         in_sample_sd: 100
         )
 
         ModeledSignal.create(
-            starttime: Time.now.to_i-60, 
+            starttime: Time.now.to_i-120, 
             model_id: "id1",
             resolution: 60,
             value: 10
@@ -87,34 +87,49 @@ RSpec.describe ArbitrageCalculator do
         expect(m.model_id).to eql "id1"
         expect(m.resolution).to eql 60
     end
+    # note in_sample_mean=0,  in_sample_sd = 100,
+    # and our op_weight=-1, eth weight = 1, const = 0
+    # so with close prices of 100,100, our signal is 0
     context 'arb signal not in range' do
-        let!(:arb_signal) do
-          lastModel = CointegrationModel.where("uuid = '#{latest_model}'").last
-          ModeledSignal.create(
-              starttime: Time.now.to_i, 
-              model_id: "id1",
-              resolution: 60,
-              value: lastModel.in_sample_mean + lastModel.in_sample_sd - 1)
-        end
-    
         it 'does not send email' do
+            Candle.create(
+                starttime: Time.now.to_i,
+                pair: "op-usd",
+                exchange: "Coinbase",
+                resolution: 60,
+                low: 100,high: 100,open: 100,close: 100,volume: 100
+            )
+            Candle.create(
+                starttime: Time.now.to_i,
+                pair: "eth-usd",
+                exchange: "Coinbase",
+                resolution: 60,
+                low: 100,high: 100,open: 100,close: 100,volume: 100
+            )
           expect { subject }.to change { ActionMailer::Base.deliveries.count }.by(0)
         end
     end
     context 'arb signal in range' do
-        lastModel = CointegrationModel.where("uuid = '#{latest_model}'").last
-        let!(:arb_signal) do
-          ModeledSignal.create(
-              starttime: Time.now.to_i, 
-              model_id: "id1",
-              resolution: 60,
-              value: lastModel.in_sample_mean + lastModel.in_sample_sd + 1)
-        end
-    
-        it 'does  send email' do
-          expect { subject }.to change { ActionMailer::Base.deliveries.count }.by(0)
+         
+        it 'does send email' do
+            Candle.create(
+                starttime: Time.now.to_i,
+                pair: "op-usd",
+                exchange: "Coinbase",
+                resolution: 60,
+                low: 100,high: 100,open: 100,close: 100,volume: 100
+            )
+            Candle.create(
+                starttime: Time.now.to_i,
+                pair: "eth-usd",
+                exchange: "Coinbase",
+                resolution: 60,
+                low: 300,high: 300,open: 300,close: 300,volume: 300
+            )
+          expect { subject }.to change { ActionMailer::Base.deliveries.count }.by(1)
         end
     end
+
    
   end
   

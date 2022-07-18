@@ -58,3 +58,14 @@ RSpec.shared_context 'token terminal client' do
     allow_any_instance_of(described_class).to receive(:token_terminal_client).and_return(token_terminal_double)
   end
 end
+
+RSpec.shared_context 'coinbase client' do
+  let(:coinbase_double) do
+    double('coinbase client',
+      getPrices: [[Time.now.to_i,100,100,100,100,100]])
+  end
+
+  before(:each) do
+    allow_any_instance_of(described_class).to receive(:coinbase_client).and_return(coinbase_double)
+  end
+end

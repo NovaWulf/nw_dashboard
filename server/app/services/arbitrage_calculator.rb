@@ -10,9 +10,10 @@ class ArbitrageCalculator < BaseService
       puts "OP weight: " + opWeight.to_s + " ETH_WEIGHT: " + ethWeight.to_s + " CONST_WEIGHT: " + constWeight.to_s
       res= 60
       last_timestamp = ModeledSignal.by_model(mostRecentModelID).last&.starttime
+      puts "last timestamp of arb signal: " + last_timestamp.to_s + "time now - 60: " + (Time.now.to_i - res).to_s
+
       return if last_timestamp && last_timestamp > Time.now.to_i - res
 
-      puts "last timestamp of arb signal: " + last_timestamp.to_s
       start_time = last_timestamp ? last_timestamp + res : Date.new(2022, 6, 13).to_time.to_i
       puts "start time: " + start_time.to_s
 
@@ -83,7 +84,7 @@ class ArbitrageCalculator < BaseService
       signal_value = arb_signal.value
       upper = in_sample_mean + sigma*in_sample_sd
       lower = in_sample_mean - sigma*in_sample_sd
-  
+      puts "signal value: " + signal_value.to_s + " upper: " + upper.to_s
       if signal_value > upper 
         NotificationMailer.with(subject: 'Statistical Arbitrage Indicator Alert',
                                 text: "OP-ETH spread value (#{signal_value.round(2)}) is above the high band of Paul's indicator (#{(upper).round(2)}). Recommend buying OP and shorting ETH").notification.deliver_now
