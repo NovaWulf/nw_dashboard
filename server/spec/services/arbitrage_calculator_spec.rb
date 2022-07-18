@@ -10,7 +10,6 @@ RSpec.describe ArbitrageCalculator do
     let(:const_weight) {CointegrationModelWeight.where("uuid = '#{latest_model}' and asset_name = 'det'").first.weight}
     
     let(:arb_signal_expected) do
-
         puts "op_weight: " + op_weight.to_s + " op_candle: " + op_candle.to_s + " eth_weight: " + eth_weight.to_s + " eth_candle: " + eth_candle.to_s + "const_wight: " + const_weight.to_s
         op_weight*op_candle +
         eth_weight*eth_candle + 
@@ -88,7 +87,32 @@ RSpec.describe ArbitrageCalculator do
         expect(m.model_id).to eql "id1"
         expect(m.resolution).to eql 60
     end
+    context 'arb signal not in range' do
+        let!(:arb_signal) do
+          ModeledSignal.create(
+              starttime: Time.now.to_i, 
+              model_id: "id1",
+              resolution: 60,
+              value: latest_model.in_sample_mean + latest_model.in_sample_sd - 1)
+        end
     
+        it 'does not send email' do
+          expect { subject }.to change { ActionMailer::Base.deliveries.count }.by(0)
+        end
+    end
+    context 'arb signal in range' do
+        let!(:arb_signal) do
+          ModeledSignal.create(
+              starttime: Time.now.to_i, 
+              model_id: "id1",
+              resolution: 60,
+              value: latest_model.in_sample_mean + latest_model.in_sample_sd + 1)
+        end
+    
+        it 'does  send email' do
+          expect { subject }.to change { ActionMailer::Base.deliveries.count }.by(0)
+        end
+    end
    
   end
   
