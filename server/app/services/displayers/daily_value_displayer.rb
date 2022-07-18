@@ -4,7 +4,7 @@ module Displayers
 
       def initialize(model:)
         if !model
-          puts "using default model for displayer -- latest"
+          Rails.logger.info "using default model for displayer -- latest"
           model = CointegrationModel.newest_first.first&.uuid
         end
         @model = model
