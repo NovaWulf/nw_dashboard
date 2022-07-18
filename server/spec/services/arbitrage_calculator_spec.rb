@@ -10,13 +10,14 @@ RSpec.describe ArbitrageCalculator do
     let(:const_weight) {CointegrationModelWeight.where("uuid = '#{latest_model}' and asset_name = 'det'").first.weight}
     
     let(:arb_signal_expected) do
-        puts "op_weight: " + op_weight.to_s + " op_candle: " + op_candle.to_s + " eth_weight: " + eth_weight.to_s + " eth_candle: " + eth_candle.to_s + "const_wight: " + const_weight.to_s
         op_weight*op_candle +
         eth_weight*eth_candle + 
         const_weight
     end
     
 
+    # suppose we have a signal from 2 time steps ago,
+    # and candles, model from 1 timestep ago
     before(:each) do
 
         Candle.create(starttime: Time.now.to_i-60,
@@ -68,6 +69,7 @@ RSpec.describe ArbitrageCalculator do
         in_sample_sd: 100
         )
 
+
         ModeledSignal.create(
             starttime: Time.now.to_i-120, 
             model_id: "id1",
@@ -90,8 +92,9 @@ RSpec.describe ArbitrageCalculator do
     # note in_sample_mean=0,  in_sample_sd = 100,
     # and our op_weight=-1, eth weight = 1, const = 0
     # so with close prices of 100,100, our signal is 0
+    # and with 300,100, our signal = 200 > in_sample_mean+in_sample_sd
     context 'arb signal not in range' do
-        it 'does not send email' do
+        let(:op_candle_new) do
             Candle.create(
                 starttime: Time.now.to_i,
                 pair: "op-usd",
@@ -99,6 +102,8 @@ RSpec.describe ArbitrageCalculator do
                 resolution: 60,
                 low: 100,high: 100,open: 100,close: 100,volume: 100
             )
+        end
+        let(:eth_candle_new) do
             Candle.create(
                 starttime: Time.now.to_i,
                 pair: "eth-usd",
@@ -106,12 +111,14 @@ RSpec.describe ArbitrageCalculator do
                 resolution: 60,
                 low: 100,high: 100,open: 100,close: 100,volume: 100
             )
+        end
+        it 'does not send email' do
           expect { subject }.to change { ActionMailer::Base.deliveries.count }.by(0)
         end
     end
     context 'arb signal in range' do
          
-        it 'does send email' do
+        let (:op_candle_create_new2) do
             Candle.create(
                 starttime: Time.now.to_i,
                 pair: "op-usd",
@@ -119,6 +126,8 @@ RSpec.describe ArbitrageCalculator do
                 resolution: 60,
                 low: 100,high: 100,open: 100,close: 100,volume: 100
             )
+        end
+        let (:eth_candle_create_new2) do
             Candle.create(
                 starttime: Time.now.to_i,
                 pair: "eth-usd",
@@ -126,6 +135,8 @@ RSpec.describe ArbitrageCalculator do
                 resolution: 60,
                 low: 300,high: 300,open: 300,close: 300,volume: 300
             )
+        end
+        it 'does send email' do
           expect { subject }.to change { ActionMailer::Base.deliveries.count }.by(1)
         end
     end

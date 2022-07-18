@@ -8,7 +8,6 @@ module Displayers
           model = CointegrationModel.newest_first.first&.uuid
         end
         @model = model
-        puts "model: " + model.to_s
       end
   
       def run
