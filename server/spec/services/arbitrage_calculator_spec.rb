@@ -94,7 +94,7 @@ RSpec.describe ArbitrageCalculator do
     # so with close prices of 100,100, our signal is 0
     # and with 300,100, our signal = 200 > in_sample_mean+in_sample_sd
     context 'arb signal not in range' do
-        let(:op_candle_new) do
+        let!(:op_candle_new) do
             Candle.create(
                 starttime: Time.now.to_i,
                 pair: "op-usd",
@@ -103,7 +103,7 @@ RSpec.describe ArbitrageCalculator do
                 low: 100,high: 100,open: 100,close: 100,volume: 100
             )
         end
-        let(:eth_candle_new) do
+        let!(:eth_candle_new) do
             Candle.create(
                 starttime: Time.now.to_i,
                 pair: "eth-usd",
@@ -118,7 +118,7 @@ RSpec.describe ArbitrageCalculator do
     end
     context 'arb signal in range' do
          
-        let (:op_candle_create_new2) do
+        let!(:op_candle_create_new2) do
             Candle.create(
                 starttime: Time.now.to_i,
                 pair: "op-usd",
@@ -127,7 +127,7 @@ RSpec.describe ArbitrageCalculator do
                 low: 100,high: 100,open: 100,close: 100,volume: 100
             )
         end
-        let (:eth_candle_create_new2) do
+        let!(:eth_candle_create_new2) do
             Candle.create(
                 starttime: Time.now.to_i,
                 pair: "eth-usd",
