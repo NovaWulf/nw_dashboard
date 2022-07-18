@@ -89,11 +89,12 @@ RSpec.describe ArbitrageCalculator do
     end
     context 'arb signal not in range' do
         let!(:arb_signal) do
+          lastModel = CointegrationModel.where("uuid = '#{latest_model}'").last
           ModeledSignal.create(
               starttime: Time.now.to_i, 
               model_id: "id1",
               resolution: 60,
-              value: latest_model.in_sample_mean + latest_model.in_sample_sd - 1)
+              value: lastModel.in_sample_mean + lastModel.in_sample_sd - 1)
         end
     
         it 'does not send email' do
@@ -101,12 +102,13 @@ RSpec.describe ArbitrageCalculator do
         end
     end
     context 'arb signal in range' do
+        lastModel = CointegrationModel.where("uuid = '#{latest_model}'").last
         let!(:arb_signal) do
           ModeledSignal.create(
               starttime: Time.now.to_i, 
               model_id: "id1",
               resolution: 60,
-              value: latest_model.in_sample_mean + latest_model.in_sample_sd + 1)
+              value: lastModel.in_sample_mean + lastModel.in_sample_sd + 1)
         end
     
         it 'does  send email' do
