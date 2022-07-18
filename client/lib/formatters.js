@@ -36,7 +36,7 @@ export function epochFormatter(time) {
   return dayjs(time * 1000).format('MMM YY');
 }
 
-export function epochFormatter2(time) {
+export function epochFormatterHighRes(time) {
   return dayjs(time * 1000).format('MMM DD');
 }
 
