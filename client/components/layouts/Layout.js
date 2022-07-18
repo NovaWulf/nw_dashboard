@@ -165,7 +165,7 @@ export default function Layout({ children }) {
             <ListItemText primary="Synthetix" />
           </ListItem>
         </Link>
-        <ListSubheader>other</ListSubheader>
+        <ListSubheader>Signals</ListSubheader>
         <Link href="/arbitrage">
           <ListItem
             button
