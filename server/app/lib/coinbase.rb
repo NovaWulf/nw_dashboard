@@ -14,18 +14,15 @@ class Coinbase
 
     
     def getPrices(pair:, start_time: DEFAULT_START_TIME,resolution: 3600)
-        puts "start time in get prices: " +  DEFAULT_START_TIME
        response("/#{pair}/candles", start_time || DEFAULT_START_TIME,resolution)
     end
 
     private
     def get_signature(request_path='', timestamp=nil, method='GET')
-        # puts "timestamp: " + timestamp + " method: " + method + " request_path: " + request_path
         message = "#{timestamp}#{method}#{request_path}"
         # create a sha256 hmac with the secret
         secret = Base64.decode64(@secret)
         hash = Base64.strict_encode64(OpenSSL::HMAC.hexdigest('sha256', secret, message))
-        #puts "hash: " + hash
         return hash
     end
 
