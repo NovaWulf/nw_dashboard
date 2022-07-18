@@ -2,7 +2,7 @@ RSpec.describe ArbitrageCalculator do
     subject { 
         described_class.run 
     }
-    let(:op_candle) {Candle.by_pair("eth-usd").last&.close}
+    let(:op_candle) {Candle.by_pair("op-usd").last&.close}
     let(:eth_candle) {Candle.by_pair("eth-usd").last&.close}
     let(:latest_model) {CointegrationModel.newest_first.first&.uuid}
     let(:op_weight) {CointegrationModelWeight.where("uuid = '#{latest_model}' and asset_name = 'op-usd'").first.weight}
@@ -24,7 +24,7 @@ RSpec.describe ArbitrageCalculator do
          pair: "op-usd",
          exchange: "Coinbase",
          resolution: 60,
-         low: 1,high: 1,open: 1,close: 1,volume: 1 )
+         low: 2,high: 2,open: 2,close: 2,volume: 2 )
 
         Candle.create(starttime: Time.now.to_i-60,
          pair: "eth-usd",
@@ -109,7 +109,7 @@ RSpec.describe ArbitrageCalculator do
                 pair: "eth-usd",
                 exchange: "Coinbase",
                 resolution: 60,
-                low: 100,high: 100,open: 100,close: 100,volume: 100
+                low: 90,high: 90,open: 90,close: 90,volume: 90
             )
         end
         it 'does not send email' do
@@ -124,7 +124,7 @@ RSpec.describe ArbitrageCalculator do
                 pair: "op-usd",
                 exchange: "Coinbase",
                 resolution: 60,
-                low: 100,high: 100,open: 100,close: 100,volume: 100
+                low: 101,high: 101,open: 101,close: 101,volume: 101
             )
         end
         let!(:eth_candle_create_new2) do
