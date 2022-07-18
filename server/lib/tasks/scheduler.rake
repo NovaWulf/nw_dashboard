@@ -69,3 +69,7 @@ end
 task update_arb_signal: :environment do
   ArbitrageCalculator.run
 end
+
+task update_model: do
+  %{RScript cointegrationAnalysis.R "2022-06-13" "2022-07-12"}
+end

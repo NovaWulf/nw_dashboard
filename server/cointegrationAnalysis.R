@@ -5,26 +5,27 @@ library(lattice)
 library(latticeExtra)
 library(lubridate)
 library(digest)
+
+args = commandArgs(trailingOnly=TRUE)
+
 dbhandle <- odbcDriverConnect('driver=/usr/local/lib/psqlodbcw.so;database=nw_server_development;trusted_connection=true;uid=nw_server')
-startTime = as.numeric(as.POSIXct("2022-06-13"))
+startTime = as.numeric(as.POSIXct(args[1]))
+endTime = as.numeric(as.POSIXct(args[2]))
 resolution = 60
 ethDat = data.table(sqlQuery(dbhandle,paste0("select starttime,close from candles where pair ='eth-usd' and resolution = ", resolution)))
 opDat = data.table(sqlQuery(dbhandle,paste0("select starttime,close from candles where pair = 'op-usd' and resolution= ",resolution )))
 
 
 bothDat = merge(ethDat,opDat,by = "starttime")
-bothDat = bothDat[starttime>startTime]
+bothDat = bothDat[starttime>startTime & starttime<endTime]
 bothDat$start_datetime = as_datetime(bothDat$starttime)    
 
-head(bothDat)
-ct = coint.test(bothDat$close.x,bothDat$close.y,d=0)
-summary(ct)
 dataMat = as.matrix(bothDat[,c("close.x","close.y")])
-ecdet = "none"
+ecdet = "const"
 spec = "transitory"
 type = "trace"
 jo=ca.jo(dataMat,type= type,ecdet = ecdet,spec=spec)
-summary(jo)
+#summary(jo)
 
 
 vecs = jo@V
