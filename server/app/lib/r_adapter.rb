@@ -23,7 +23,14 @@ class RAdapter
             
             DOC
     end
+    def run_r_script(script,returnVal)
 
+        R.eval <<-DOC
+        #{script}
+        DOC
+        return R.pull returnVal.to_s # Be sure to return the object assigned in R script
+        
+    end
     def cointegration_analysis(startTimeString: , endTimeString:)
 
         R.eval <<-DOC 
