@@ -12,7 +12,7 @@ shared:
 executors:
   ruby:
     docker:
-      - image: cimg/ruby:2.6.6-node
+      - image: cimg/ruby:2.7.2-node
         environment: # environment variables for primary container
           BUNDLE_PATH: vendor/bundle
           PGHOST: 127.0.0.1
