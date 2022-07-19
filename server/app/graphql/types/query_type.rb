@@ -7,6 +7,12 @@ module Types
     field :btc_mvrv, [Types::MetricType], null: false
     field :rhodl_ratio, [Types::MetricType], null: false
     field :jesse, [Types::MetricType], null: false
+    field :latest_cointegration_model_info, [Types::CointegrationModelType], null: false
+    field :arb_signal_latest_model, [Types::ModeledSignalType], null: false
+
+    field :cointegration_model_info, [Types::CointegrationModelType], null: false do
+      argument :model, String
+    end
 
     field :smart_contract_active_users, [Types::MetricType], null: false do
       argument :token, String
@@ -122,6 +128,18 @@ module Types
 
     def jesse
       Displayers::WeeklyValueDisplayer.run(token: 'btc', metric: 'jesse').value
+    end
+
+    def latest_cointegration_model_info
+      [CointegrationModel.newest_first.first]
+    end
+
+    def cointegration_model_info(model:)
+      [CointegrationModel.where("uuid = '#{model}'").first]
+    end
+
+    def arb_signal_latest_model()      
+      Displayers::DailyValueDisplayer.run(model: nil).value
     end
 
     def smart_contract_contracts(token:)

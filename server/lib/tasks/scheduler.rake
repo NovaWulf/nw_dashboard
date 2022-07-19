@@ -58,3 +58,18 @@ end
 task hedgeserv_email: :environment do
   Hedgeserv::DailyProcessor.run
 end
+
+task download_candles: :environment do
+  tracked_pairs = %w[eth-usd op-usd]
+  tracked_pairs.each do |p|
+    Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
+  end
+end
+
+task update_arb_signal: :environment do
+  ArbitrageCalculator.run
+end
+
+task update_model: :environment do
+  `RScript cointegrationAnalysis.R "2022-06-13" "2022-07-12"`
+end

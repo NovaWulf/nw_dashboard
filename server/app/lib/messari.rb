@@ -2,7 +2,7 @@ class Messari
   include HTTParty
   base_uri 'data.messari.io/api/v1'
 
-  DEFAULT_START_DATE = Date.new(2017, 1, 1)
+  DEFAULT_START_DATE = Date.today - 2015 # messari only goes 2016 days back
 
   def initialize
     @options = { headers: { "x-messari-api-key": ENV['MESSARI_API_KEY'] } }

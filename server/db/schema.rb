@@ -10,10 +10,49 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_04_04_134949) do
+ActiveRecord::Schema.define(version: 2022_07_12_133110) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "candles", force: :cascade do |t|
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.integer "starttime", null: false
+    t.string "pair", null: false
+    t.string "exchange", null: false
+    t.integer "resolution", null: false
+    t.float "open", null: false
+    t.float "close", null: false
+    t.float "high", null: false
+    t.float "low", null: false
+    t.float "volume", null: false
+    t.index ["exchange", "starttime", "pair", "resolution"], name: "index_candles_on_exchange_and_starttime_and_pair_and_resolution", unique: true
+  end
+
+  create_table "cointegration_model_weights", force: :cascade do |t|
+    t.string "uuid"
+    t.integer "timestamp"
+    t.string "asset_name"
+    t.float "weight"
+  end
+
+  create_table "cointegration_models", force: :cascade do |t|
+    t.string "uuid"
+    t.integer "timestamp"
+    t.string "ecdet"
+    t.string "spec"
+    t.float "cv_10_pct"
+    t.float "cv_5_pct"
+    t.float "cv_1_pct"
+    t.float "test_stat"
+    t.float "top_eig"
+    t.float "in_sample_mean"
+    t.float "in_sample_sd"
+    t.integer "resolution"
+    t.integer "model_starttime"
+    t.integer "model_endtime"
+  end
 
   create_table "metrics", force: :cascade do |t|
     t.date "timestamp"
@@ -22,6 +61,15 @@ ActiveRecord::Schema.define(version: 2022_04_04_134949) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "token"
     t.string "metric"
+  end
+
+  create_table "modeled_signals", force: :cascade do |t|
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.integer "starttime", null: false
+    t.string "model_id", null: false
+    t.integer "resolution", null: false
+    t.float "value", null: false
   end
 
   create_table "repo_commits", force: :cascade do |t|
