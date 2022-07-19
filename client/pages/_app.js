@@ -20,6 +20,7 @@ export default function MyApp(props) {
   return (
     <CacheProvider value={emotionCache}>
       <Head>
+        <title>NovaWulf Dashboard</title>
         <meta property="og:title" content="NovaWulf Dashboard" key="title" />
 
         <meta name="viewport" content="initial-scale=1, width=device-width" />
