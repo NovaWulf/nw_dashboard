@@ -54,12 +54,17 @@ class ArbitrageCalculator < BaseService
       
       if this_op_candle.count >0
           current_op_val = this_op_candle.pluck(:close)[0]
+      else 
+        Candle.create(starttime: time, pair: "op-usd",exchange: "Coinbase",
+          resolution:res,low:current_op_val,high: current_op_val,open:current_op_val,close: current_op_val,volume:0)
       end
       if this_eth_candle.count>0
           current_eth_val = this_eth_candle.pluck(:close)[0]
+      else 
+        Candle.create(starttime: time, pair: "eth-usd",exchange: "Coinbase",
+          resolution:res,low:current_eth_val,high: current_eth_val,open:current_eth_val,close: current_eth_val,volume:0)
       end
       signal_value = current_op_val*op_weight + current_eth_val*eth_weight + const_weight
-      
       m=ModeledSignal.create(starttime: time, model_id: most_recent_model_id, resolution: res, value: signal_value)
     end
 
