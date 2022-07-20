@@ -21,4 +21,11 @@ Things you may want to cover:
 
 * Deployment instructions
 
+Arbitrage data  + model pipeline:
+- In order to download recent candles, run `rake download_candles`
+
+- Next update the model by running `rake cointegration_analysis`
+
+- Finally run `rake update_arb_signal`
+
 * ...
