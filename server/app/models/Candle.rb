@@ -15,6 +15,10 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #
+# Indexes
+#
+#  index_candles_on_exchange_and_starttime_and_pair_and_resolution  (exchange,starttime,pair,resolution) UNIQUE
+#
 
 class Candle < ApplicationRecord
     self.filter_attributes = []

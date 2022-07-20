@@ -18,6 +18,10 @@
 #  top_eig         :float
 #  uuid            :string
 #
+# Indexes
+#
+#  index_cointegration_models_on_uuid  (uuid) UNIQUE
+#
 class CointegrationModel < ApplicationRecord
     #has_many :cointegration_model_weight
     scope :by_asset, ->(p) { where(asset_name: p) }

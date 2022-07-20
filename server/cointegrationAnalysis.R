@@ -1,16 +1,14 @@
 library(data.table)
 library(RODBC)
 library(urca)
-library(lattice)
-library(latticeExtra)
 library(lubridate)
 library(digest)
 
-args = commandArgs(trailingOnly=TRUE)
+fitModel = function(dbhandle,startTimeString,endTimeString,ecdet_param="const"){
 
-dbhandle <- odbcDriverConnect('driver=/usr/local/lib/psqlodbcw.so;database=nw_server_development;trusted_connection=true;uid=nw_server')
-startTime = as.numeric(as.POSIXct(args[1]))
-endTime = as.numeric(as.POSIXct(args[2]))
+startTime = as.numeric(strptime(startTimeString, "%Y-%m-%d"))
+endTime = as.numeric(strptime(endTimeString,"%Y-%m-%d"))
+
 resolution = 60
 ethDat = data.table(sqlQuery(dbhandle,paste0("select starttime,close from candles where pair ='eth-usd' and resolution = ", resolution)))
 opDat = data.table(sqlQuery(dbhandle,paste0("select starttime,close from candles where pair = 'op-usd' and resolution= ",resolution )))
@@ -18,10 +16,11 @@ opDat = data.table(sqlQuery(dbhandle,paste0("select starttime,close from candles
 
 bothDat = merge(ethDat,opDat,by = "starttime")
 bothDat = bothDat[starttime>startTime & starttime<endTime]
+print(dim(bothDat))
 bothDat$start_datetime = as_datetime(bothDat$starttime)    
 
 dataMat = as.matrix(bothDat[,c("close.x","close.y")])
-ecdet = "const"
+ecdet = ecdet_param
 spec = "transitory"
 type = "trace"
 jo=ca.jo(dataMat,type= type,ecdet = ecdet,spec=spec)
@@ -35,9 +34,9 @@ spread = vecs[1,1]*bothDat$close.x + vecs[2,1]*bothDat$close.y+vecs[3,1]
 meanSpread= mean(spread)
 sdSpread = sd(spread)
 
-plot1 = xyplot(close.x~start_datetime,bothDat,type="l", auto.key = TRUE, main = "double axis plot of OP vs ETH futures")
-plot2 = xyplot(close.y~start_datetime,bothDat,type="l",auto.key = TRUE)
-doubleYScale(plot1, plot2)
+# plot1 = xyplot(close.x~start_datetime,bothDat,type="l", auto.key = TRUE, main = "double axis plot of OP vs ETH futures")
+# plot2 = xyplot(close.y~start_datetime,bothDat,type="l",auto.key = TRUE)
+# doubleYScale(plot1, plot2)
 
 realStartDate = min(bothDat$start_datetime)
 realEndDate = max(bothDat$start_datetime)
@@ -87,4 +86,5 @@ totalValString = paste0(valStrings,collapse=",")
 
 sqlQuery(dbhandle,paste0("insert into cointegration_model_weights ",colNamesString2," values ",totalValString))
 
-
+return (summary(jo))
+}
