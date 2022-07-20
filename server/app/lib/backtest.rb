@@ -3,7 +3,7 @@ class Backtest
     @ownable_assets
     @asset_weights
     @cursor
-    @starttime
+    @model_starttime
     @signal
     @in_sample_mean
     @multiplier
@@ -14,39 +14,47 @@ class Backtest
     @num_ownable_assets
     @targets
     @orders
+    @starttimes
     def initialize 
         @cursor = 0
         @multiplier = 1.0
         @max_trade_size_eth = 1000
     end
     def load_model(model_id:)
+        puts "loading model..."
         model = CointegrationModel.where("uuid = '#{model_id}'").last
-        @starttime = model&.model_starttime
+        @model_starttime = model&.model_starttime
         @in_sample_sd = model&.in_sample_sd
         @in_sample_mean = model&.in_sample_mean
-
+        puts "loading model weights..."
         weights = CointegrationModelWeight.where("uuid = '#{model_id}'")
         puts "number of weights for model: " + weights.count.to_s
         @assets = weights.pluck(:asset_name)
-        @asset_weights = weights.pluck(:weights)
+        @asset_weights = weights.pluck(:weight)
         puts "assets: " + @assets.to_s
         @ownable_assets = @assets.delete("det")
         @num_ownable_assets = @ownable_assets.length()
         
-        puts "model starttime: " + @starttime.to_s
-        @signal = ModeledSignal.where("model_id = '#{model_id}'").oldest_first.pluck(:value)
+        puts "model starttime: " + @model_starttime.to_s
+        puts "loading arbitrage signal..."
+        modeled_signal = ModeledSignal.where("model_id = '#{model_id}'").oldest_first
+        @signal = modeled_signal.pluck(:value)
+        @starttimes = modeled_signal.pluck(:starttime)
         @num_obs = @signal.length()
         @positions = Array.new(@num_obs){Array.new(@num_ownable_assets)}
         @pnl = Array.new(@num_obs)
         @transactions = Array.new(@num_obs)
+        puts "loading prices..."
         @prices = Array.new(@num_obs){Array.new(@num_ownable_assets)}
         for i in 0..(@num_obs-1)
-            this_start_time = @signal[i]&.starttime
+            puts (100.0*i/(@num_obs-1)).to_s + "% done"
+            this_start_time = @starttimes[i]
             for j in 0..(@num_ownable_assets)
                 # this is a slow but simple way of getting the most recent asset price on each time step for the signal
-                @prices[i][j] = Candle.where("pair = '#{{assets[j]}}' and starttime < #{{this_start_time}}").oldest_first.last&.close
+                @prices[i][j] = Candle.where("pair = '#{@assets[j]}' and starttime = #{this_start_time}").last&.close
             end
         end
+        puts "done loading"
     end
     def target_positions()
         target_positions = Array.new(@num_ownable_assets)
@@ -112,4 +120,5 @@ class Backtest
             self.execute_trades
             self.calculate_pnl
         end
+    end
 end
