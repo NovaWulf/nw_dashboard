@@ -77,5 +77,5 @@ end
 
 task run_backtest: :environment do
   b = Backtest.new
-  b.load_model(model_id: "5995ec80eb42ed497c40f69f94e6d963")
+  b.run_simulation(model_id: "5995ec80eb42ed497c40f69f94e6d963")
 end
