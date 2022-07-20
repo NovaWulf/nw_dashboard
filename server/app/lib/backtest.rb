@@ -10,6 +10,7 @@ class Backtest
     def initialize 
         @cursor = 0
         @multiplier = 1.0
+        @max_trade_size_eth = 1000
     end
     def load_model(model_id:)
         model = CointegrationModel.where("uuid = '#{model_id}'").last
@@ -38,7 +39,6 @@ class Backtest
         if signal_up
 
         end
-
     end
 
     def signal_up()
