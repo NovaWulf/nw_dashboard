@@ -1,0 +1,12 @@
+{
+  "recommendations": [
+    "esbenp.prettier-vscode",
+    "rebornix.ruby",
+    "misogi.ruby-rubocop",
+    "wingrunr21.vscode-ruby",
+    "reditorsupport.r",
+    "aliariff.auto-add-brackets",
+    "kamikillerto.vscode-colorize",
+    "kaiwood.endwise"
+  ]
+}

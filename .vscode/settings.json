@@ -1,0 +1,11 @@
+{
+  "editor.tabSize": 2,
+  "launch": {
+
+    "configurations": [],
+    "compounds": []
+  },
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "editor.formatOnSave": true,
+  "ruby.rubocop.suppressRubocopWarnings": true
+}
