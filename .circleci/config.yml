@@ -1,6 +1,6 @@
 version: 2.1
 
-orbs: 
+orbs:
   heroku: circleci/heroku@1.2.6
   slack: circleci/slack@4.8.3
 
@@ -8,11 +8,11 @@ shared:
   shared-environment: &environment
     environment:
       CIRCLE_COMPARE_URL: << pipeline.project.git_url >>/compare/<< pipeline.git.base_revision >>...<<pipeline.git.revision>>
-  
+
 executors:
   ruby:
     docker:
-      - image: cimg/ruby:2.7.2-node
+      - image: cimg/ruby:2.7.6-node
         environment: # environment variables for primary container
           BUNDLE_PATH: vendor/bundle
           PGHOST: 127.0.0.1
@@ -22,7 +22,7 @@ executors:
         environment:
           POSTGRES_USER: nw_server
           POSTGRES_DB: nw_server_test
-          POSTGRES_PASSWORD: ''
+          POSTGRES_PASSWORD: ""
           POSTGRES_HOST_AUTH_METHOD: trust
 
 jobs:
