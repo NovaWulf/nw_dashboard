@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_07_12_133110) do
+ActiveRecord::Schema.define(version: 2022_07_20_001107) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -35,6 +35,7 @@ ActiveRecord::Schema.define(version: 2022_07_12_133110) do
     t.integer "timestamp"
     t.string "asset_name"
     t.float "weight"
+    t.index ["uuid", "asset_name"], name: "index_cointegration_model_weights_on_uuid_and_asset_name", unique: true
   end
 
   create_table "cointegration_models", force: :cascade do |t|
@@ -52,6 +53,7 @@ ActiveRecord::Schema.define(version: 2022_07_12_133110) do
     t.integer "resolution"
     t.integer "model_starttime"
     t.integer "model_endtime"
+    t.index ["uuid"], name: "index_cointegration_models_on_uuid", unique: true
   end
 
   create_table "metrics", force: :cascade do |t|
@@ -70,6 +72,7 @@ ActiveRecord::Schema.define(version: 2022_07_12_133110) do
     t.string "model_id", null: false
     t.integer "resolution", null: false
     t.float "value", null: false
+    t.index ["model_id", "starttime"], name: "index_modeled_signals_on_model_id_and_starttime", unique: true
   end
 
   create_table "repo_commits", force: :cascade do |t|

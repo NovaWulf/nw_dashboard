@@ -2,7 +2,9 @@ require "rinruby"
 
 class RAdapter
     @env_name
+    
     def initialize
+       
         env_name = "test" 
         if Rails.env.development?
             env_name = "development"
