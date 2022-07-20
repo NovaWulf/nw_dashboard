@@ -48,12 +48,13 @@ class Coinbase
         responses.concat self.class.get("#{path}?start=#{newStartTime.to_s}&end=#{time_now}&granularity=#{resolution}", headers: generate_headers(path)).parsed_response
         
         firstTime = responses.last()[0]
-        puts "time now: "+time_now.to_s+" most recent time: " +responses[0][0].to_s+ " last time: " +firstTime.to_s
         newEndTime=firstTime-resolution
         while newEndTime>start_timestamp 
             newStartTime=newEndTime-299*resolution
-            responses.concat self.class.get("#{path}?start=#{newStartTime.to_s}&end=#{newEndTime.to_s}&granularity=#{resolution}", headers: generate_headers(path))
+            thisResponse = self.class.get("#{path}?start=#{newStartTime.to_s}&end=#{newEndTime.to_s}&granularity=#{resolution}", headers: generate_headers(path))
             .parsed_response
+            Rails.logger.info "reponse from coinbase: #{thisResponse}"
+            responses.concat thisResponse
             newEndTime=newEndTime-300*resolution
             newEndTime2=responses.last()[0]-resolution
             if newEndTime<start_timestamp
@@ -61,7 +62,6 @@ class Coinbase
             end
         end
       else
-        puts "time now: " + time_now.to_s + " start timestamp: " + start_timestamp.to_s + " resolution: " + resolution.to_s  
         responses = self.class.get("#{path}?start=#{start_timestamp.to_s}&end=#{time_now.to_s}&granularity=#{resolution}", headers: generate_headers(path))
         responses = responses.parsed_response
         #puts responses
