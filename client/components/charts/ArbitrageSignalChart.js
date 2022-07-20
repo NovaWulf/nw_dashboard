@@ -8,7 +8,7 @@ import {
   Tooltip,
   YAxis,
 } from 'recharts';
-import { dateFormatter, mergeTimestamps, nFormatter } from 'lib/formatters';
+import { dateFormatter, nFormatter } from 'lib/formatters';
 import DashboardItem from 'components/DashboardItem';
 import TimeAxisHighRes from 'components/TimeAxisHighRes';
 import CsvDownloadLink from 'components/CsvDownloadLink';

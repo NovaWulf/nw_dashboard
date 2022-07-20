@@ -67,6 +67,10 @@ task download_candles: :environment do
 end
 
 task update_arb_signal: :environment do
+  tracked_pairs = %w[eth-usd op-usd]
+  tracked_pairs.each do |p|
+    Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
+  end
   ArbitrageCalculator.run
 end
 
@@ -79,3 +83,4 @@ task run_backtest: :environment do
   b = Backtest.new
   b.run_simulation(model_id: "5995ec80eb42ed497c40f69f94e6d963")
 end
+

@@ -43,13 +43,10 @@ class Coinbase
       
       if num_candles>300
         responses=[]
-        Rails.logger.info "#{num_candles} candles exceeds maximum amount of 300, using pagination..."
         new_start_time = time_now - 298*resolution
         responses.concat self.class.get("#{path}?start=#{new_start_time.to_s}&end=#{time_now}&granularity=#{resolution}", headers: generate_headers(path)).parsed_response
-        
         first_time = responses.last()[0]
-        puts "time now: "+time_now.to_s+" most recent time: " +responses[0][0].to_s+ " last time: " +first_time.to_s
-        newEndTime=firstTime-resolution
+        new_end_time=first_time-resolution
         while new_end_time>start_timestamp 
             new_start_time=new_end_time-299*resolution
             responses.concat self.class.get("#{path}?start=#{new_start_time.to_s}&end=#{new_end_time.to_s}&granularity=#{resolution}", headers: generate_headers(path))
@@ -62,7 +59,6 @@ class Coinbase
             sleep 0.34
         end
       else
-        puts "time now: " + time_now.to_s + " start timestamp: " + start_timestamp.to_s + " resolution: " + resolution.to_s  
         responses = self.class.get("#{path}?start=#{start_timestamp.to_s}&end=#{time_now.to_s}&granularity=#{resolution}", headers: generate_headers(path))
         responses = responses.parsed_response
         #puts responses

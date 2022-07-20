@@ -10,6 +10,10 @@
 #  updated_at :datetime         not null
 #  model_id   :string           not null
 #
+# Indexes
+#
+#  index_modeled_signals_on_model_id_and_starttime  (model_id,starttime) UNIQUE
+#
 class ModeledSignal < ApplicationRecord
     self.filter_attributes = []
     scope :by_model, ->(m) { where(model_id: m) }

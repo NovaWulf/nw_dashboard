@@ -139,7 +139,7 @@ module Types
     end
 
     def arb_signal_latest_model()      
-      Displayers::DailyValueDisplayer.run(model: nil).value
+      Displayers::HourlyValueDisplayer.run(model: nil).value
     end
 
     def smart_contract_contracts(token:)
