@@ -75,9 +75,14 @@ task update_arb_signal: :environment do
 end
 
 task cointegration_analysis: :environment do
-  
   r = RAdapter.new
-
   r.cointegration_analysis(startTimeString: "'2022-06-13'",endTimeString: "'2022-07-12'")
+end
 
+<<<<<<< HEAD
+=======
+task run_backtest: :environment do
+  b = Backtest.new
+  b.load_model(model_id: "5995ec80eb42ed497c40f69f94e6d963")
+>>>>>>> backtesting
 end

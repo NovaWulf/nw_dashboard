@@ -13,7 +13,7 @@ class Coinbase
     end
 
     
-    def getPrices(pair:, start_time: DEFAULT_START_TIME,resolution: 3600)
+    def get_prices(pair:, start_time: DEFAULT_START_TIME,resolution: 3600)
        response("/#{pair}/candles", start_time || DEFAULT_START_TIME,resolution)
     end
 
@@ -27,39 +27,36 @@ class Coinbase
     end
 
     def generate_headers(path)
-        requestTimeStamp = Time.now.getutc.to_i.to_s
+        request_timestamp = Time.now.getutc.to_i.to_s
         headers = {
             "CB-ACCESS-KEY": @key,
-            "CB-ACCESS-TIMESTAMP": requestTimeStamp,
+            "CB-ACCESS-TIMESTAMP": request_timestamp,
             "CB-ACCESS-PASSPHRASE": @pass,
-            "CB-ACCESS-SIGN": get_signature(path,requestTimeStamp)
+            "CB-ACCESS-SIGN": get_signature(path,request_timestamp)
         }
     end
     def response(path, start_time, resolution)
       time_now =  Time.now.getutc.to_i
       start_timestamp= start_time.to_i
       
-      numCandles = (time_now-start_timestamp.to_i).div(resolution)
+      num_candles = (time_now-start_timestamp.to_i).div(resolution)
       
-      if numCandles>300
+      if num_candles>300
         responses=[]
-        Rails.logger.info "#{numCandles} candles exceeds maximum amount of 300, using pagination..."
-        newStartTime = time_now - 298*resolution
-        responses.concat self.class.get("#{path}?start=#{newStartTime.to_s}&end=#{time_now}&granularity=#{resolution}", headers: generate_headers(path)).parsed_response
-        
-        firstTime = responses.last()[0]
-        newEndTime=firstTime-resolution
-        while newEndTime>start_timestamp 
-            newStartTime=newEndTime-299*resolution
-            thisResponse = self.class.get("#{path}?start=#{newStartTime.to_s}&end=#{newEndTime.to_s}&granularity=#{resolution}", headers: generate_headers(path))
+        new_start_time = time_now - 298*resolution
+        responses.concat self.class.get("#{path}?start=#{new_start_time.to_s}&end=#{time_now}&granularity=#{resolution}", headers: generate_headers(path)).parsed_response
+        first_time = responses.last()[0]
+        new_end_time=first_time-resolution
+        while new_end_time>start_timestamp 
+            new_start_time=new_end_time-299*resolution
+            responses.concat self.class.get("#{path}?start=#{new_start_time.to_s}&end=#{new_end_time.to_s}&granularity=#{resolution}", headers: generate_headers(path))
             .parsed_response
-            Rails.logger.info "reponse from coinbase: #{thisResponse}"
-            responses.concat thisResponse
-            newEndTime=newEndTime-300*resolution
-            newEndTime2=responses.last()[0]-resolution
-            if newEndTime<start_timestamp
-                newEndTime=start_timestamp
+            new_end_time=new_end_time-300*resolution
+            new_end_time2=responses.last()[0]-resolution
+            if new_end_time<start_timestamp
+                new_end_time=start_timestamp
             end
+            sleep 0.34
         end
       else
         responses = self.class.get("#{path}?start=#{start_timestamp.to_s}&end=#{time_now.to_s}&granularity=#{resolution}", headers: generate_headers(path))
