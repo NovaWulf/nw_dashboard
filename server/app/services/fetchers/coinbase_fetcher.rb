@@ -26,7 +26,7 @@ module Fetchers
     def coinbase_client
       Coinbase.new
     end
-    uydfjtd
+    
 
   end
   end
