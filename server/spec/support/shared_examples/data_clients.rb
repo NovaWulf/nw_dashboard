@@ -62,7 +62,7 @@ end
 RSpec.shared_context 'coinbase client' do
   let(:coinbase_double) do
     double('coinbase client',
-      getPrices: [[Time.now.to_i,100,100,100,100,100]])
+      get_prices: [[Time.now.to_i,100,100,100,100,100]])
   end
 
   before(:each) do
