@@ -59,7 +59,7 @@ class Coinbase
             if new_end_time<start_timestamp
                 new_end_time=start_timestamp
             end
-            sleep .34
+            sleep 0.34
         end
       else
         puts "time now: " + time_now.to_s + " start timestamp: " + start_timestamp.to_s + " resolution: " + resolution.to_s  
