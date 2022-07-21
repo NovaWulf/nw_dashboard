@@ -16,19 +16,16 @@ import CsvDownloadLink from 'components/CsvDownloadLink';
 export default function ArbitrageBacktestChart({ pnl }) {
   const theme = useTheme();
 
+  const updatedData = [];
   const tempSum = 0;
   for (let i = 0; i < pnl.length; i++) {
     tempSum += pnl[i].v;
-    pnl[i].cum_v = tempSum;
+    updatedData.push({
+      ts: pnl[i].ts,
+      v: pnl[i].v,
+      v_cum: tempSum,
+    });
   }
-
-  const updatedData = pnl.map(d => {
-    return {
-      ts: d.ts,
-      v: d.v,
-      v_cum: d.cum_v,
-    };
-  });
 
   return (
     <DashboardItem
