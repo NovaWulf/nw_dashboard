@@ -4,11 +4,11 @@ class Coinbase
     require 'json'
     base_uri 'https://api.exchange.coinbase.com/products'
   
-    DEFAULT_START_TIME = DateTime.new(2022, 6, 01,0,0,0).to_i.to_s
+    DEFAULT_START_TIME = DateTime.new(2022, 6, 1,0,0,0).to_i.to_s
   
     def initialize
       @key = ENV['COINBASE_API_KEY']
-      @secret = ENV['COINBASE_API_SECRET']     
+      @secret = ENV['COINBASE_API_SECRET']
       @pass = ENV['COINBASE_PASS']
     end
 

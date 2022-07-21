@@ -4,7 +4,7 @@ class ArbitrageCalculator < BaseService
     fetch_coinbase_data
     most_recent_model = CointegrationModel.newest_first.first
     most_recent_model_id = most_recent_model&.uuid
-    last_in_sample_date = most_recent_model&.model_endtime
+    last_in_sample_timestamp = most_recent_model&.model_endtime
 
     op_weight = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}' and asset_name = 'op-usd'").pluck(:weight)[0]
     eth_weight = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}' and asset_name = 'eth-usd'").pluck(:weight)[0]
@@ -58,7 +58,7 @@ class ArbitrageCalculator < BaseService
       
       if this_op_candle.count >0
           current_op_val = this_op_candle.pluck(:close)[0]
-      else 
+      else
         Candle.create(starttime: time, pair: "op-usd",exchange: "Coinbase",
           resolution:res,low:current_op_val,high: current_op_val,open:current_op_val,close: current_op_val,volume:0)
       end
@@ -69,7 +69,11 @@ class ArbitrageCalculator < BaseService
           resolution:res,low:current_eth_val,high: current_eth_val,open:current_eth_val,close: current_eth_val,volume:0)
       end
       signal_value = current_op_val*op_weight + current_eth_val*eth_weight + const_weight
-      m=ModeledSignal.create(starttime: time, model_id: most_recent_model_id, resolution: res, value: signal_value)
+      in_sample_flag = true
+      if time > last_in_sample_timestamp
+        in_sample_flag=false
+      end
+      m=ModeledSignal.create(starttime: time, model_id: most_recent_model_id, resolution: res, value: signal_value,in_sample:in_sample_flag)
     end
 
   email_notification(m) if m
