@@ -143,7 +143,7 @@ module Types
       Displayers::HourlyValueDisplayer.run(model: nil).value
     end
 
-    def arb_backtest_latest_model()      
+    def backtest_latest_model()      
       Displayers::HourlyValueDisplayer.run_backtest(model: nil).value
     end
 

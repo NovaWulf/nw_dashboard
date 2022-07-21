@@ -4,6 +4,7 @@ import Grid from '@mui/material/Grid';
 import * as React from 'react';
 import ArbitrageSignalChart from 'components/charts/ArbitrageSignalChart';
 import ArbitrageBacktestChart from 'components/charts/ArbitrageBacktestChart';
+import LoadingGridItem from 'components/LoadingGridItem';
 
 const QUERY = gql`
   query {
@@ -33,7 +34,10 @@ export default function ArbitrageCharts() {
     arbSignalLatestModel,
     backtestLatestModel,
   } = data || {};
-  console.log('in sample mean: ' + JSON.stringify(arbSignalLatestModel));
+  console.log(
+    'latestCointegrationModelInfo: ' +
+      JSON.stringify(latestCointegrationModelInfo),
+  );
 
   if (error) {
     console.error(error);
@@ -50,7 +54,7 @@ export default function ArbitrageCharts() {
         />
       </LoadingGridItem>
       <LoadingGridItem loading={loading}>
-        <LoadingGridBacktestChart pnl={backtestLatestModel} />
+        <ArbitrageBacktestChart pnl={backtestLatestModel} />
       </LoadingGridItem>
     </Grid>
   );
