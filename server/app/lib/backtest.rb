@@ -32,77 +32,81 @@ class Backtest
         @assets = weights.pluck(:asset_name)
         @asset_weights = weights.pluck(:weight)
         puts "assets: " + @assets.to_s
-        @ownable_assets = @assets.delete("det")
-        @num_ownable_assets = @ownable_assets.length()
+        @assets.delete("det")
+        @num_ownable_assets = @assets.length()
         
-        puts "model starttime: " + @model_starttime.to_s
+        puts "@num_ownable_assets: "+@num_ownable_assets.to_s
         puts "loading arbitrage signal..."
         modeled_signal = ModeledSignal.where("model_id = '#{model_id}'").oldest_first
         @signal = modeled_signal.pluck(:value)
         @starttimes = modeled_signal.pluck(:starttime)
+        signal_starttime = @starttimes[0]
+        signal_endtime = @starttimes[@starttimes.length()-1]
         @num_obs = @signal.length()
-        @positions = Array.new(@num_obs){Array.new(@num_ownable_assets)}
+        @positions = Array.new(@num_ownable_assets){Array.new(@num_obs)}
         @pnl = Array.new(@num_obs)
         @transactions = Array.new(@num_obs)
         puts "loading prices..."
-        @prices = Array.new(@num_obs){Array.new(@num_ownable_assets)}
-        for i in 0..(@num_obs-1)
-            puts (100.0*i/(@num_obs-1)).to_s + "% done"
-            this_start_time = @starttimes[i]
-            for j in 0..(@num_ownable_assets)
-                # this is a slow but simple way of getting the most recent asset price on each time step for the signal
-                @prices[i][j] = Candle.where("pair = '#{@assets[j]}' and starttime = #{this_start_time}").last&.close
-            end
+        @prices = Array.new(@num_ownable_assets){Array.new(@num_obs)}
+        for i in 0..(@num_ownable_assets-1)
+            @prices[i] = Candle.where("pair = '#{@assets[i]}' and starttime >= #{signal_starttime} and starttime <= #{signal_endtime}").oldest_first.pluck(:close)
         end
+        
         puts "done loading"
     end
     def target_positions()
         target_positions = Array.new(@num_ownable_assets)
-        for i in 0..@num_ownable_assets
+        for i in 0..(@num_ownable_assets-1)
             if signal_up(@cursor)
-                target_positions[i] = - @asset_weights[i] * max_trade_size_eth
-            end
-            if signal_down(@cursor)
-                target_positions[i] = @asset_weights[i]*max_trade_size_eth
+                target_positions[i] = - @asset_weights[i] * @max_trade_size_eth
+            elsif signal_down(@cursor)
+                target_positions[i] = @asset_weights[i]*@max_trade_size_eth
+            else 
+                target_positions[i] = 0
             end
         end
+
         @targets = target_positions
     end
     def generate_orders()
         deltas = Array.new(@num_ownable_assets)
-        for i in 0..@num_ownable_assets
-            deltas[i] = @targets - positions[@cursor][i]
+        for i in 0..(@num_ownable_assets-1)
+            puts "target " + i.to_s + ": "+@targets[i].to_s
+            deltas[i] = @targets[i] - @positions[i][@cursor]
         end
         @orders = deltas
     end
     def execute_trades()
-        for i in 0..num_ownable_assets
-            @positions[@cursor][i] = positions[@cursor-1][i]+@orders[i]
+        for i in 0..(@num_ownable_assets-1)
+            @positions[i][@cursor] = @positions[i][@cursor-1]+@orders[i]
             @orders[i]=0
         end
     end
     def calculate_pnl
-        for i in 0..num_ownable_assets
-            pnl[@cursor] = positions[@cursor][i]*(prices[@cursor][i]-prices[@cursor-1][i])
+        @pnl[@cursor] = 0
+        for i in 0..(@num_ownable_assets-1)
+            @pnl[@cursor] += @positions[i][@cursor]*(@prices[i][@cursor]-@prices[i][@cursor-1])
         end
     end
     def set_initial_positions()
         return unless @cursor == 0
-        for i in 0..@num_ownable_assets
-            positions[@cursor][i] = 0
+        puts @positions.length()
+        puts @positions[0].length()
+        for i in 0..(@num_ownable_assets-1)
+            @positions[i][@cursor] = 0
         end
     end
 
     def signal_up(index)
         returnVal = false
-        if signal[index]>@in_sample_mean + @in_sample_sd*@multiplier
+        if @signal[index]>@in_sample_mean + @in_sample_sd*@multiplier
             returnVal = true
         end
         return returnVal
     end
     def signal_down(index)
         returnVal = false
-        if signal[index]<@in_sample_mean - @in_sample_sd*@multiplier
+        if @signal[index]<@in_sample_mean - @in_sample_sd*@multiplier
             returnVal = true
         end
         return returnVal
@@ -113,8 +117,10 @@ class Backtest
         while true
             self.target_positions
             self.generate_orders
+            puts @cursor.to_s
             @cursor+=1 #time moves forward after setting target positions, before actually updating positions
-            if @cursor==numObs 
+            if @cursor==@num_obs 
+                puts "reached end"
                 break
             end
             self.execute_trades

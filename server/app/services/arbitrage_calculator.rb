@@ -2,7 +2,9 @@ class ArbitrageCalculator < BaseService
 
   def run
     fetch_coinbase_data
-    most_recent_model_id = CointegrationModel.newest_first.first&.uuid
+    most_recent_model = CointegrationModel.newest_first.first
+    most_recent_model_id = most_recent_model&.uuid
+    last_in_sample_date = most_recent_model&.model_endtime
 
     op_weight = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}' and asset_name = 'op-usd'").pluck(:weight)[0]
     eth_weight = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}' and asset_name = 'eth-usd'").pluck(:weight)[0]
@@ -50,7 +52,9 @@ class ArbitrageCalculator < BaseService
       this_op_candle = Candle.by_resolution(res).by_pair("op-usd").where("starttime = #{time}")
       this_eth_candle = Candle.by_resolution(res).by_pair("eth-usd").where("starttime = #{time}")
       
-      # update current candle value if not null, otherwise, use most recent non-null value (flat-forward interpolation)
+      # update current candle value if not null, otherwise, use most recent non-null value 
+      # and create a new candle using the old value for flat-forward interpolation
+      # (useful for better efficiency during backtesting)
       
       if this_op_candle.count >0
           current_op_val = this_op_candle.pluck(:close)[0]
