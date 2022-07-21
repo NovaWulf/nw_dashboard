@@ -16,10 +16,17 @@ import CsvDownloadLink from 'components/CsvDownloadLink';
 export default function ArbitrageBacktestChart({ pnl }) {
   const theme = useTheme();
 
+  const tempSum = 0;
+  for (let i = 0; i < pnl.length; i++) {
+    tempSum += pnl[i].v;
+    pnl[i].cum_v = tempSum;
+  }
+
   const updatedData = pnl.map(d => {
     return {
       ts: d.ts,
       v: d.v,
+      v_cum: d.cum_v,
     };
   });
 
@@ -38,7 +45,7 @@ export default function ArbitrageBacktestChart({ pnl }) {
         >
           <Line
             type="monotone"
-            dataKey="v"
+            dataKey="v_cum"
             name="Profit and Loss"
             stroke={theme.palette.secondary.secondary}
             yAxisId="pnl"
@@ -52,7 +59,7 @@ export default function ArbitrageBacktestChart({ pnl }) {
             orientation="left"
             tickFormatter={nFormatter}
             stroke={theme.palette.primary.main}
-            domain={[-150, 150]}
+            domain={[-500000, 1500000]}
           />
 
           <Tooltip labelFormatter={dateFormatter} />
