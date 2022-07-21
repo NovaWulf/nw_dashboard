@@ -15,15 +15,6 @@ ActiveRecord::Schema.define(version: 2022_07_21_004750) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "backtests", force: :cascade do |t|
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.string "starttime", null: false
-    t.string "model_id", null: false
-    t.boolean "in_sample", null: false
-    t.float "pnl", null: false
-  end
-
   create_table "candles", force: :cascade do |t|
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
