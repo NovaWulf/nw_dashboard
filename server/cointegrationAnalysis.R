@@ -3,6 +3,8 @@ library(RODBC)
 library(urca)
 library(lubridate)
 library(digest)
+library(lattice)
+library(latticeExtra)
 
 fitModel = function(dbhandle,startTimeString,endTimeString,ecdet_param="const"){
 
@@ -24,19 +26,32 @@ ecdet = ecdet_param
 spec = "transitory"
 type = "trace"
 jo=ca.jo(dataMat,type= type,ecdet = ecdet,spec=spec)
-#summary(jo)
+summary(jo)
 
 
 vecs = jo@V
 
-spread = vecs[1,1]*bothDat$close.x + vecs[2,1]*bothDat$close.y+vecs[3,1]
+spread = NULL
+if (ecdet_param == "const")
+ spread = vecs[1,1]*bothDat$close.x + vecs[2,1]*bothDat$close.y+vecs[3,1]
+
+if (ecdet_param == "none")
+ spread = vecs[1,1]*bothDat$close.x + vecs[2,1]*bothDat$close.y
 
 meanSpread= mean(spread)
 sdSpread = sd(spread)
+sigma = 1
 
-# plot1 = xyplot(close.x~start_datetime,bothDat,type="l", auto.key = TRUE, main = "double axis plot of OP vs ETH futures")
-# plot2 = xyplot(close.y~start_datetime,bothDat,type="l",auto.key = TRUE)
-# doubleYScale(plot1, plot2)
+plot1 = xyplot(close.x~start_datetime,bothDat,type="l", auto.key = TRUE, main = "double axis plot of OP vs ETH futures")
+plot2 = xyplot(close.y~start_datetime,bothDat,type="l",auto.key = TRUE)
+doubleYScale(plot1, plot2)
+bothDat$upper = bothDat$meanSpread+sigma*bothDat$sdSpread
+bothDat$lower = bothDat$meanSpread-sigma*bothDat$sdSpread
+bothDat$spread = spread
+bothDat$meanSpread = meanSpread
+bothDat$sdSpread = sdSpread
+xyplot(spread + meanSpread~start_datetime,bothDat,type = "l",auto.key = T,main= "mean reverting portfolio")
+
 
 realStartDate = min(bothDat$start_datetime)
 realEndDate = max(bothDat$start_datetime)

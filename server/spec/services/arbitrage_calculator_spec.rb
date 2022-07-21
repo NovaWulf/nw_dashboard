@@ -37,7 +37,6 @@ RSpec.describe ArbitrageCalculator do
             timestamp: 1800000000,
             asset_name: "op-usd", 
             weight: -1 ) 
-        thing= CointegrationModelWeight.last
 
         CointegrationModelWeight.create(
             uuid: "id1", 
