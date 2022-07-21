@@ -13,6 +13,9 @@ module Displayers
       def run
         ModeledSignal.by_model(@model).on_the_hour.oldest_first
       end
+      def run_backtest
+        ModeledSignal.by_model(@model+"-b").on_the_hour.oldest_first
+      end
     end
   end
   
