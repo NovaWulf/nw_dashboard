@@ -1,6 +1,5 @@
 class Backtest
     @assets
-    @ownable_assets
     @asset_weights
     @cursor
     @model_starttime
@@ -59,10 +58,9 @@ class Backtest
         for i in 0..(@num_ownable_assets-1)
             @prices[i] = Candle.where("pair = '#{@assets[i]}' and starttime >= #{signal_starttime} and starttime <= #{signal_endtime}").oldest_first.pluck(:close)
         end
-        
         puts "done loading"
     end
-    def target_positions()
+    def target_positions
         target_positions = Array.new(@num_ownable_assets)
         for i in 0..(@num_ownable_assets-1)
             if signal_up(@cursor)
@@ -70,20 +68,20 @@ class Backtest
             elsif signal_down(@cursor)
                 target_positions[i] = @asset_weights[i]*@max_trade_size_eth
             else 
-                target_positions[i] = 0
+                target_positions[i] = @positions[i][@cursor]
             end
         end
 
         @targets = target_positions
     end
-    def generate_orders()
+    def generate_orders
         deltas = Array.new(@num_ownable_assets)
         for i in 0..(@num_ownable_assets-1)
             deltas[i] = @targets[i] - @positions[i][@cursor]
         end
         @orders = deltas
     end
-    def execute_trades()
+    def execute_trades
         for i in 0..(@num_ownable_assets-1)
             @positions[i][@cursor] = @positions[i][@cursor-1]+@orders[i]
             @orders[i]=0
@@ -98,9 +96,15 @@ class Backtest
                 in_sample_flag=false
             end
         end
-        ModeledSignal.create(starttime: @starttimes[@cursor], model_id: @model_id+"-b", resolution: @resolution, value: @pnl[@cursor],in_sample:in_sample_flag)
+        ModeledSignal.find_or_create_by(
+            starttime: @starttimes[@cursor],
+            model_id: @model_id+"-b",
+            resolution: @resolution,
+            value: @pnl[@cursor],
+            in_sample:in_sample_flag
+        )
     end
-    def set_initial_positions()
+    def set_initial_positions
         return unless @cursor == 0
         puts @positions.length()
         puts @positions[0].length()
@@ -127,7 +131,6 @@ class Backtest
         self.load_model(model_id: model_id)
         self.set_initial_positions
         while true
-            puts "cursor: " + @cursor.to_s
             self.target_positions
             self.generate_orders
             @cursor+=1 #time moves forward after setting target positions, before actually updating positions
@@ -138,5 +141,6 @@ class Backtest
             self.execute_trades
             self.calculate_pnl
         end
+        puts "total profit: $" + @pnl.inject(:+).to_s
     end
 end
