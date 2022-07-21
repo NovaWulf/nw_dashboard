@@ -4,7 +4,6 @@ import Grid from '@mui/material/Grid';
 import * as React from 'react';
 import ArbitrageSignalChart from 'components/charts/ArbitrageSignalChart';
 import ArbitrageBacktestChart from 'components/charts/ArbitrageBacktestChart';
-import LoadingGridItem from 'components/LoadingGridItem';
 
 const QUERY = gql`
   query {
@@ -46,16 +45,23 @@ export default function ArbitrageCharts() {
 
   return (
     <Grid container spacing={3}>
-      <LoadingGridItem loading={loading}>
-        <ArbitrageSignalChart
-          arb_signal={arbSignalLatestModel}
-          mean={latestCointegrationModelInfo[0].inSampleMean}
-          sd={latestCointegrationModelInfo[0].inSampleSd}
-        />
-      </LoadingGridItem>
-      <LoadingGridItem loading={loading}>
-        <ArbitrageBacktestChart pnl={backtestLatestModel} />
-      </LoadingGridItem>
+      <Grid item sx={{ display: 'flex' }} xs={12} md={12}>
+        {loading ? (
+          <Skeleton variant="rectangular" />
+        ) : (
+          <ArbitrageSignalChart
+            arb_signal={arbSignalLatestModel}
+            mean={latestCointegrationModelInfo[0].inSampleMean}
+            sd={latestCointegrationModelInfo[0].inSampleSd}
+          />
+        )}
+        ,
+        {loading ? (
+          <Skeleton variant="rectangular" />
+        ) : (
+          <ArbitrageBacktestChart pnl={backtestLatestModel} />
+        )}
+      </Grid>
     </Grid>
   );
 }
