@@ -86,6 +86,8 @@ valueVec = c(
 colNameString = "(uuid, timestamp,ecdet,spec,cv_10_pct,cv_5_pct,cv_1_pct,test_stat,top_eig,resolution,model_starttime,model_endtime,in_sample_mean,in_sample_sd)"
 valueString = paste0(c("(",paste0(valueVec,collapse = ","),")"),collapse = "")
 queryString = paste0("insert into cointegration_models " , colNameString," values",valueString)
+
+print(queryString)
 sqlQuery(dbhandle,queryString)
 
 assetNames = c("'eth-usd'","'op-usd'","'det'")
@@ -100,6 +102,6 @@ for (i in 1:3){
 totalValString = paste0(valStrings,collapse=",")
 
 sqlQuery(dbhandle,paste0("insert into cointegration_model_weights ",colNamesString2," values ",totalValString))
-
+print(paste0("insert into cointegration_model_weights ",colNamesString2," values ",totalValString))
 return (summary(jo))
 }
