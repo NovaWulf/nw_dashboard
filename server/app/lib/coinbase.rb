@@ -56,7 +56,6 @@ class Coinbase
         )
                              .parsed_response
         new_end_time -= 300 * resolution
-        new_end_time2 = responses.last[0] - resolution
         new_end_time = start_timestamp if new_end_time < start_timestamp
         sleep 0.34
       end
