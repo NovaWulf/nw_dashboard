@@ -67,14 +67,11 @@ task download_candles: :environment do
 end
 
 task update_arb_signal: :environment do
-  tracked_pairs = %w[eth-usd op-usd]
-  tracked_pairs.each do |p|
-    Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
-  end
   ArbitrageCalculator.run
 end
 
+# this needs to be run before downloading candles or updating arb signal
 task cointegration_analysis: :environment do
   r = RAdapter.new
-  r.cointegration_analysis(startTimeString: "'2022-06-13'",endTimeString: "'2022-07-12'")
+  r.cointegration_analysis(startTimeString: "'2022-06-13'", endTimeString: "'2022-07-12'")
 end
