@@ -28,11 +28,11 @@ class ArbitrageCalculator < BaseService
       this_op_candle = Candle.by_resolution(res).by_pair('op-usd').where("starttime = #{this_start_time}")
       this_eth_candle = Candle.by_resolution(res).by_pair('eth-usd').where("starttime = #{this_start_time}")
 
-      if this_op_candle.positive?
+      if this_op_candle.count.positive?
         op_not_null = 1
         current_op_val = this_op_candle.pluck(:close)[0]
       end
-      if this_eth_candle.positive?
+      if this_eth_candle.count.positive?
         eth_not_null = 1
         current_eth_val = this_eth_candle.pluck(:close)[0]
       end
@@ -50,8 +50,8 @@ class ArbitrageCalculator < BaseService
 
       # update current candle value if not null, otherwise, use most recent non-null value (flat-forward interpolation)
 
-      current_op_val = this_op_candle.pluck(:close)[0] if this_op_candle.count > 0
-      current_eth_val = this_eth_candle.pluck(:close)[0] if this_eth_candle.count > 0
+      current_op_val = this_op_candle.pluck(:close)[0] if this_op_candle.count.positive?
+      current_eth_val = this_eth_candle.pluck(:close)[0] if this_eth_candle.count.positive?
       signal_value = current_op_val * op_weight + current_eth_val * eth_weight + const_weight
 
       m = ModeledSignal.create(starttime: time, model_id: most_recent_model_id, resolution: res, value: signal_value)
