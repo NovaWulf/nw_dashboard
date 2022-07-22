@@ -28,11 +28,11 @@ class ArbitrageCalculator < BaseService
       this_op_candle = Candle.by_resolution(res).by_pair('op-usd').where("starttime = #{this_start_time}")
       this_eth_candle = Candle.by_resolution(res).by_pair('eth-usd').where("starttime = #{this_start_time}")
 
-      if this_op_candle.count > 0
+      if this_op_candle.positive?
         op_not_null = 1
         current_op_val = this_op_candle.pluck(:close)[0]
       end
-      if this_eth_candle.count > 0
+      if this_eth_candle.positive?
         eth_not_null = 1
         current_eth_val = this_eth_candle.pluck(:close)[0]
       end
