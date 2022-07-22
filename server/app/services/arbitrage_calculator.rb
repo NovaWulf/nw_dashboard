@@ -36,7 +36,7 @@ class ArbitrageCalculator < BaseService
         eth_not_null = 1
         current_eth_val = this_eth_candle.pluck(:close)[0]
       end
-      break if eth_not_null == 1 and op_not_null == 1
+      break if eth_not_null == 1 && op_not_null == 1
 
       index += 1
     end
