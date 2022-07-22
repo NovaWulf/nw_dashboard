@@ -40,7 +40,7 @@ class ArbitrageCalculator < BaseService
 
       index += 1
     end
-    counter = 0
+
     length_start_times = starttimes.length
     starttimes = starttimes[index..(length_start_times - 1)]
     m = nil
