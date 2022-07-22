@@ -141,6 +141,6 @@ class Backtest
             self.execute_trades
             self.calculate_pnl
         end
-        puts "total profit: $" + @pnl.inject(:+).to_s
+        # puts "total profit: $" + @pnl.inject(:+).to_s
     end
 end
