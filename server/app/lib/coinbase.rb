@@ -27,7 +27,7 @@ class Coinbase
 
   def generate_headers(path)
     request_timestamp = Time.now.getutc.to_i.to_s
-    headers = {
+    {
       "CB-ACCESS-KEY": @key,
       "CB-ACCESS-TIMESTAMP": request_timestamp,
       "CB-ACCESS-PASSPHRASE": @pass,
