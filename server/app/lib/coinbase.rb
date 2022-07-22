@@ -13,7 +13,7 @@ class Coinbase
     end
 
     
-    def get_prices(pair:, start_time: DEFAULT_START_TIME,resolution: 3600)
+    def get_prices(pair:, start_time: DEFAULT_START_TIME,resolution: 60)
        response("/#{pair}/candles", start_time || DEFAULT_START_TIME,resolution)
     end
 
