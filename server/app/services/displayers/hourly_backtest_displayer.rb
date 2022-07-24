@@ -11,9 +11,7 @@ module Displayers
     end
 
     def run()
-      thing = ModeledSignal.by_model(@model+"-b").on_the_hour.oldest_first
-      Rails.logger.info "backtest first val: " + thing.count.to_s
-      return thing
+      ModeledSignal.by_model(@model+"-b").on_the_hour.oldest_first
     end
 
   end

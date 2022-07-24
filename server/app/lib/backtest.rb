@@ -52,6 +52,7 @@ class Backtest
         @num_obs = @signal.length()
         @positions = Array.new(@num_ownable_assets){Array.new(@num_obs)}
         @pnl = Array.new(@num_obs)
+        @pnl[0] =0
         @transactions = Array.new(@num_obs)
         puts "loading prices..."
         @prices = Array.new(@num_ownable_assets){Array.new(@num_obs)}
@@ -96,6 +97,8 @@ class Backtest
                 in_sample_flag=false
             end
         end
+        @pnl[@cursor] += @pnl[@cursor-1]
+
         ModeledSignal.find_or_create_by(
             starttime: @starttimes[@cursor],
             model_id: @model_id+"-b",
@@ -106,8 +109,6 @@ class Backtest
     end
     def set_initial_positions
         return unless @cursor == 0
-        puts @positions.length()
-        puts @positions[0].length()
         for i in 0..(@num_ownable_assets-1)
             @positions[i][@cursor] = 0
         end

@@ -7,13 +7,19 @@ import {
   ResponsiveContainer,
   Tooltip,
   YAxis,
+  ReferenceLine,
 } from 'recharts';
 import { dateFormatter, nFormatter } from 'lib/formatters';
 import DashboardItem from 'components/DashboardItem';
 import TimeAxisHighRes from 'components/TimeAxisHighRes';
 import CsvDownloadLink from 'components/CsvDownloadLink';
 
-export default function ArbitrageSignalChart({ arb_signal, mean, sd }) {
+export default function ArbitrageSignalChart({
+  arb_signal,
+  mean,
+  sd,
+  is_end_date,
+}) {
   const theme = useTheme();
   const SIGMA = 1;
   console.log('mean: ' + mean + ', sd: ' + sd);
@@ -21,11 +27,13 @@ export default function ArbitrageSignalChart({ arb_signal, mean, sd }) {
     return {
       ts: d.ts,
       v: d.v,
+      // is: d.is,
       arbLow: mean - SIGMA * sd,
       arbHigh: mean + SIGMA * sd,
+      arbMean: mean,
     };
   });
-
+  console.log('in sample end date: ' + is_end_date);
   return (
     <DashboardItem
       title="Arbitrage Indicator"
@@ -39,6 +47,20 @@ export default function ArbitrageSignalChart({ arb_signal, mean, sd }) {
           data={updatedData}
           margin={{ top: 5, right: 15, bottom: 5, left: 0 }}
         >
+          <ReferenceLine
+            strokeDasharray="3 3"
+            yAxisId="spread"
+            x={is_end_date}
+            stroke="red"
+          />
+          <Line
+            type="monotone"
+            dataKey="arbMean"
+            name="mean spread"
+            stroke="red"
+            yAxisId="spread"
+            dot={false}
+          />
           <Line
             type="monotone"
             dataKey="arbLow"
@@ -51,7 +73,7 @@ export default function ArbitrageSignalChart({ arb_signal, mean, sd }) {
             type="monotone"
             dataKey="arbHigh"
             name="High Range"
-            stroke="red"
+            stroke="green"
             dot={false}
             yAxisId="spread"
           />
@@ -63,6 +85,7 @@ export default function ArbitrageSignalChart({ arb_signal, mean, sd }) {
             yAxisId="spread"
             dot={false}
           />
+
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
           {TimeAxisHighRes()}
 

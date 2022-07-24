@@ -12,16 +12,19 @@ const QUERY = gql`
       inSampleSd
       uuid
       id
+      modelEndtime
     }
 
     arbSignalLatestModel {
       ts
       v
+      is
     }
 
     backtestLatestModel {
       ts
       v
+      is
     }
   }
 `;
@@ -53,13 +56,18 @@ export default function ArbitrageCharts() {
             arb_signal={arbSignalLatestModel}
             mean={latestCointegrationModelInfo[0].inSampleMean}
             sd={latestCointegrationModelInfo[0].inSampleSd}
+            is_end_date={latestCointegrationModelInfo[0].modelEndtime}
           />
         )}
-        ,
+      </Grid>
+      <Grid item sx={{ display: 'flex' }} xs={12} md={12}>
         {loading ? (
           <Skeleton variant="rectangular" />
         ) : (
-          <ArbitrageBacktestChart pnl={backtestLatestModel} />
+          <ArbitrageBacktestChart
+            pnl={backtestLatestModel}
+            is_end_date={latestCointegrationModelInfo[0].modelEndtime}
+          />
         )}
       </Grid>
     </Grid>

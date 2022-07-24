@@ -7,25 +7,23 @@ import {
   ResponsiveContainer,
   Tooltip,
   YAxis,
+  ReferenceLine,
 } from 'recharts';
 import { dateFormatter, nFormatter } from 'lib/formatters';
 import DashboardItem from 'components/DashboardItem';
 import TimeAxisHighRes from 'components/TimeAxisHighRes';
 import CsvDownloadLink from 'components/CsvDownloadLink';
 
-export default function ArbitrageBacktestChart({ pnl }) {
+export default function ArbitrageBacktestChart({ pnl, is_end_date }) {
   const theme = useTheme();
 
-  const updatedData = [];
-  const tempSum = 0;
-  for (let i = 0; i < pnl.length; i++) {
-    tempSum += pnl[i].v;
-    updatedData.push({
-      ts: pnl[i].ts,
-      v: pnl[i].v,
-      v_cum: tempSum,
-    });
-  }
+  const updatedData = pnl.map(d => {
+    return {
+      ts: d.ts,
+      v: d.v,
+      is: d.is,
+    };
+  });
 
   return (
     <DashboardItem
@@ -40,9 +38,16 @@ export default function ArbitrageBacktestChart({ pnl }) {
           data={updatedData}
           margin={{ top: 5, right: 15, bottom: 5, left: 0 }}
         >
+          <ReferenceLine
+            strokeDasharray="3 3"
+            yAxisId="pnl"
+            x={is_end_date}
+            stroke="red"
+            label="IS <-> OOS"
+          />
           <Line
             type="monotone"
-            dataKey="v_cum"
+            dataKey="v"
             name="Profit and Loss"
             stroke={theme.palette.secondary.secondary}
             yAxisId="pnl"
