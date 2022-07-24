@@ -80,7 +80,6 @@ task cointegration_analysis: :environment do
 end
 
 task run_backtest: :environment do
-  b = Backtest.new
-  b.run_simulation(model_id: "5995ec80eb42ed497c40f69f94e6d963")
+  b = Backtest.run(model_id: "5995ec80eb42ed497c40f69f94e6d963")
 end
 

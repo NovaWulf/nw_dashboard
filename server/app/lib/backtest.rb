@@ -117,7 +117,7 @@ class Backtest
         end
         return returnVal
     end
-    def run_simulation(model_id:)
+    def run(model_id:)
         self.load_model(model_id: model_id)
         self.set_initial_positions
         while true

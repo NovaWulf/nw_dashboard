@@ -61,7 +61,6 @@ class Coinbase
       else
         responses = self.class.get("#{path}?start=#{start_timestamp.to_s}&end=#{time_now.to_s}&granularity=#{resolution}", headers: generate_headers(path))
         responses = responses.parsed_response
-        #puts responses
       end
       responses
       
