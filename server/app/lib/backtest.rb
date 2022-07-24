@@ -24,29 +24,20 @@ class Backtest
     end
     def load_model(model_id:)
         @model_id = model_id
-        puts "loading model..."
         model = CointegrationModel.where("uuid = '#{model_id}'").last
         @resolution = model&.resolution
         @model_starttime = model&.model_starttime
         @model_endtime = model&.model_endtime
         @in_sample_sd = model&.in_sample_sd
         @in_sample_mean = model&.in_sample_mean
-        puts "loading model weights..."
         weights = CointegrationModelWeight.where("uuid = '#{model_id}'")
-        puts "number of weights for model: " + weights.count.to_s
         @assets = weights.pluck(:asset_name)
         @asset_weights = weights.pluck(:weight)
-        puts "assets: " + @assets.to_s
         @assets.delete("det")
         @num_ownable_assets = @assets.length()
-
-        puts "@num_ownable_assets: "+@num_ownable_assets.to_s
-        puts "loading arbitrage signal..."
         modeled_signal = ModeledSignal.where("model_id = '#{model_id}'").oldest_first
         @signal = modeled_signal.pluck(:value)
         @starttimes = modeled_signal.pluck(:starttime)
-        puts "unique start times: " + @starttimes.uniq.length().to_s
-
         signal_starttime = @starttimes[0]
         signal_endtime = @starttimes[@starttimes.length()-1]
         @num_obs = @signal.length()
@@ -54,12 +45,10 @@ class Backtest
         @pnl = Array.new(@num_obs)
         @pnl[0] =0
         @transactions = Array.new(@num_obs)
-        puts "loading prices..."
         @prices = Array.new(@num_ownable_assets){Array.new(@num_obs)}
         for i in 0..(@num_ownable_assets-1)
             @prices[i] = Candle.where("pair = '#{@assets[i]}' and starttime >= #{signal_starttime} and starttime <= #{signal_endtime}").oldest_first.pluck(:close)
         end
-        puts "done loading"
     end
     def target_positions
         target_positions = Array.new(@num_ownable_assets)
@@ -136,12 +125,10 @@ class Backtest
             self.generate_orders
             @cursor+=1 #time moves forward after setting target positions, before actually updating positions
             if @cursor==@num_obs 
-                puts "reached end"
                 break
             end
             self.execute_trades
             self.calculate_pnl
         end
-        # puts "total profit: $" + @pnl.inject(:+).to_s
     end
 end

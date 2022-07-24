@@ -6,5 +6,4 @@ module Types
       field :in_sample_sd, Float, null: false
       field :model_endtime, Integer, null: false
     end
-  end
-  
+end
