@@ -41,6 +41,7 @@ class Backtest
         signal_starttime = @starttimes[0]
         signal_endtime = @starttimes[@starttimes.length()-1]
         @num_obs = @signal.length()
+        puts "num obs: " + @num_obs.to_s
         @positions = Array.new(@num_ownable_assets){Array.new(@num_obs)}
         @pnl = Array.new(@num_obs)
         @pnl[0] =0
@@ -78,6 +79,7 @@ class Backtest
         end
     end
     def calculate_pnl
+      
         @pnl[@cursor] = 0
         for i in 0..(@num_ownable_assets-1)
             @pnl[@cursor] += @positions[i][@cursor]*(@prices[i][@cursor]-@prices[i][@cursor-1])
