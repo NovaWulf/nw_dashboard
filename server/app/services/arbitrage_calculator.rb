@@ -8,6 +8,11 @@ class ArbitrageCalculator < BaseService
     op_weight = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}' and asset_name = 'op-usd'").pluck(:weight)[0]
     eth_weight = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}' and asset_name = 'eth-usd'").pluck(:weight)[0]
     const_weight = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}' and asset_name = 'det'").pluck(:weight)[0]
+    if !op_weight || !eth_weight || !const_weight
+      Rails.logger.info "model weight is null, returning"
+      return
+    end
+
     res = 60
     last_timestamp = ModeledSignal.by_model(most_recent_model_id).last&.starttime
 
@@ -95,7 +100,6 @@ class ArbitrageCalculator < BaseService
                               text: "OP-ETH (#{signal_value.round(2)}) is below the low band of Paul's indicator (#{lower.round(2)}). Recommend buying ETH and shorting OP").notification.deliver_now
     end
   end
-
 
   def fetch_coinbase_data
     tracked_pairs = %w[eth-usd op-usd]
