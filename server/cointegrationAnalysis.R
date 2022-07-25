@@ -8,13 +8,16 @@ library(latticeExtra)
 
 fitModel = function(dbhandle,startTimeString,endTimeString,ecdet_param="const"){
 
-startTime = as.numeric(strptime(startTimeString, "%Y-%m-%d"))
-endTime = as.numeric(strptime(endTimeString,"%Y-%m-%d"))
+startTime = startTimeString
+endTime = endTimeString
+if (class(startTimeString)=="character" && class(endTimeString)== "character"){
+  startTime = as.numeric(strptime(startTimeString, "%Y-%m-%d"))
+  endTime = as.numeric(strptime(endTimeString,"%Y-%m-%d")) 
+}
 
 resolution = 60
 ethDat = data.table(sqlQuery(dbhandle,paste0("select starttime,close from candles where pair ='eth-usd' and resolution = ", resolution)))
 opDat = data.table(sqlQuery(dbhandle,paste0("select starttime,close from candles where pair = 'op-usd' and resolution= ",resolution )))
-
 
 bothDat = merge(ethDat,opDat,by = "starttime")
 bothDat = bothDat[starttime>startTime & starttime<endTime]

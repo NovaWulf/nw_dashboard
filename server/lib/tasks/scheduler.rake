@@ -73,9 +73,8 @@ task update_arb_signal: :environment do
 end
 
 task cointegration_analysis: :environment do
-  r = RAdapter.new
-  r.cointegration_analysis(startTimeString: "'2022-06-13'",endTimeString: "'2022-07-12'")
+  mu = ModelUpdate.new
+  mu.update_model(version: 0)
 end
-
 
 

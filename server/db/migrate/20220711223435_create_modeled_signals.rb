@@ -7,6 +7,7 @@ class CreateModeledSignals < ActiveRecord::Migration[6.1]
       t.string :model_id, null: false
       t.integer :resolution, null: false
       t.float :value, null: false
+      t.boolean :in_sample, null: false, default: true
       
     end
   end

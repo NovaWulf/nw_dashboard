@@ -9,8 +9,8 @@ class ArbitrageCalculator < BaseService
     eth_weight = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}' and asset_name = 'eth-usd'").pluck(:weight)[0]
     const_weight = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}' and asset_name = 'det'").pluck(:weight)[0]
     if !op_weight || !eth_weight || !const_weight
-      Rails.logger.info "model weight is null, returning"
-      return
+      Rails.logger.info "model weight is null or model does not exist, aborting"
+      abort "model weight is null, aborting"
     end
 
     res = 60
