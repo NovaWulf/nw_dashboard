@@ -116,7 +116,7 @@ jobs:
             . ~/nw_dashboard/.circleci/should_i_run.sh
             shouldIRun server $CIRCLE_COMPARE_URL
       - heroku/install
-      - heroku/deploy-via-git
+      - heroku/deploy-via-git:
           app-name: nw-dashboard-staging
 
 workflows:
