@@ -47,6 +47,7 @@ jobs:
           root: .
           paths:
             - vendor/bundle
+
   test-server:
     working_directory: ~/nw_dashboard/server
     <<: *environment
@@ -103,6 +104,22 @@ jobs:
       - heroku/install
       - heroku/deploy-via-git
 
+  deploy_server_staging:
+    executor: heroku/default
+    working_directory: ~/nw_dashboard/server
+    <<: *environment
+    steps:
+      - checkout:
+          path: ~/nw_dashboard/
+      - run:
+          name: Should I run?
+          command: |
+            . ~/nw_dashboard/.circleci/should_i_run.sh
+            shouldIRun server $CIRCLE_COMPARE_URL
+      - heroku/install
+      - heroku/deploy-via-git:
+          app-name: nw-dashboard-staging
+
 workflows:
   version: 2
   nw_dashboard:
@@ -118,3 +135,9 @@ workflows:
           filters:
             branches:
               only: main
+      - deploy_server_staging:
+          requires:
+            - test-server
+          filters:
+            branches:
+              only: staging
