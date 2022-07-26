@@ -1,11 +1,18 @@
 class ArbitrageCalculator < BaseService
   def run
     fetch_coinbase_data
-    most_recent_model_id = CointegrationModel.newest_first.first&.uuid
+    most_recent_model = CointegrationModel.newest_first.first
+    most_recent_model_id = most_recent_model&.uuid
+    last_in_sample_timestamp = most_recent_model&.model_endtime
 
     op_weight = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}' and asset_name = 'op-usd'").pluck(:weight)[0]
     eth_weight = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}' and asset_name = 'eth-usd'").pluck(:weight)[0]
     const_weight = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}' and asset_name = 'det'").pluck(:weight)[0]
+    if !op_weight || !eth_weight || !const_weight
+      Rails.logger.info "model weight is null or model does not exist, aborting"
+      abort "model weight is null, aborting"
+    end
+
     res = 60
     last_timestamp = ModeledSignal.by_model(most_recent_model_id).last&.starttime
 
@@ -45,16 +52,32 @@ class ArbitrageCalculator < BaseService
     starttimes = starttimes[index..(length_start_times - 1)]
     m = nil
     starttimes.each do |time|
-      this_op_candle = Candle.by_resolution(res).by_pair('op-usd').where("starttime = #{time}")
-      this_eth_candle = Candle.by_resolution(res).by_pair('eth-usd').where("starttime = #{time}")
+      this_op_candle = Candle.by_resolution(res).by_pair("op-usd").where("starttime = #{time}")
+      this_eth_candle = Candle.by_resolution(res).by_pair("eth-usd").where("starttime = #{time}")
+      
+      # update current candle value if not null, otherwise, use most recent non-null value 
+      # and create a new candle using the old value for flat-forward interpolation
+      # (useful for better efficiency during backtesting)
+      
+      if this_op_candle.count >0
+          current_op_val = this_op_candle.pluck(:close)[0]
+      else
+        Candle.create(starttime: time, pair: "op-usd",exchange: "Coinbase",
+          resolution:res,low:current_op_val,high: current_op_val,open:current_op_val,close: current_op_val,volume:0)
+      end
+      if this_eth_candle.count>0
+          current_eth_val = this_eth_candle.pluck(:close)[0]
+      else 
+        Candle.create(starttime: time, pair: "eth-usd",exchange: "Coinbase",
+          resolution:res,low:current_eth_val,high: current_eth_val,open:current_eth_val,close: current_eth_val,volume:0)
+      end
+      signal_value = current_op_val*op_weight + current_eth_val*eth_weight + const_weight
+      in_sample_flag = true
+      if time > last_in_sample_timestamp
+        in_sample_flag=false
+      end
+      m=ModeledSignal.create(starttime: time, model_id: most_recent_model_id, resolution: res, value: signal_value,in_sample:in_sample_flag)
 
-      # update current candle value if not null, otherwise, use most recent non-null value (flat-forward interpolation)
-
-      current_op_val = this_op_candle.pluck(:close)[0] if this_op_candle.count.positive?
-      current_eth_val = this_eth_candle.pluck(:close)[0] if this_eth_candle.count.positive?
-      signal_value = current_op_val * op_weight + current_eth_val * eth_weight + const_weight
-
-      m = ModeledSignal.create(starttime: time, model_id: most_recent_model_id, resolution: res, value: signal_value)
     end
 
     email_notification(m) if m

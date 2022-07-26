@@ -9,6 +9,7 @@ module Types
     field :jesse, [Types::MetricType], null: false
     field :latest_cointegration_model_info, [Types::CointegrationModelType], null: false
     field :arb_signal_latest_model, [Types::ModeledSignalType], null: false
+    field :backtest_latest_model, [Types::ModeledSignalType], null: false
 
     field :cointegration_model_info, [Types::CointegrationModelType], null: false do
       argument :model, String
@@ -140,6 +141,10 @@ module Types
 
     def arb_signal_latest_model()      
       Displayers::HourlyValueDisplayer.run(model: nil).value
+    end
+
+    def backtest_latest_model()
+      Displayers::HourlyBacktestDisplayer.run(model: nil).value
     end
 
     def smart_contract_contracts(token:)

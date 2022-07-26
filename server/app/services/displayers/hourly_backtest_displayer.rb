@@ -1,5 +1,5 @@
 module Displayers
-  class HourlyValueDisplayer < BaseService
+  class HourlyBacktestDisplayer < BaseService
     attr_reader :model 
 
     def initialize(model:)
@@ -10,12 +10,9 @@ module Displayers
       @model = model
     end
 
-    def run
-      ModeledSignal.by_model(@model).on_the_hour.oldest_first
+    def run()
+      ModeledSignal.by_model(@model+"-b").on_the_hour.oldest_first
     end
 
   end
 end
-  
-
-  

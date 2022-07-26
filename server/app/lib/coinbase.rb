@@ -1,4 +1,5 @@
 class Coinbase
+
   include HTTParty
   require 'openssl'
   require 'json'

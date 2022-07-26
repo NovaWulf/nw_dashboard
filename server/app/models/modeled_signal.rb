@@ -3,6 +3,7 @@
 # Table name: modeled_signals
 #
 #  id         :bigint           not null, primary key
+#  in_sample  :boolean          default(TRUE)
 #  resolution :integer          not null
 #  starttime  :integer          not null
 #  value      :float            not null

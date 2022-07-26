@@ -10,10 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_07_20_001107) do
+ActiveRecord::Schema.define(version: 2022_07_24_190725) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "backtest_models", force: :cascade do |t|
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.string "model_id"
+    t.integer "sequence_number"
+    t.integer "version"
+    t.index ["version", "sequence_number"], name: "index_backtest_models_on_version_and_sequence_number", unique: true
+  end
 
   create_table "candles", force: :cascade do |t|
     t.datetime "created_at", precision: 6, null: false
@@ -72,6 +81,7 @@ ActiveRecord::Schema.define(version: 2022_07_20_001107) do
     t.string "model_id", null: false
     t.integer "resolution", null: false
     t.float "value", null: false
+    t.boolean "in_sample", default: true
     t.index ["model_id", "starttime"], name: "index_modeled_signals_on_model_id_and_starttime", unique: true
   end
 
