@@ -1,30 +1,18 @@
-require 'rinruby'
-
 class RAdapter
+  require 'rinruby'
   def initialize
-    R.eval <<-DOC
-            my_packages<-c("data.table","RODBC","urca","lubridate","digest","lattice","latticeExtra")
-
-            install_if_missing = function(p) {
-              if (p %in% rownames(installed.packages()) == FALSE) {
-                  install.packages(p, repos='http://cran.us.r-project.org')
-              }
-            }
-
-            invisible(sapply(my_packages, install_if_missing))
-
-    DOC
+    @R = RinRuby.new
   end
 
   def run_r_script(script, return_val)
-    R.eval <<-DOC
+    @R.eval <<-EOF
         #{script}
-    DOC
-    R.pull return_val.to_s # Be sure to return the object assigned in R script
+    EOF
+    @R.pull return_val.to_s # Be sure to return the object assigned in R script
   end
 
   def cointegration_analysis(start_time_string:, end_time_string:)
-    R.eval <<-DOC
+    @R.eval <<-EOF
 
         source("./cointegrationAnalysis.R")
 
@@ -32,6 +20,6 @@ class RAdapter
 
         fitModel(dbhandle,#{start_time_string},#{end_time_string},ecdet_param = "const")
 
-    DOC
+    EOF
   end
 end

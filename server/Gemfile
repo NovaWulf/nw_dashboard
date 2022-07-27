@@ -45,7 +45,7 @@ gem 'graphiql-rails', group: :development
 gem 'graphql', '~> 1.13'
 
 group :development, :production do
-  gem 'rinruby'
+  gem 'rootapp-rinruby'
 end
 
 group :development, :test do

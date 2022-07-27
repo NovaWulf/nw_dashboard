@@ -1,4 +1,4 @@
-my_packages = c("RODBC")
+my_packages = c("data.table","RODBC","urca","lubridate","digest","lattice","latticeExtra")
 
 install_if_missing = function(p) {
   if (p %in% rownames(installed.packages()) == FALSE) {
