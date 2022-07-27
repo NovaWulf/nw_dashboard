@@ -1,9 +1,8 @@
-require 'rinruby'
-
 class RAdapter
+  require 'rinruby'
   def initialize
-    R.eval <<-DOC
-            my_packages<-c("data.table","RODBC","urca","lubridate","digest","lattice","latticeExtra")
+    R.eval <<-EOF
+            my_packages<-c("data.table","urca","lubridate","digest","lattice","latticeExtra")
 
             install_if_missing = function(p) {
               if (p %in% rownames(installed.packages()) == FALSE) {
@@ -13,7 +12,7 @@ class RAdapter
 
             invisible(sapply(my_packages, install_if_missing))
 
-    DOC
+    EOF
   end
 
   def run_r_script(script, return_val)
