@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_07_24_190725) do
+ActiveRecord::Schema.define(version: 2022_07_28_190247) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -21,6 +21,7 @@ ActiveRecord::Schema.define(version: 2022_07_24_190725) do
     t.string "model_id"
     t.integer "sequence_number"
     t.integer "version"
+    t.string "name"
     t.index ["version", "sequence_number"], name: "index_backtest_models_on_version_and_sequence_number", unique: true
   end
 
@@ -62,6 +63,7 @@ ActiveRecord::Schema.define(version: 2022_07_24_190725) do
     t.integer "resolution"
     t.integer "model_starttime"
     t.integer "model_endtime"
+    t.string "name"
     t.index ["uuid"], name: "index_cointegration_models_on_uuid", unique: true
   end
 

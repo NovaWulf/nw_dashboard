@@ -8,7 +8,16 @@ class RAdapter
     @R.eval <<-EOF
         #{script}
     EOF
-    @R.pull return_val.to_s # Be sure to return the object assigned in R script
+    @R.pull return_val.to_s 
+  end
+  def test_odbc()
+    @R.eval <<-EOF
+      library(RODBC)
+      dbhandle = as.vector(odbcDriverConnect('driver=./psqlodbcw.so;database=nw_server_#{Rails.env};trusted_connection=true;uid=nw_server'))
+    EOF
+    returnVal = @R.pull "dbhandle" 
+    puts "returnVal: " + returnVal.to_s
+    return returnVal
   end
 
   def cointegration_analysis(start_time_string:, end_time_string:)

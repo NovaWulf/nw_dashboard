@@ -11,7 +11,7 @@ class ModelUpdate < BaseService
       BacktestModel.create(
         version: 0,
         model_id: first_model,
-        sequence_number: 0
+        sequence_number: 0,
         name: "seed_model"
       )
     end

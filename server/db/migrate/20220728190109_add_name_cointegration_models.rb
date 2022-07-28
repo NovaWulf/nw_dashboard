@@ -1,5 +1,5 @@
 class AddNameCointegrationModels < ActiveRecord::Migration[6.1]
   def change
-    add_column :backtest_models, :name, :string,
+    add_column :cointegration_models, :name, :string
   end
 end
