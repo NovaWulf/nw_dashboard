@@ -13,7 +13,9 @@ class RAdapter
   def test_odbc()
     @R.eval <<-EOF
       library(RODBC)
+      assign("last.warning", NULL, envir = baseenv())
       dbhandle = as.vector(odbcDriverConnect('driver=./psqlodbcw.so;database=nw_server_#{Rails.env};trusted_connection=true;uid=nw_server'))
+      print(warnings())
     EOF
     @R.pull "dbhandle" 
   end
