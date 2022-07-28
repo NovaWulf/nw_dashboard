@@ -25,17 +25,17 @@ class Backtest
     MAX_TRADE_SIZE_ETH = 1000
 
     def run(model_id:)
-        self.load_model(model_id: model_id)
-        self.set_initial_positions
+        load_model(model_id: model_id)
+        set_initial_positions
         while true
-            self.target_positions
-            self.generate_orders
+            target_positions
+            generate_orders
             cursor+=1 #time moves forward after setting target positions, before actually updating positions
             if cursor==num_obs 
                 break
             end
-            self.execute_trades
-            self.calculate_pnl
+            execute_trades
+            calculate_pnl
         end
     end
 
@@ -106,10 +106,7 @@ class Backtest
         pnl[cursor] = 0
         for i in 0..(num_ownable_assets-1)
             pnl[cursor] += positions[i][cursor]*(prices[i][cursor]-prices[i][cursor-1])
-            in_sample_flag = true
-            if starttimes[cursor] > model_endtime
-                in_sample_flag=false
-            end
+            in_sample_flag = starttimes[cursor] <= model_endtime
         end
         pnl[cursor] += pnl[cursor-1]
         r_count = ModeledSignal.where("model_id=#{model_id}-b and starttime=#{starttimes[cursor]}").r_count
@@ -133,19 +130,11 @@ class Backtest
     end
 
     def signal_up(index)
-        returnVal = false
-        if signal[index]>in_sample_mean + in_sample_sd*MULTIPLIER
-            returnVal = true
-        end
-        return returnVal
+        signal[index]>in_sample_mean + in_sample_sd*MULTIPLIER
     end
 
     def signal_down(index)
-        returnVal = false
-        if signal[index]<in_sample_mean - in_sample_sd*MULTIPLIER
-            returnVal = true
-        end
-        return returnVal
+        signal[index]<in_sample_mean - in_sample_sd*MULTIPLIER
     end
     
 end

@@ -4,11 +4,11 @@ class ArbitrageCalculator < BaseService
     puts "here"
     most_recent_backtest_model = BacktestModel.oldest_first.last
     puts "here 2"
-    most_recent_model_id = most_recent_backtest_model&.model_id
+    most_recent_model_id = most_recent_backtest_model.model_id
 
     most_recent_model = CointegrationModel.where("uuid='#{most_recent_model_id}'").last
     puts "model id in arb: " + most_recent_model_id
-    last_in_sample_timestamp = most_recent_model&.model_endtime
+    last_in_sample_timestamp = most_recent_model.model_endtime
 
     op_weight = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}' and asset_name = 'op-usd'").pluck(:weight)[0]
     eth_weight = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}' and asset_name = 'eth-usd'").pluck(:weight)[0]
@@ -19,7 +19,7 @@ class ArbitrageCalculator < BaseService
     end
 
     res = 60
-    last_timestamp = ModeledSignal.by_model(most_recent_model_id).last&.starttime
+    last_timestamp = ModeledSignal.by_model(most_recent_model_id).last.starttime
 
     return if last_timestamp && last_timestamp > Time.now.to_i - res
 
@@ -75,10 +75,7 @@ class ArbitrageCalculator < BaseService
           resolution:res,low:current_eth_val,high: current_eth_val,open:current_eth_val,close: current_eth_val,volume:0)
       end
       signal_value = current_op_val*op_weight + current_eth_val*eth_weight + const_weight
-      in_sample_flag = true
-      if time > last_in_sample_timestamp
-        in_sample_flag=false
-      end
+      in_sample_flag = time <= last_in_sample_timestamp
       m=ModeledSignal.create(starttime: time, model_id: most_recent_model_id, resolution: res, value: signal_value,in_sample:in_sample_flag)
 
     end
