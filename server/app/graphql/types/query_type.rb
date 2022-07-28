@@ -139,11 +139,11 @@ module Types
       [CointegrationModel.where("uuid = '#{model}'").first]
     end
 
-    def arb_signal_latest_model()      
+    def arb_signal_latest_model
       Displayers::HourlyValueDisplayer.run(model: nil).value
     end
 
-    def backtest_latest_model()
+    def backtest_latest_model
       Displayers::HourlyBacktestDisplayer.run(model: nil).value
     end
 
