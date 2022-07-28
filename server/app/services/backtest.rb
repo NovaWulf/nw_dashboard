@@ -74,10 +74,13 @@ class Backtest
     def target_positions
         @targets = (0..(@num_ownable_assets-1)).map do |i|
             if signal_up(@cursor)
+                puts "up val: " + (- @asset_weights[i] * MAX_TRADE_SIZE_ETH).to_S
                 - @asset_weights[i] * MAX_TRADE_SIZE_ETH
             elsif signal_down(@cursor)
+                puts "down val: " + (@asset_weights[i]*MAX_TRADE_SIZE_ETH).to_s
                 @asset_weights[i]*MAX_TRADE_SIZE_ETH
             else 
+                "mid val: " + (@positions[i][@cursor]).to_s
                 @positions[i][@cursor]
             end
         end
