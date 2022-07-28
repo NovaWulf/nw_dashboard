@@ -44,11 +44,11 @@ class Backtest
         model_id = BacktestModel.oldest_first.last&.model_id
         puts "model_id: "+model_id.to_s
         model = CointegrationModel.where("uuid = '#{model_id}'").last
-        resolution = model&.resolution
-        model_starttime = model&.model_starttime
-        model_endtime = model&.model_endtime
-        in_sample_sd = model&.in_sample_sd
-        in_sample_mean = model&.in_sample_mean
+        resolution = model.resolution
+        model_starttime = model.model_starttime
+        model_endtime = model.model_endtime
+        in_sample_sd = model.in_sample_sd
+        in_sample_mean = model.in_sample_mean
         weights = CointegrationModelWeight.where("uuid = '#{model_id}'")
         assets = weights.pluck(:asset_name)
         asset_weights = weights.pluck(:weight).unique
