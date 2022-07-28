@@ -115,14 +115,17 @@ class Backtest
             end
         end
         pnl[cursor] += pnl[cursor-1]
-
-        ModeledSignal.find_or_create_by(
-            starttime: starttimes[cursor],
-            model_id: model_id+"-b",
-            resolution: resolution,
-            value: pnl[cursor],
-            in_sample:in_sample_flag
-        )
+        r_count = ModeledSignal.where("model_id=#{model_id}-b and starttime=#{starttimes[cursor]}").r_count
+        if r_count==0
+            ModeledSignal.create(
+                starttime: starttimes[cursor],
+                model_id: model_id+"-b",
+                resolution: resolution,
+                value: pnl[cursor],
+                in_sample:in_sample_flag
+            )
+        end
+        
     end
 
     def set_initial_positions

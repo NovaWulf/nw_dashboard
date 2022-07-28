@@ -67,6 +67,7 @@ task download_candles: :environment do
 end
 
 task update_arb_signal: :environment do
+  ModelUpdate.seed
   ArbitrageCalculator.run
   # b = Backtest.new
   # b.run
@@ -74,7 +75,9 @@ end
 
 task cointegration_analysis: :environment do
   mu = ModelUpdate.new
-  mu.update_model(version: 0)
+  mu.seed
+  
+  # mu.update_model(version: 0)
 end
 
 

@@ -5,11 +5,16 @@ class ModelUpdate < BaseService
     @r = RAdapter.new
     @r.cointegration_analysis(start_time_string: "'2022-06-13'",end_time_string: "'2022-07-12'")
     first_model = CointegrationModel.last&.uuid
-    BacktestModel.find_or_create_by(
-      version: 0,
-      model_id: first_model,
-      sequence_number: 0
-    )
+    r_count = BacktestModel.where("version= 0 and sequence_number= 0").count
+    
+    if r_count==0
+      BacktestModel.create(
+        version: 0,
+        model_id: first_model,
+        sequence_number: 0
+      )
+    end
+
     @RES_HOURS=1
   end
   def update_model(version:)
