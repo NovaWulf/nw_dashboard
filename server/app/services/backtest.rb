@@ -21,16 +21,14 @@ class Backtest
     MAX_TRADE_SIZE_ETH = 1000
 
     def run(model_id:)
-        @cursor = 1
-        puts "cursor: " + @cursor.to_s
+        @cursor = 0
         load_model(model_id: model_id)
         set_initial_positions
         while true
             target_positions
             generate_orders
             @cursor+=1 #time moves forward after setting target positions, before actually updating positions
-            puts "cursor: " + @cursor
-            if @cursor==@num_obs 
+            if @cursor==@num_obs
                 break
             end
             execute_trades
@@ -54,7 +52,6 @@ class Backtest
         @num_ownable_assets = @assets.length()
         modeled_signal = ModeledSignal.where("model_id = '#{model_id}'").oldest_first
         @signal = modeled_signal.pluck(:value)
-        puts "signal: " + @signal.to_s
         @starttimes = modeled_signal.pluck(:starttime)
         signal_starttime = @starttimes[0]
         signal_endtime = @starttimes.last
@@ -74,26 +71,18 @@ class Backtest
     def target_positions
         @targets = (0..(@num_ownable_assets-1)).map do |i|
             if signal_up(@cursor)
-                puts "up val: " + (- @asset_weights[i] * MAX_TRADE_SIZE_ETH).to_S
                 - @asset_weights[i] * MAX_TRADE_SIZE_ETH
             elsif signal_down(@cursor)
-                puts "down val: " + (@asset_weights[i]*MAX_TRADE_SIZE_ETH).to_s
                 @asset_weights[i]*MAX_TRADE_SIZE_ETH
             else 
-                "mid val: " + (@positions[i][@cursor]).to_s
                 @positions[i][@cursor]
             end
         end
-        puts "targets after setting: " + @targets.to_s
     end
 
     def generate_orders
         deltas = Array.new(@num_ownable_assets)
         for i in 0..(@num_ownable_assets-1)
-            puts "i: " + i.to_s
-            puts "targets: " + @targets[i].to_s
-            puts "targets: " + @positions[i].to_s
-            puts "cursor: " + @cursor.to_s
             deltas[i] = @targets[i] - @positions[i][@cursor]
         end
         @orders = deltas
@@ -107,14 +96,14 @@ class Backtest
     end
 
     def calculate_pnl
-      
-    @pnl[@cursor] = 0
-    for i in 0..(@num_ownable_assets-1)
-        @pnl[@cursor] += @positions[i][@cursor]*(@prices[i][@cursor]-@prices[i][@cursor-1])
-        in_sample_flag = @starttimes[@cursor] <= @model_endtime
-        
-        @pnl[@cursor] += @pnl[@cursor-1]
-        r_count = ModeledSignal.where("model_id=#{@model_id}-b and starttime=#{@starttimes[@cursor]}").r_count
+        @pnl[@cursor] = 0
+        for i in 0..(@num_ownable_assets-1)
+            @pnl[@cursor] += @positions[i][@cursor]*(@prices[i][@cursor]-@prices[i][@cursor-1])
+            in_sample_flag = @starttimes[@cursor] <= @model_endtime
+            
+            @pnl[@cursor] += @pnl[@cursor-1]
+        end
+        r_count = ModeledSignal.where("model_id='#{@model_id}-b' and starttime=#{@starttimes[@cursor]}").count
         if r_count==0
             ModeledSignal.create(
                 starttime: @starttimes[@cursor],
@@ -124,7 +113,6 @@ class Backtest
                 in_sample:in_sample_flag
             )
         end
-    end 
     end
 
     def set_initial_positions
