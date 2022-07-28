@@ -67,6 +67,12 @@ RSpec.describe Backtest do
       in_sample_sd: 5
       )
 
+      BacktestModel.create(
+        version: 0,
+        model_id: "id1",
+        sequence_number: 0,
+        name: "seed_model"
+      )
 
       ModeledSignal.create(
           starttime: Time.now.to_i-60, 

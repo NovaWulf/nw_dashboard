@@ -15,9 +15,7 @@ class RAdapter
       library(RODBC)
       dbhandle = as.vector(odbcDriverConnect('driver=./psqlodbcw.so;database=nw_server_#{Rails.env};trusted_connection=true;uid=nw_server'))
     EOF
-    returnVal = @R.pull "dbhandle" 
-    puts "returnVal: " + returnVal.to_s
-    return returnVal
+    @R.pull "dbhandle" 
   end
 
   def cointegration_analysis(start_time_string:, end_time_string:)

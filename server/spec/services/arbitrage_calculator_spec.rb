@@ -72,6 +72,12 @@ RSpec.describe ArbitrageCalculator do
       in_sample_mean: 0,
       in_sample_sd: 100
     )
+    BacktestModel.create(
+      version: 0,
+      model_id: "id1",
+      sequence_number: 0,
+      name: "seed_model"
+    )
 
     ModeledSignal.create(
       starttime: Time.now.to_i - 120,

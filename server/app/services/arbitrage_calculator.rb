@@ -1,9 +1,7 @@
 class ArbitrageCalculator < BaseService
   def run
     fetch_coinbase_data
-    puts "here"
     most_recent_backtest_model = BacktestModel.oldest_first.last
-    puts "here 2"
     most_recent_model_id = most_recent_backtest_model.model_id
 
     most_recent_model = CointegrationModel.where("uuid='#{most_recent_model_id}'").last
