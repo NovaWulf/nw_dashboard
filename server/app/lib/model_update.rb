@@ -12,6 +12,7 @@ class ModelUpdate < BaseService
         version: 0,
         model_id: first_model,
         sequence_number: 0
+        name: "seed_model"
       )
     end
 
