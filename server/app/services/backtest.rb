@@ -75,18 +75,15 @@ class Backtest
     end
 
     def target_positions
-        target_positions = Array.new(num_ownable_assets)
-        for (0..(num_ownable_assets-1)).map do |i|
+        targets = (0..(num_ownable_assets-1)).map do |i|
             if signal_up(cursor)
-                target_positions[i] = - asset_weights[i] * MAX_TRADE_SIZE_ETH
+                - asset_weights[i] * MAX_TRADE_SIZE_ETH
             elsif signal_down(cursor)
-                target_positions[i] = asset_weights[i]*MAX_TRADE_SIZE_ETH
+                asset_weights[i]*MAX_TRADE_SIZE_ETH
             else 
-                target_positions[i] = positions[i][cursor]
+                positions[i][cursor]
             end
         end
-
-        targets = target_positions
     end
 
     def generate_orders
