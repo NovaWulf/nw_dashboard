@@ -1,8 +1,13 @@
 class ArbitrageCalculator < BaseService
   def run
     fetch_coinbase_data
-    most_recent_model = CointegrationModel.newest_first.first
-    most_recent_model_id = most_recent_model&.uuid
+    puts "here"
+    most_recent_backtest_model = BacktestModel.oldest_first.last
+    puts "here 2"
+    most_recent_model_id = most_recent_backtest_model&.model_id
+
+    most_recent_model = CointegrationModel.where("uuid='#{most_recent_model_id}'").last
+    puts "model id in arb: " + most_recent_model_id
     last_in_sample_timestamp = most_recent_model&.model_endtime
 
     op_weight = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}' and asset_name = 'op-usd'").pluck(:weight)[0]
@@ -22,7 +27,6 @@ class ArbitrageCalculator < BaseService
 
     starttimes = Candle.by_resolution(res).where("starttime>= #{start_time}").pluck(:starttime)
     starttimes = starttimes.uniq.sort
-
     eth_not_null = 0
     op_not_null = 0
     index = 0
@@ -47,7 +51,6 @@ class ArbitrageCalculator < BaseService
 
       index += 1
     end
-
     length_start_times = starttimes.length
     starttimes = starttimes[index..(length_start_times - 1)]
     m = nil

@@ -1,7 +1,7 @@
 class ModelUpdate < BaseService
   @r
   @RES_HOURS
-  def initialize
+  def seed
     @r = RAdapter.new
     @r.cointegration_analysis(start_time_string: "'2022-06-13'",end_time_string: "'2022-07-12'")
     first_model = CointegrationModel.last&.uuid

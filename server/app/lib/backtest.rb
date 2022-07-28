@@ -20,7 +20,7 @@ class Backtest
     attr_accessor :signal,:in_sample_mean,:in_sample_sd, :cursor,:target_positions, :prices,:num_ownable_assets,
     :asset_weights,:positions,:assets,:targets,:model_endttime,:starttimes
     attr_reader :model_id,:resolution
-    
+
     MULTIPLIER = 1.0
     MAX_TRADE_SIZE_ETH = 1000
 
@@ -41,28 +41,32 @@ class Backtest
 
     private
     def load_model(model_id:)
-        @model_id = model_id
+        model_id = BacktestModel.oldest_first.last&.model_id
+        puts "model_id: "+model_id.to_s
         model = CointegrationModel.where("uuid = '#{model_id}'").last
-        @resolution = model&.resolution
-        @model_starttime = model&.model_starttime
-        @model_endtime = model&.model_endtime
-        @in_sample_sd = model&.in_sample_sd
-        @in_sample_mean = model&.in_sample_mean
+        resolution = model&.resolution
+        model_starttime = model&.model_starttime
+        model_endtime = model&.model_endtime
+        in_sample_sd = model&.in_sample_sd
+        in_sample_mean = model&.in_sample_mean
         weights = CointegrationModelWeight.where("uuid = '#{model_id}'")
-        @assets = weights.pluck(:asset_name)
-        @asset_weights = weights.pluck(:weight)
-        @assets.delete("det")
-        @num_ownable_assets = assets.length()
+        assets = weights.pluck(:asset_name)
+        asset_weights = weights.pluck(:weight)
+        assets.delete("det")
+        num_ownable_assets = assets.length()
         modeled_signal = ModeledSignal.where("model_id = '#{model_id}'").oldest_first
-        @signal = modeled_signal.pluck(:value)
-        @starttimes = modeled_signal.pluck(:starttime)
+        puts "modeled_signal count: " + modeled_signal.count.to_s
+        signal = modeled_signal.pluck(:value)
+        puts "signal : " +signal.to_s
+        starttimes = modeled_signal.pluck(:starttime)
         signal_starttime = starttimes[0]
         signal_endtime = starttimes.last
+        puts "signal start time: " + signal_starttime.to_s
         num_obs = signal.length()
         puts "num obs: " + @num_obs.to_s
         positions = Array.new(num_ownable_assets){Array.new(num_obs)}
         pnl = Array.new(num_obs)
-        pnl[0] =0
+        pnl[0] = 0
         transactions = Array.new(num_obs)
         prices = Array.new(num_ownable_assets){Array.new(num_obs)}
         for i in 0..(num_ownable_assets-1)

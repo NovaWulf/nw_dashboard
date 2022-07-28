@@ -68,8 +68,8 @@ end
 
 task update_arb_signal: :environment do
   ArbitrageCalculator.run
-  b = Backtest.new
-  b.run(model_id: "5995ec80eb42ed497c40f69f94e6d963")
+  # b = Backtest.new
+  # b.run
 end
 
 task cointegration_analysis: :environment do
