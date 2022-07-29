@@ -1,6 +1,0 @@
-# AptFile
-# You can write comments in this file.
-unixodbc
-unixodbc-dev
-gfortran
-g++
