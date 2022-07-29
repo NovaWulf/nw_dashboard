@@ -1,4 +1,6 @@
 module Fetchers
+  require 'csv'
+
   class CoinbaseFetcher < BaseService
     attr_reader :resolution, :pair
 
