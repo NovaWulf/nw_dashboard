@@ -22,7 +22,7 @@ class RAdapter
 
   def cointegration_analysis(start_time_string:, end_time_string:)
     @R.eval <<-EOF
-
+        print(getwd())
         source("./cointegrationAnalysis.R")
         returnVals = fitModel(#{start_time_string},#{end_time_string},ecdet_param = "const")
   
