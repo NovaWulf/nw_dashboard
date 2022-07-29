@@ -59,26 +59,16 @@ task hedgeserv_email: :environment do
   Hedgeserv::DailyProcessor.run
 end
 
-task download_candles: :environment do
+task update_arb_signal: :environment do
   tracked_pairs = %w[eth-usd op-usd]
   tracked_pairs.each do |p|
     Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
   end
   CsvWriter.run
-end
-
-task update_arb_signal: :environment do
-  ModelUpdate.seed
-  ArbitrageCalculator.run
-  # b = Backtest.new
-  # b.run
-end
-
-task cointegration_analysis: :environment do
   mu = ModelUpdate.new
   mu.seed
-  
-  # mu.update_model(version: 0)
+  ModelUpdate.seed
+  ArbitrageCalculator.run
+  b = Backtest.new
+  b.run
 end
-
-
