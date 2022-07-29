@@ -60,6 +60,12 @@ task hedgeserv_email: :environment do
 end
 
 task update_arb_signal: :environment do
+  tracked_pairs = %w[eth-usd op-usd]
+  tracked_pairs.each do |p|
+    Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
+  end
+  Rails.logger.info "writing candle data to CSV..."
+  CsvWriter.run
   mu = ModelUpdate.new
   mu.seed
   ArbitrageCalculator.run

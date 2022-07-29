@@ -1,6 +1,5 @@
 class ArbitrageCalculator < BaseService
   def run
-    fetch_coinbase_data
     most_recent_backtest_model = BacktestModel.oldest_first.last
     Rails.logger.info "most recent backtest model exists? #{BacktestModel.oldest_first.count}"
     most_recent_model_id = most_recent_backtest_model.model_id
@@ -95,11 +94,4 @@ class ArbitrageCalculator < BaseService
     end
   end
 
-  def fetch_coinbase_data
-    tracked_pairs = %w[eth-usd op-usd]
-    tracked_pairs.each do |p|
-      Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
-    end
-    CsvWriter.run
-  end
 end

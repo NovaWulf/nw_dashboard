@@ -86,7 +86,6 @@ RSpec.describe ArbitrageCalculator do
       value: 10
     )
 
-    allow_any_instance_of(described_class).to receive(:fetch_coinbase_data).and_return(true)
   end
 
   it 'persists' do
