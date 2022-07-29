@@ -19,10 +19,10 @@ class Backtest
     @resolution
     MULTIPLIER = 1.0
     MAX_TRADE_SIZE_ETH = 1000
-
-    def run(model_id:)
+    attr_accessor :model_id
+    def run
         @cursor = 0
-        load_model(model_id: model_id)
+        load_model
         set_initial_positions
         while true
             target_positions
@@ -37,24 +37,27 @@ class Backtest
     end
 
     private
-    def load_model(model_id:)
-        @model_id = BacktestModel.oldest_first.last&.model_id
-        model = CointegrationModel.where("uuid = '#{model_id}'").last
+    def load_model()
+        @model_id = BacktestModel.oldest_first.last.model_id
+        puts "model id: " + @model_id.to_s
+        model = CointegrationModel.where("uuid = '#{@model_id}'").last
         @resolution = model.resolution
         @model_starttime = model.model_starttime
         @model_endtime = model.model_endtime
         @in_sample_sd = model.in_sample_sd
         @in_sample_mean = model.in_sample_mean
-        weights = CointegrationModelWeight.where("uuid = '#{model_id}'")
+        weights = CointegrationModelWeight.where("uuid = '#{@model_id}'")
         @assets = weights.pluck(:asset_name)
         @asset_weights = weights.pluck(:weight).uniq
         @assets.delete("det")
         @num_ownable_assets = @assets.length()
-        modeled_signal = ModeledSignal.where("model_id = '#{model_id}'").oldest_first
+        modeled_signal = ModeledSignal.where("model_id = '#{@model_id}'").oldest_first
+        puts "modeled signal count: " + modeled_signal.count.to_s
         @signal = modeled_signal.pluck(:value)
         @starttimes = modeled_signal.pluck(:starttime)
         signal_starttime = @starttimes[0]
         signal_endtime = @starttimes.last
+        puts "signal_starttime: " + signal_starttime.to_s + " signal endtime: " + signal_endtime.to_s
         @num_obs = @signal.length()
         @pnl = Array.new(@num_obs)
         @targets = Array.new(@num_ownable_assets)

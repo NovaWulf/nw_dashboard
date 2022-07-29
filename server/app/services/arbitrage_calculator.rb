@@ -3,11 +3,8 @@ class ArbitrageCalculator < BaseService
     fetch_coinbase_data
     most_recent_backtest_model = BacktestModel.oldest_first.last
     most_recent_model_id = most_recent_backtest_model.model_id
-
     most_recent_model = CointegrationModel.where("uuid='#{most_recent_model_id}'").last
-    puts "model id in arb: " + most_recent_model_id
     last_in_sample_timestamp = most_recent_model.model_endtime
-
     op_weight = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}' and asset_name = 'op-usd'").pluck(:weight)[0]
     eth_weight = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}' and asset_name = 'eth-usd'").pluck(:weight)[0]
     const_weight = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}' and asset_name = 'det'").pluck(:weight)[0]
@@ -15,16 +12,15 @@ class ArbitrageCalculator < BaseService
       Rails.logger.info "model weight is null or model does not exist, aborting"
       abort "model weight is null, aborting"
     end
-
     res = 60
-    last_timestamp = ModeledSignal.by_model(most_recent_model_id).last.starttime
-
+    last_timestamp = ModeledSignal.by_model(most_recent_model_id).last&.starttime
     return if last_timestamp && last_timestamp > Time.now.to_i - res
 
     start_time = last_timestamp ? last_timestamp + res : Date.new(2022, 6, 13).to_time.to_i
-
+    puts "start time: " +start_time.to_s
     starttimes = Candle.by_resolution(res).where("starttime>= #{start_time}").pluck(:starttime)
     starttimes = starttimes.uniq.sort
+    puts "length of start times in arb: " + starttimes.length().to_s
     eth_not_null = 0
     op_not_null = 0
     index = 0
