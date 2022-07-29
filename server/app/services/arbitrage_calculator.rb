@@ -17,7 +17,6 @@ class ArbitrageCalculator < BaseService
     return if last_timestamp && last_timestamp > Time.now.to_i - res
 
     start_time = last_timestamp ? last_timestamp + res : Date.new(2022, 6, 13).to_time.to_i
-    puts "start time: " +start_time.to_s
     starttimes = Candle.by_resolution(res).where("starttime>= #{start_time}").pluck(:starttime)
     starttimes = starttimes.uniq.sort
     puts "length of start times in arb: " + starttimes.length().to_s
@@ -100,5 +99,6 @@ class ArbitrageCalculator < BaseService
     tracked_pairs.each do |p|
       Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
     end
+    CsvWriter.run
   end
 end

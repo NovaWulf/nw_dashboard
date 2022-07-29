@@ -6,8 +6,9 @@ class ModelUpdate < BaseService
     @r.cointegration_analysis(start_time_string: "'2022-06-13'",end_time_string: "'2022-07-12'")
     first_model = CointegrationModel.last&.uuid
     r_count = BacktestModel.where("version= 0 and sequence_number= 0").count
-    
+    Rails.logger.info "r count: #{{r_count}}"
     if r_count==0
+      Rails.logger.info "adding initial backtest model"
       BacktestModel.create(
         version: 0,
         model_id: first_model,
