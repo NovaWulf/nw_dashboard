@@ -1,12 +1,8 @@
 class ArbitrageCalculator < BaseService
   def run
     most_recent_backtest_model = BacktestModel.oldest_first.last
-    Rails.logger.info "most recent backtest model exists? #{BacktestModel.oldest_first.count}"
-    Rails.logger.info "unique model ids in backtest models database: #{BacktestModel.pluck(:model_id).uniq}"
 
     most_recent_model_id = most_recent_backtest_model&.model_id
-    Rails.logger.info "most recent model id: #{most_recent_model_id}"
-    Rails.logger.info "unique model ids in database: #{CointegrationModel.pluck(:uuid).uniq}"
     most_recent_model = CointegrationModel.where("uuid='#{most_recent_model_id}'").last
     last_in_sample_timestamp = most_recent_model&.model_endtime
     op_weight = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}' and asset_name = 'op-usd'").pluck(:weight)[0]
@@ -23,7 +19,6 @@ class ArbitrageCalculator < BaseService
     start_time = last_timestamp ? last_timestamp + res : Date.new(2022, 6, 13).to_time.to_i
     starttimes = Candle.by_resolution(res).where("starttime>= #{start_time}").pluck(:starttime)
     starttimes = starttimes.uniq.sort
-    puts "length of start times in arb: " + starttimes.length().to_s
     eth_not_null = 0
     op_not_null = 0
     index = 0
