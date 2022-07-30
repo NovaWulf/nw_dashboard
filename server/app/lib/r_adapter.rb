@@ -29,6 +29,7 @@ class RAdapter
     EOF
     return_vals = @R.pull "returnVals"
     write_model_to_db(return_vals: return_vals)
+    Rails.logger.info "number of cointegration models: #{CointegrationModel.count}"
   end
 
   def write_model_to_db(return_vals:)
