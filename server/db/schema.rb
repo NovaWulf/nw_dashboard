@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_07_28_190247) do
+ActiveRecord::Schema.define(version: 2022_07_30_010609) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -18,9 +18,9 @@ ActiveRecord::Schema.define(version: 2022_07_28_190247) do
   create_table "backtest_models", force: :cascade do |t|
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.string "model_id"
-    t.integer "sequence_number"
-    t.integer "version"
+    t.string "model_id", null: false
+    t.integer "sequence_number", null: false
+    t.integer "version", null: false
     t.string "name"
     t.index ["version", "sequence_number"], name: "index_backtest_models_on_version_and_sequence_number", unique: true
   end

@@ -4,11 +4,11 @@
 #
 #  id              :bigint           not null, primary key
 #  name            :string
-#  sequence_number :integer
-#  version         :integer
+#  sequence_number :integer          not null
+#  version         :integer          not null
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
-#  model_id        :string
+#  model_id        :string           not null
 #
 # Indexes
 #
