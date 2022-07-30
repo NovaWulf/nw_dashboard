@@ -2,11 +2,13 @@ class ArbitrageCalculator < BaseService
   def run
     most_recent_backtest_model = BacktestModel.oldest_first.last
     Rails.logger.info "most recent backtest model exists? #{BacktestModel.oldest_first.count}"
-    most_recent_model_id = most_recent_backtest_model.model_id
+    Rails.logger.info "unique model ids in backtest models database: #{BacktestModel.pluck(:model_id).uniq}"
+
+    most_recent_model_id = most_recent_backtest_model&.model_id
     Rails.logger.info "most recent model id: #{most_recent_model_id}"
     Rails.logger.info "unique model ids in database: #{CointegrationModel.pluck(:uuid).uniq}"
     most_recent_model = CointegrationModel.where("uuid='#{most_recent_model_id}'").last
-    last_in_sample_timestamp = most_recent_model.model_endtime
+    last_in_sample_timestamp = most_recent_model&.model_endtime
     op_weight = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}' and asset_name = 'op-usd'").pluck(:weight)[0]
     eth_weight = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}' and asset_name = 'eth-usd'").pluck(:weight)[0]
     const_weight = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}' and asset_name = 'det'").pluck(:weight)[0]
