@@ -17,7 +17,7 @@ class Backtest
     @starttimes
     @model_id
     @resolution
-    MULTIPLIER = 3
+    MULTIPLIER = 1
     MAX_TRADE_SIZE_ETH = 1000
     attr_accessor :model_id, :resolution, :model_starttime, :model_endtime, :in_sample_mean, :in_sample_sd, :assets, 
     :asset_weights, :num_ownable_assets, :num_obs, :positions, :prices, :pnl, :targets
@@ -101,9 +101,9 @@ class Backtest
         for i in 0..(@num_ownable_assets-1)
             @pnl[@cursor] += @positions[i][@cursor]*(@prices[i][@cursor]-@prices[i][@cursor-1])
             in_sample_flag = @starttimes[@cursor] <= @model_endtime
-            
-            @pnl[@cursor] += @pnl[@cursor-1]
         end
+        @pnl[@cursor] += @pnl[@cursor-1]
+
         r_count = ModeledSignal.where("model_id='#{@model_id}-b' and starttime=#{@starttimes[@cursor]}").count
         if r_count==0
             ModeledSignal.create(
