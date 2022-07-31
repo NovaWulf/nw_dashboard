@@ -19,9 +19,16 @@ if (class(startTimeString)=="character" && class(endTimeString)== "character"){
 
 resolution = 60
 allDat = data.table(read.csv("./public/data.csv"))
+print("dimensions of allDat:")
+print(dim(allDat))
+print("head of allDat")
+print(head(allDat))
 ethDat = allDat[starttime>startTime & starttime<endTime & resolution == resolution & pair == "eth-usd"]
 opDat =  allDat[starttime>startTime & starttime<endTime & resolution == resolution & pair == "op-usd"]
-
+print("dimensions of ethDat: ")
+print(dim(ethDat))
+print("dimensions of opDat")
+print(dim(opDat))
 bothDat = merge(ethDat,opDat,by = "starttime")
 bothDat = bothDat[starttime>startTime & starttime<endTime]
 bothDat = bothDat[order(bothDat$starttime)]
