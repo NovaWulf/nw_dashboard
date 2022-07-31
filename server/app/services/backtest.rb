@@ -17,7 +17,7 @@ class Backtest
     @starttimes
     @model_id
     @resolution
-    MULTIPLIER = 1.0
+    MULTIPLIER = 3
     MAX_TRADE_SIZE_ETH = 1000
     attr_accessor :model_id, :resolution, :model_starttime, :model_endtime, :in_sample_mean, :in_sample_sd, :assets, 
     :asset_weights, :num_ownable_assets, :num_obs, :positions, :prices, :pnl, :targets
@@ -56,7 +56,6 @@ class Backtest
         @starttimes = modeled_signal.pluck(:starttime)
         signal_starttime = @starttimes[0]
         signal_endtime = @starttimes.last
-        puts "signal_starttime: " + signal_starttime.to_s + " signal endtime: " + signal_endtime.to_s
         @num_obs = @signal.length()
         @pnl = Array.new(@num_obs)
         @targets = Array.new(@num_ownable_assets)

@@ -10,22 +10,12 @@ class RAdapter
     EOF
     @R.pull return_val.to_s 
   end
-  def test_odbc()
-    @R.eval <<-EOF
-      library(RODBC)
-      assign("last.warning", NULL, envir = baseenv())
-      dbhandle = as.vector(odbcDriverConnect('driver=./psqlodbcw.so;database=nw_server_#{Rails.env};trusted_connection=true;uid=nw_server'))
-      print(warnings())
-    EOF
-    @R.pull "dbhandle" 
-  end
 
   def cointegration_analysis(start_time_string:, end_time_string:)
     @R.eval <<-EOF
         print(getwd())
         source("./cointegrationAnalysis.R")
         returnVals = fitModel(#{start_time_string},#{end_time_string},ecdet_param = "const")
-  
     EOF
     return_vals = @R.pull "returnVals"
     write_model_to_db(return_vals: return_vals)

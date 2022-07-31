@@ -1,5 +1,4 @@
 library(data.table)
-library(RODBC)
 library(urca)
 library(lubridate)
 library(digest)
