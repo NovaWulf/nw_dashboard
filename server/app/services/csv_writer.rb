@@ -1,5 +1,4 @@
 class CsvWriter < BaseService
-  BATCH_SIZE = 5000
   def run
     file = "#{Rails.root}/public/data.csv"
     Rails.logger.info "writing csv to #{file}"
@@ -11,6 +10,7 @@ class CsvWriter < BaseService
       end
     end
     Rails.logger.info "done writing csv"
+    Rails.logger.info "file exists? #{File.file?(file)}"
   end
 
 end
