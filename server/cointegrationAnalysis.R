@@ -7,6 +7,9 @@ library(latticeExtra)
 
 fitModel = function(startTimeString,endTimeString,ecdet_param="const"){
 
+print("does file exist in r?")
+print(file.exists("./public/data.csv"))
+
 startTime = startTimeString
 endTime = endTimeString
 if (class(startTimeString)=="character" && class(endTimeString)== "character"){
