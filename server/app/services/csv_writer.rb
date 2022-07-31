@@ -10,7 +10,10 @@ class CsvWriter < BaseService
       end
     end
     Rails.logger.info "done writing csv"
-    Rails.logger.info "file exists? #{File.file?(file)}"
+    CSV.foreach(file) do |row|
+      Rails.logger.info row
+    end
+    
   end
 
 end

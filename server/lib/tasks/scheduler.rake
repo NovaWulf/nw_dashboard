@@ -66,9 +66,9 @@ task update_arb_signal: :environment do
   end
   Rails.logger.info "writing candle data to CSV..."
   CsvWriter.run
-  mu = ModelUpdate.new
-  mu.seed
-  ArbitrageCalculator.run
-  b = Backtest.new
-  b.run
+  # mu = ModelUpdate.new
+  # mu.seed
+  # ArbitrageCalculator.run
+  # b = Backtest.new
+  # b.run
 end
