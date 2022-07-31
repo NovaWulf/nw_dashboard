@@ -1,5 +1,4 @@
 class Coinbase
-
   include HTTParty
   require 'openssl'
   require 'json'
@@ -45,9 +44,7 @@ class Coinbase
     if num_candles > 300
       responses = []
       new_start_time = time_now - 298 * resolution
-      if new_start_time<start_timestamp
-        new_start_time=start_timestamp
-      end
+      new_start_time = start_timestamp if new_start_time < start_timestamp
       responses.concat self.class.get(
         "#{path}?start=#{new_start_time}&end=#{time_now}&granularity=#{resolution}", headers: generate_headers(path)
       ).parsed_response
@@ -55,6 +52,7 @@ class Coinbase
       new_end_time = first_time - resolution
       while new_end_time > start_timestamp
         new_start_time = new_end_time - 299 * resolution
+        Rails.logger.info "Calling Coinbase with start time: #{Time.at(new_start_time)}"
         responses.concat self.class.get(
           "#{path}?start=#{new_start_time}&end=#{new_end_time}&granularity=#{resolution}", headers: generate_headers(path)
         )
