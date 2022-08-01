@@ -38,7 +38,7 @@ class Coinbase
   def response(path, start_time, resolution)
     time_now = Time.now.getutc.to_i
     start_timestamp = start_time.to_i
-    
+
     num_candles = (time_now - start_timestamp.to_i).div(resolution)
 
     if num_candles > 300
@@ -52,7 +52,7 @@ class Coinbase
       new_end_time = first_time - resolution
       while new_end_time > start_timestamp
         new_start_time = new_end_time - 299 * resolution
-        Rails.logger.info "Calling Coinbase with start time: #{Time.at(new_start_time)}"
+        Rails.logger.info "Num candles > 300. Calling Coinbase with start time: #{Time.at(new_start_time)}"
         responses.concat self.class.get(
           "#{path}?start=#{new_start_time}&end=#{new_end_time}&granularity=#{resolution}", headers: generate_headers(path)
         ).parsed_response
@@ -60,7 +60,7 @@ class Coinbase
         sleep 0.34
       end
     else
-      Rails.logger.info "Calling Coinbase with start time: #{Time.at(start_timestamp)}"
+      Rails.logger.info "Num candles < 300. Calling Coinbase with start time: #{Time.at(start_timestamp)}"
       responses = self.class.get(
         "#{path}?start=#{start_timestamp}&end=#{time_now}&granularity=#{resolution}", headers: generate_headers(path)
       )
