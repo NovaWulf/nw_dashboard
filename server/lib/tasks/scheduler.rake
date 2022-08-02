@@ -69,12 +69,12 @@ task update_arb_signal: :environment do
   mu = ModelUpdate.new
   mu.seed
   ArbitrageCalculator.run
-  b = Backtest.new
-  b.run
+  # b = Backtest.new
+  # b.run
 end
 
 task merge_prices: :environment do
   p = PriceProcessor.new
-  records = p.run(['eth-usd'])
+  records = p.run(%w[eth-usd op-usd])
   puts records.count.to_s
 end
