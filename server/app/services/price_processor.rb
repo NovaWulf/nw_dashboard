@@ -1,8 +1,6 @@
 class PriceProcessor
   def run(asset_names, start_time = nil, end_time = nil)
-    puts 'asset names array: ' + asset_names.to_s
     asset_aliases = asset_names.map { |e| e.gsub('-', '_') }
-    puts 'asset_aliases: ' + asset_aliases.to_s
     sql = "Select
     t1.starttime as starttime,
     t1.close as #{asset_aliases[0]},
@@ -15,11 +13,17 @@ class PriceProcessor
     "
 
     records_array = ActiveRecord::Base.connection.execute(sql)
-    if start_time && end_time
-      records_array = records_array.where("starttime >= #{start_time} and starttime <= #{end_time}")
-    end
-    prices = asset_aliases.map { |a| records_array.pluck(a) }
     starttimes = records_array.pluck('starttime')
+    prices = asset_aliases.map { |a| records_array.pluck(a) }
+
+    if start_time && end_time
+      start_index = starttimes.index(start_time)
+      end_index = starttimes.index(end_time)
+      starttimes = starttimes[start_index..end_index]
+      for i in 0..1
+        prices[i] = prices[i][start_index..end_index]
+      end
+    end
     [starttimes, prices]
   end
 end

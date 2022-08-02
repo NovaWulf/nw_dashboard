@@ -64,11 +64,7 @@ class Backtest
     @transactions = Array.new(@num_obs)
     @prices = Array.new(@num_ownable_assets) { Array.new(@num_obs) }
     @positions = Array.new(@num_ownable_assets) { Array.new(@num_obs) }
-
-    for i in 0..(@num_ownable_assets - 1)
-      @prices[i] =
-        Candle.where("pair = '#{@assets[i]}' and starttime >= #{signal_starttime} and starttime <= #{signal_endtime}").oldest_first.pluck(:close)
-    end
+    @prices = PriceProcessor.new.run(assets, signal_starttime, signal_endtime)[1]
   end
 
   def target_positions

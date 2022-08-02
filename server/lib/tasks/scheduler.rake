@@ -69,8 +69,8 @@ task update_arb_signal: :environment do
   mu = ModelUpdate.new
   mu.seed
   ArbitrageCalculator.run
-  # b = Backtest.new
-  # b.run
+  b = Backtest.new
+  b.run
 end
 
 task merge_prices: :environment do
