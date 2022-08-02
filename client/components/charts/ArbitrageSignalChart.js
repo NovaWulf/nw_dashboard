@@ -21,7 +21,7 @@ export default function ArbitrageSignalChart({
   is_end_date,
 }) {
   const theme = useTheme();
-  const SIGMA = 1;
+  const SIGMA = 3;
   console.log('mean: ' + mean + ', sd: ' + sd);
   const updatedData = arb_signal.map(d => {
     return {

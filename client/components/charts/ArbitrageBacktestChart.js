@@ -28,7 +28,7 @@ export default function ArbitrageBacktestChart({ pnl, is_end_date }) {
   return (
     <DashboardItem
       title="Arbitrage Backtester"
-      helpText="Arbitrage Backtester looks at the value of the mean reverting portfolio of assets"
+      helpText="Arbitrage Backtester looks at the PnL of a given trading strategy over time"
       downloadButton={
         <CsvDownloadLink data={updatedData} title="Arbitrage Backtester" />
       }

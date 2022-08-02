@@ -1,28 +1,24 @@
 class ArbitrageCalculator < BaseService
   def run
-    fetch_coinbase_data
-    most_recent_model = CointegrationModel.newest_first.first
-    most_recent_model_id = most_recent_model&.uuid
-    last_in_sample_timestamp = most_recent_model&.model_endtime
+    most_recent_backtest_model = BacktestModel.oldest_first.last
 
+    most_recent_model_id = most_recent_backtest_model&.model_id
+    most_recent_model = CointegrationModel.where("uuid='#{most_recent_model_id}'").last
+    last_in_sample_timestamp = most_recent_model&.model_endtime
     op_weight = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}' and asset_name = 'op-usd'").pluck(:weight)[0]
     eth_weight = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}' and asset_name = 'eth-usd'").pluck(:weight)[0]
     const_weight = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}' and asset_name = 'det'").pluck(:weight)[0]
     if !op_weight || !eth_weight || !const_weight
-      Rails.logger.info "model weight is null or model does not exist, aborting"
-      abort "model weight is null, aborting"
+      Rails.logger.info 'model weight is null or model does not exist, aborting'
+      abort 'model weight is null, aborting'
     end
-
     res = 60
     last_timestamp = ModeledSignal.by_model(most_recent_model_id).last&.starttime
-
     return if last_timestamp && last_timestamp > Time.now.to_i - res
 
     start_time = last_timestamp ? last_timestamp + res : Date.new(2022, 6, 13).to_time.to_i
-
     starttimes = Candle.by_resolution(res).where("starttime>= #{start_time}").pluck(:starttime)
     starttimes = starttimes.uniq.sort
-
     eth_not_null = 0
     op_not_null = 0
     index = 0
@@ -47,40 +43,36 @@ class ArbitrageCalculator < BaseService
 
       index += 1
     end
-
     length_start_times = starttimes.length
     starttimes = starttimes[index..(length_start_times - 1)]
     m = nil
     starttimes.each do |time|
-      this_op_candle = Candle.by_resolution(res).by_pair("op-usd").where("starttime = #{time}")
-      this_eth_candle = Candle.by_resolution(res).by_pair("eth-usd").where("starttime = #{time}")
-      
-      # update current candle value if not null, otherwise, use most recent non-null value 
+      this_op_candle = Candle.by_resolution(res).by_pair('op-usd').where("starttime = #{time}")
+      this_eth_candle = Candle.by_resolution(res).by_pair('eth-usd').where("starttime = #{time}")
+
+      # update current candle value if not null, otherwise, use most recent non-null value
       # and create a new candle using the old value for flat-forward interpolation
       # (useful for better efficiency during backtesting)
-      
-      if this_op_candle.count >0
-          current_op_val = this_op_candle.pluck(:close)[0]
-      else
-        Candle.create(starttime: time, pair: "op-usd",exchange: "Coinbase",
-          resolution:res,low:current_op_val,high: current_op_val,open:current_op_val,close: current_op_val,volume:0)
-      end
-      if this_eth_candle.count>0
-          current_eth_val = this_eth_candle.pluck(:close)[0]
-      else 
-        Candle.create(starttime: time, pair: "eth-usd",exchange: "Coinbase",
-          resolution:res,low:current_eth_val,high: current_eth_val,open:current_eth_val,close: current_eth_val,volume:0)
-      end
-      signal_value = current_op_val*op_weight + current_eth_val*eth_weight + const_weight
-      in_sample_flag = true
-      if time > last_in_sample_timestamp
-        in_sample_flag=false
-      end
-      m=ModeledSignal.create(starttime: time, model_id: most_recent_model_id, resolution: res, value: signal_value,in_sample:in_sample_flag)
 
+      if this_op_candle.count > 0
+        current_op_val = this_op_candle.pluck(:close)[0]
+      else
+        Candle.create(starttime: time, pair: 'op-usd', exchange: 'Coinbase',
+                      resolution: res, low: current_op_val, high: current_op_val, open: current_op_val, close: current_op_val, volume: 0)
+      end
+      if this_eth_candle.count > 0
+        current_eth_val = this_eth_candle.pluck(:close)[0]
+      else
+        Candle.create(starttime: time, pair: 'eth-usd', exchange: 'Coinbase',
+                      resolution: res, low: current_eth_val, high: current_eth_val, open: current_eth_val, close: current_eth_val, volume: 0)
+      end
+      signal_value = current_op_val * op_weight + current_eth_val * eth_weight + const_weight
+      in_sample_flag = time <= last_in_sample_timestamp
+      m = ModeledSignal.create(starttime: time, model_id: most_recent_model_id, resolution: res, value: signal_value,
+                               in_sample: in_sample_flag)
     end
 
-    email_notification(m) if m
+    # email_notification(m) if m
   end
 
   def email_notification(arb_signal, sigma = 1)
@@ -98,13 +90,6 @@ class ArbitrageCalculator < BaseService
     elsif signal_value < lower
       NotificationMailer.with(subject: 'Statistical Arbitrage Indicator Alert',
                               text: "OP-ETH (#{signal_value.round(2)}) is below the low band of Paul's indicator (#{lower.round(2)}). Recommend buying ETH and shorting OP").notification.deliver_now
-    end
-  end
-
-  def fetch_coinbase_data
-    tracked_pairs = %w[eth-usd op-usd]
-    tracked_pairs.each do |p|
-      Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
     end
   end
 end

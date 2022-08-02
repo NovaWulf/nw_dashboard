@@ -1,8 +1,8 @@
-my_packages = c()
+my_packages = c("data.table","urca","lubridate","digest","lattice","latticeExtra")
 
 install_if_missing = function(p) {
   if (p %in% rownames(installed.packages()) == FALSE) {
-    install.packages(p)
+    install.packages(p, repos='http://cran.us.r-project.org')
   }
 }
 

@@ -11,6 +11,7 @@
 #  in_sample_sd    :float
 #  model_endtime   :integer
 #  model_starttime :integer
+#  name            :string
 #  resolution      :integer
 #  spec            :string
 #  test_stat       :float

@@ -11,7 +11,6 @@ RSpec.describe Fetchers::CoinbaseFetcher do
       expect(m.high).to eql 100.0
       expect(m.close).to eql 100.0
       expect(m.low).to eql 100.0
-      expect(m.starttime).to eql Time.now.to_i
       expect(m.pair).to eql "op-usd"
       expect(m.resolution).to eql 60
       expect(m.exchange).to eql "Coinbase"

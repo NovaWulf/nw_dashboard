@@ -11,7 +11,7 @@ module Displayers
     end
 
     def run
-      ModeledSignal.by_model(@model).on_the_hour.oldest_first
+      ModeledSignal.by_model(model).on_the_hour.oldest_first
     end
 
   end

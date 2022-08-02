@@ -67,6 +67,12 @@ RSpec.describe Backtest do
       in_sample_sd: 5
       )
 
+      BacktestModel.create(
+        version: 0,
+        model_id: "id1",
+        sequence_number: 0,
+        name: "seed_model"
+      )
 
       ModeledSignal.create(
           starttime: Time.now.to_i-60, 
@@ -105,7 +111,7 @@ RSpec.describe Backtest do
  
 
   it 'persists' do
-      expect { instance.run(model_id: "id1") }.to change { ModeledSignal.where("model_id = 'id1-b'").count }.by(1)
+      expect { instance.run }.to change { ModeledSignal.where("model_id = 'id1-b'").count }.by(1)
       m = ModeledSignal.last
       expect(m.value.round(2)).to eql pnl_expected.round(2)
   end

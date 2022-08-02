@@ -38,3 +38,5 @@ yarn-debug.log*
 .env.local
 
 Rplots.pdf
+
+/public/data.csv

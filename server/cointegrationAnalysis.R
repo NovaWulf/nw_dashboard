@@ -1,12 +1,14 @@
 library(data.table)
-library(RODBC)
 library(urca)
 library(lubridate)
 library(digest)
 library(lattice)
 library(latticeExtra)
 
-fitModel = function(dbhandle,startTimeString,endTimeString,ecdet_param="const"){
+fitModel = function(startTimeString,endTimeString,ecdet_param="const"){
+
+print("does file exist in r?")
+print(file.exists("./public/data.csv"))
 
 startTime = startTimeString
 endTime = endTimeString
@@ -16,11 +18,16 @@ if (class(startTimeString)=="character" && class(endTimeString)== "character"){
 }
 
 resolution = 60
-ethDat = data.table(sqlQuery(dbhandle,paste0("select starttime,close from candles where pair ='eth-usd' and resolution = ", resolution)))
-opDat = data.table(sqlQuery(dbhandle,paste0("select starttime,close from candles where pair = 'op-usd' and resolution= ",resolution )))
+allDat = data.table(read.csv("./public/data.csv"))
+print("counts of different pairs")
+print(table(allDat$pair,useNA="always"))
+
+ethDat = allDat[starttime>startTime & starttime<endTime & resolution == resolution & pair == "eth-usd"]
+opDat =  allDat[starttime>startTime & starttime<endTime & resolution == resolution & pair == "op-usd"]
 
 bothDat = merge(ethDat,opDat,by = "starttime")
 bothDat = bothDat[starttime>startTime & starttime<endTime]
+bothDat = bothDat[order(bothDat$starttime)]
 print(dim(bothDat))
 bothDat$start_datetime = as_datetime(bothDat$starttime)    
 
@@ -67,13 +74,13 @@ forDigest = c(ecdet,
               realStartDate,
               realEndDate)
 
-uid =paste0("'",digest(forDigest),"'")
+uid =digest(forDigest)
 
 valueVec = c(
         uid,
         currentTime,
-        paste0("'",ecdet,"'"),
-        paste0("'",spec,"'"),
+        ecdet,
+        spec,
         jo@cval[1,1],
         jo@cval[1,2],
         jo@cval[1,3],
@@ -85,26 +92,28 @@ valueVec = c(
         meanSpread,
         sdSpread
         )
-
+returnVals = list()
 colNameString = "(uuid, timestamp,ecdet,spec,cv_10_pct,cv_5_pct,cv_1_pct,test_stat,top_eig,resolution,model_starttime,model_endtime,in_sample_mean,in_sample_sd)"
 valueString = paste0(c("(",paste0(valueVec,collapse = ","),")"),collapse = "")
 queryString = paste0("insert into cointegration_models " , colNameString," values",valueString)
+returnVals[[1]] = colNameString
+returnVals[[2]] = valueString
 
 print(queryString)
-sqlQuery(dbhandle,queryString)
 
-assetNames = c("'eth-usd'","'op-usd'","'det'")
+assetNames = c("eth-usd","op-usd","det")
 assetWeights=c(vecs[1,1],vecs[2,1],vecs[3,1])
 
 colNamesString2 = "(uuid,timestamp,asset_name,weight)"
+returnVals[[3]] = colNamesString2
 
 valStrings=rep("",3)
 for (i in 1:3){
   valStrings[i]=paste0("(", paste0(c(uid,currentTime,assetNames[i],assetWeights[i]),collapse=","),")")
 }
 totalValString = paste0(valStrings,collapse=",")
-
-sqlQuery(dbhandle,paste0("insert into cointegration_model_weights ",colNamesString2," values ",totalValString))
-print(paste0("insert into cointegration_model_weights ",colNamesString2," values ",totalValString))
-return (summary(jo))
+returnVals[[4]] = totalValString
+returnVals = unlist(returnVals)
+print(returnVals)
+return (returnVals)
 }
