@@ -4,6 +4,7 @@ class ArbitrageCalculator < BaseService
 
     most_recent_model_id = most_recent_backtest_model&.model_id
     most_recent_model = CointegrationModel.where("uuid='#{most_recent_model_id}'").last
+    res = most_recent_model&.resolution
     last_in_sample_timestamp = most_recent_model&.model_endtime
     assets = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}'")
     asset_weights = assets.pluck(:weight)
