@@ -38,10 +38,10 @@ class MvrvCalculator < BaseService
   def email_notification(mvrv_value)
     if mvrv_value > 2.75
       NotificationMailer.with(subject: 'MVRV Alert',
-                              text: "MVRV is above 2.75, with a value of #{mvrv_value.round(3)}").notification.deliver_now
+                              text: "MVRV is above 2.75, with a value of #{mvrv_value.round(3)}.").notification.deliver_now
     elsif mvrv_value < 1.25
       NotificationMailer.with(subject: 'MVRV Alert',
-                              text: "MVRV is below 1.25, with a value of #{mvrv_value.round(3)}").notification.deliver_now
+                              text: "MVRV is below 1.25, with a value of #{mvrv_value.round(3)}.").notification.deliver_now
     end
   end
 end
