@@ -30,7 +30,7 @@ class ArbitrageCalculator < BaseService
                                in_sample: in_sample_flag)
     end
 
-    email_notification(m) if m
+    # email_notification(m) if m
   end
 
   def email_notification(arb_signal, sigma = 1)
