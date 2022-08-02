@@ -64,11 +64,17 @@ task update_arb_signal: :environment do
   tracked_pairs.each do |p|
     Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
   end
-  Rails.logger.info "writing candle data to CSV..."
+  Rails.logger.info 'writing candle data to CSV...'
   CsvWriter.run
   mu = ModelUpdate.new
   mu.seed
   ArbitrageCalculator.run
   b = Backtest.new
   b.run
+end
+
+task merge_prices: :environment do
+  p = PriceProcessor.new
+  records = p.run(%w[eth-usd op-usd])
+  puts records.count.to_s
 end
