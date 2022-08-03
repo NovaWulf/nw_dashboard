@@ -9,6 +9,7 @@
 #  ecdet           :string
 #  in_sample_mean  :float
 #  in_sample_sd    :float
+#  log_prices      :boolean
 #  model_endtime   :integer
 #  model_starttime :integer
 #  name            :string

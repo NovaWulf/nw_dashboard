@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_08_03_163227) do
+ActiveRecord::Schema.define(version: 2022_08_03_225854) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -64,6 +64,7 @@ ActiveRecord::Schema.define(version: 2022_08_03_163227) do
     t.integer "model_starttime"
     t.integer "model_endtime"
     t.string "name"
+    t.boolean "log_prices"
     t.index ["uuid"], name: "index_cointegration_models_on_uuid", unique: true
   end
 
