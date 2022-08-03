@@ -45,19 +45,31 @@ class Coinbase
       responses = []
       new_start_time = time_now - 298 * resolution
       new_start_time = start_timestamp if new_start_time < start_timestamp
-      responses.concat self.class.get(
-        "#{path}?start=#{new_start_time}&end=#{time_now}&granularity=#{resolution}", headers: generate_headers(path)
-      ).parsed_response
+
+      begin
+        responses.concat self.class.get(
+          "#{path}?start=#{new_start_time}&end=#{time_now}&granularity=#{resolution}", headers: generate_headers(path)
+        ).parsed_response
+      rescue StandardError => e
+        puts 'StandardError ' + e.message
+      end
+
       first_time = responses.last[0]
       new_end_time = first_time - resolution
       while new_end_time > start_timestamp
         new_start_time = new_end_time - 299 * resolution
         Rails.logger.info "Num candles > 300. Calling Coinbase with start time: #{Time.at(new_start_time)}"
-        responses.concat self.class.get(
-          "#{path}?start=#{new_start_time}&end=#{new_end_time}&granularity=#{resolution}", headers: generate_headers(path)
-        ).parsed_response
+        times_retried = 0
+
+        begin
+          responses.concat self.class.get(
+            "#{path}?start=#{new_start_time}&end=#{new_end_time}&granularity=#{resolution}", headers: generate_headers(path)
+          ).parsed_response
+        rescue StandardError => e
+          puts 'StandardError ' + e.message
+        end
         new_end_time -= 300 * resolution
-        Rails.logger.info "new start time: #{new_start_time}, new end time: #{new_end_time}"  
+        Rails.logger.info "new start time: #{new_start_time}, new end time: #{new_end_time}"
         sleep 0.34
       end
     else
@@ -66,9 +78,10 @@ class Coinbase
         "#{path}?start=#{start_timestamp}&end=#{time_now}&granularity=#{resolution}", headers: generate_headers(path)
       )
       responses = responses.parsed_response
+
       # puts responses
     end
-    Rails.logger.info "done with coinbase call"
+    Rails.logger.info 'done with coinbase call'
     responses
   end
 end
