@@ -69,15 +69,31 @@ class Backtest
   end
 
   def target_positions
-    max_shares_first_asset = MAX_TRADE_SIZE_DOLLARS / prices[0][@cursor]
-
-    @targets = (0..(@num_ownable_assets - 1)).map do |i|
-      if signal_up(@cursor)
-        - @asset_weights[i] * max_shares_first_asset
-      elsif signal_down(@cursor)
-        @asset_weights[i] * max_shares_first_asset
-      else
-        @positions[i][@cursor]
+    # In price model, eigenvectors represent weight in shares,
+    # whereas in log-price model, eigenvectors are in $
+    if @log_prices
+      @targets = (0..(@num_ownable_assets - 1)).map do |i|
+        if signal_up(@cursor)
+          - @asset_weights[i] * MAX_TRADE_SIZE_DOLLARS
+        elsif signal_down(@cursor)
+          @asset_weights[i] * MAX_TRADE_SIZE_DOLLARS
+        else
+          @positions[i][@cursor]
+        end
+      end
+    else
+      multiplier = n_shares_first_asset / @asset_weights[0]
+      n_shares_first_asset = MAX_TRADE_SIZE_DOLLARS / prices[0][@cursor]
+      # NOTE: first asset weight should always be 0 using the urca package
+      # but I'm writing it out here explicitly for clarity
+      @targets = (0..(@num_ownable_assets - 1)).map do |i|
+        if signal_up(@cursor)
+          - @asset_weights[i] * multiplier
+        elsif signal_down(@cursor)
+          @asset_weights[i] * multiplier
+        else
+          @positions[i][@cursor]
+        end
       end
     end
   end
