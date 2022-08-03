@@ -7,7 +7,6 @@ class Backtest
   @signal
   @in_sample_mean
   @multiplier
-  @max_trade_size_eth
   @positions
   @prices
   @num_obs
@@ -17,8 +16,9 @@ class Backtest
   @starttimes
   @model_id
   @resolution
+  @log_prices
   MULTIPLIER = 1
-  MAX_TRADE_SIZE_ETH = 1000
+  MAX_TRADE_SIZE_DOLLARS = 1000
   attr_accessor :model_id, :resolution, :model_starttime, :model_endtime, :in_sample_mean, :in_sample_sd, :assets,
                 :asset_weights, :num_ownable_assets, :num_obs, :positions, :prices, :pnl, :targets
 
@@ -42,6 +42,7 @@ class Backtest
   def load_model
     @model_id = BacktestModel.oldest_first.last.model_id
     model = CointegrationModel.where("uuid = '#{@model_id}'").last
+    @log_prices = model&.log_prices
     @resolution = model.resolution
     @model_starttime = model.model_starttime
     @model_endtime = model.model_endtime
@@ -68,11 +69,13 @@ class Backtest
   end
 
   def target_positions
+    max_shares_first_asset = MAX_TRADE_SIZE_DOLLARS / prices[0][@cursor]
+
     @targets = (0..(@num_ownable_assets - 1)).map do |i|
       if signal_up(@cursor)
-        - @asset_weights[i] * MAX_TRADE_SIZE_ETH
+        - @asset_weights[i] * max_shares_first_asset
       elsif signal_down(@cursor)
-        @asset_weights[i] * MAX_TRADE_SIZE_ETH
+        @asset_weights[i] * max_shares_first_asset
       else
         @positions[i][@cursor]
       end

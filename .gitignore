@@ -2,3 +2,4 @@
 server/.RData
 server/.Rhistory
 server/public/data.csv
+server/*.png
