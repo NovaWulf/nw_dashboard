@@ -72,9 +72,3 @@ task update_arb_signal: :environment do
   b = Backtest.new
   b.run
 end
-
-task merge_prices: :environment do
-  p = PriceProcessor.new
-  records = p.run(%w[eth-usd op-usd])
-  puts records.count.to_s
-end

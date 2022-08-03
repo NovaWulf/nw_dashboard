@@ -1,5 +1,8 @@
 class PriceProcessor
   def run(asset_names, start_time = nil, end_time = nil)
+    if asset_names.length != 2
+      abort("price processor currently only works with 2 assets. you are trying to merge #{asset_names.length} asset timeseries")
+    end
     asset_aliases = asset_names.map { |e| e.gsub('-', '_') }
     sql = "Select
     t1.starttime as starttime,
