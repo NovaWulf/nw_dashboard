@@ -40,7 +40,7 @@ class Backtest
   private
 
   def load_model(version)
-    @model_id = BacktestModel.where("version=#{version}").oldest_first.last.model_id
+    @model_id = BacktestModel.where("version=#{version}").oldest_sequence_number_first.last&.model_id
     model = CointegrationModel.where("uuid = '#{@model_id}'").last
     @log_prices = model&.log_prices
     @resolution = model.resolution
@@ -88,10 +88,8 @@ class Backtest
       # but I'm writing it out here explicitly for clarity
       @targets = (0..(@num_ownable_assets - 1)).map do |i|
         if signal_up(@cursor)
-          puts 'signal up'
           - @asset_weights[i] * multiplier
         elsif signal_down(@cursor)
-          puts 'signal down'
           @asset_weights[i] * multiplier
         else
           @positions[i][@cursor]

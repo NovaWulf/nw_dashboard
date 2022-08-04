@@ -7,7 +7,7 @@ import ArbitrageBacktestChart from 'components/charts/ArbitrageBacktestChart';
 
 const QUERY = gql`
   query {
-    latestCointegrationModelInfo {
+    cointegrationModelInfo(version:1) {
       inSampleMean
       inSampleSd
       uuid
@@ -32,13 +32,13 @@ const QUERY = gql`
 export default function ArbitrageCharts() {
   const { data, loading, error } = useQuery(QUERY);
   const {
-    latestCointegrationModelInfo,
+    cointegrationModelInfo,
     arbSignalLatestModel,
     backtestLatestModel,
   } = data || {};
   console.log(
-    'latestCointegrationModelInfo: ' +
-      JSON.stringify(latestCointegrationModelInfo),
+    'cointegrationModelInfo: ' +
+      JSON.stringify(cointegrationModelInfo),
   );
 
   if (error) {
@@ -54,9 +54,9 @@ export default function ArbitrageCharts() {
         ) : (
           <ArbitrageSignalChart
             arb_signal={arbSignalLatestModel}
-            mean={latestCointegrationModelInfo[0].inSampleMean}
-            sd={latestCointegrationModelInfo[0].inSampleSd}
-            is_end_date={latestCointegrationModelInfo[0].modelEndtime}
+            mean={cointegrationModelInfo[0].inSampleMean}
+            sd={cointegrationModelInfo[0].inSampleSd}
+            is_end_date={cointegrationModelInfo[0].modelEndtime}
           />
         )}
       </Grid>
@@ -66,7 +66,7 @@ export default function ArbitrageCharts() {
         ) : (
           <ArbitrageBacktestChart
             pnl={backtestLatestModel}
-            is_end_date={latestCointegrationModelInfo[0].modelEndtime}
+            is_end_date={cointegrationModelInfo[0].modelEndtime}
           />
         )}
       </Grid>

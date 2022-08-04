@@ -1,7 +1,6 @@
 class ArbitrageCalculator < BaseService
   def run
-    most_recent_backtest_model = BacktestModel.oldest_first.last
-
+    most_recent_backtest_model = BacktestModel.oldest_version_first.last.oldest_sequence_number_first.last
     most_recent_model_id = most_recent_backtest_model&.model_id
     most_recent_model = CointegrationModel.where("uuid='#{most_recent_model_id}'").last
     log_prices = most_recent_model&.log_prices
