@@ -1,53 +1,50 @@
 RSpec.describe Backtest do
   subject(:instance) { described_class.new }
-
   let(:op_candle_first) { Candle.by_pair('op-usd').first&.close }
   let(:eth_candle_first) { Candle.by_pair('eth-usd').first&.close }
   let(:op_candle_second) { Candle.by_pair('op-usd').last&.close }
   let(:eth_candle_second) { Candle.by_pair('eth-usd').last&.close }
-
   let(:latest_model) { CointegrationModel.newest_first.first&.uuid }
-  let(:log_normal) { CointegrationModel.newest_first.first&.log_prices }
+  let(:log_prices) { CointegrationModel.newest_first.first&.log_prices }
   let(:op_weight) { CointegrationModelWeight.where("uuid = '#{latest_model}' and asset_name = 'op-usd'").first.weight }
   let(:eth_weight) do
     CointegrationModelWeight.where("uuid = '#{latest_model}' and asset_name = 'eth-usd'").first.weight
   end
 
   let(:pnl_expected) do
-    if log_normal
-      - (op_weight / op_candle_first) * (op_candle_second - op_candle_first) - (eth_weight / eth_candle_first) * (eth_candle_second - eth_candle_first)
-    else
-      -1_000 * op_weight * (op_candle_second - op_candle_first) - 1000 * eth_weight * (eth_candle_second - eth_candle_first)
-    end
+    - op_weight * (op_candle_second - op_candle_first) -  eth_weight * (eth_candle_second - eth_candle_first)
+  end
+  let(:pnl_expected_log) do
+    - (op_weight / op_candle_first) * (op_candle_second - op_candle_first) - (eth_weight / eth_candle_first) * (eth_candle_second - eth_candle_first)
   end
 
   # suppose we have a signal from 2 time steps ago,
   # and candles, model from 1 timestep ago
   before(:each) do
     Candle.create(starttime: Time.now.to_i - 60,
-                  pair: 'op-usd',
-                  exchange: 'Coinbase',
-                  resolution: 60,
-                  low: 2, high: 2, open: 2, close: 2, volume: 2)
-
-    Candle.create(starttime: Time.now.to_i - 60,
                   pair: 'eth-usd',
                   exchange: 'Coinbase',
                   resolution: 60,
                   low: 1, high: 1, open: 1, close: 1, volume: 1)
 
-    CointegrationModelWeight.create(
-      uuid: 'id1',
-      timestamp: 1_800_000_000,
-      asset_name: 'op-usd',
-      weight: -1
-    )
+    Candle.create(starttime: Time.now.to_i - 60,
+                  pair: 'op-usd',
+                  exchange: 'Coinbase',
+                  resolution: 60,
+                  low: 2, high: 2, open: 2, close: 2, volume: 2)
 
     CointegrationModelWeight.create(
       uuid: 'id1',
       timestamp: 1_800_000_000,
       asset_name: 'eth-usd',
       weight: 1
+    )
+
+    CointegrationModelWeight.create(
+      uuid: 'id1',
+      timestamp: 1_800_000_000,
+      asset_name: 'op-usd',
+      weight: -1
     )
     CointegrationModelWeight.create(
       uuid: 'id1',
@@ -71,7 +68,7 @@ RSpec.describe Backtest do
       model_endtime: 1_700_000_000,
       in_sample_mean: 0,
       in_sample_sd: 5,
-      log_prices: true
+      log_prices: false
     )
 
     BacktestModel.create(
@@ -84,6 +81,58 @@ RSpec.describe Backtest do
     ModeledSignal.create(
       starttime: Time.now.to_i - 60,
       model_id: 'id1',
+      resolution: 60,
+      value: 10
+    )
+
+    CointegrationModelWeight.create(
+      uuid: 'id2',
+      timestamp: 1_800_000_000,
+      asset_name: 'eth-usd',
+      weight: 1
+    )
+
+    CointegrationModelWeight.create(
+      uuid: 'id2',
+      timestamp: 1_800_000_000,
+      asset_name: 'op-usd',
+      weight: -1
+    )
+    CointegrationModelWeight.create(
+      uuid: 'id2',
+      timestamp: 1_800_000_000,
+      asset_name: 'det',
+      weight: 0
+    )
+
+    CointegrationModel.create(
+      uuid: 'id2',
+      timestamp: 1_800_000_000,
+      ecdet: 'const',
+      spec: 'transitory',
+      cv_10_pct: 6,
+      cv_5_pct: 7,
+      cv_1_pct: 8,
+      test_stat: 9,
+      top_eig: 0.0008,
+      resolution: 60,
+      model_starttime: 1_600_000_000,
+      model_endtime: 1_700_000_000,
+      in_sample_mean: 0,
+      in_sample_sd: 5,
+      log_prices: true
+    )
+
+    BacktestModel.create(
+      version: 1,
+      model_id: 'id2',
+      sequence_number: 0,
+      name: 'seed_model'
+    )
+
+    ModeledSignal.create(
+      starttime: Time.now.to_i - 60,
+      model_id: 'id2',
       resolution: 60,
       value: 10
     )
@@ -117,11 +166,22 @@ RSpec.describe Backtest do
       resolution: 60,
       value: 3
     )
+    ModeledSignal.create(
+      starttime: Time.now.to_i,
+      model_id: 'id2',
+      resolution: 60,
+      value: 3
+    )
   end
 
-  it 'persists' do
-    expect { instance.run }.to change { ModeledSignal.where("model_id = 'id1-b'").count }.by(1)
+  it 'pnl calculation is accurate for price-level model' do
+    expect { instance.run(0) }.to change { ModeledSignal.where("model_id = 'id1-b'").count }.by(1)
     m = ModeledSignal.last
     expect(m.value.round(2)).to eql pnl_expected.round(2)
+  end
+  it 'pnl calculation is accurate for log-price model' do
+    expect { instance.run(1) }.to change { ModeledSignal.where("model_id = 'id2-b'").count }.by(1)
+    m = ModeledSignal.last
+    expect(m.value.round(2)).to eql pnl_expected_log.round(2)
   end
 end
