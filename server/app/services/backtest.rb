@@ -119,6 +119,7 @@ class Backtest
       @pnl[@cursor] += @positions[i][@cursor] * (@prices[i][@cursor] - @prices[i][@cursor - 1])
       in_sample_flag = @starttimes[@cursor] <= @model_endtime
     end
+    @pnl[@cursor] /= MAX_TRADE_SIZE_DOLLARS
     @pnl[@cursor] += @pnl[@cursor - 1]
 
     r_count = ModeledSignal.where("model_id='#{@model_id}-b' and starttime=#{@starttimes[@cursor]}").count

@@ -9,7 +9,7 @@ import {
   YAxis,
   ReferenceLine,
 } from 'recharts';
-import { dateFormatter, nFormatter } from 'lib/formatters';
+import { dateFormatter, percentFormatter } from 'lib/formatters';
 import DashboardItem from 'components/DashboardItem';
 import TimeAxisHighRes from 'components/TimeAxisHighRes';
 import CsvDownloadLink from 'components/CsvDownloadLink';
@@ -26,11 +26,11 @@ export default function ArbitrageSignalChart({
   const updatedData = arb_signal.map(d => {
     return {
       ts: d.ts,
-      v: d.v,
+      v: Math.floor(100*d.v),
       // is: d.is,
-      arbLow: mean - SIGMA * sd,
-      arbHigh: mean + SIGMA * sd,
-      arbMean: mean,
+      arbLow: Math.floor(100*(mean - SIGMA * sd)),
+      arbHigh: Math.floor(100*(mean + SIGMA * sd)),
+      arbMean: Math.floor(100*mean),
     };
   });
   console.log('in sample end date: ' + is_end_date);
@@ -92,9 +92,9 @@ export default function ArbitrageSignalChart({
           <YAxis
             yAxisId="spread"
             orientation="left"
-            tickFormatter={nFormatter}
+            tickFormatter={percentFormatter}
             stroke={theme.palette.primary.main}
-            domain={[-1.5, 1.5]}
+            domain={[-50, 150]}
           />
 
           <Tooltip labelFormatter={dateFormatter} />

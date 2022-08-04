@@ -9,7 +9,7 @@ import {
   YAxis,
   ReferenceLine,
 } from 'recharts';
-import { dateFormatter, nFormatter } from 'lib/formatters';
+import { dateFormatter, percentFormatter } from 'lib/formatters';
 import DashboardItem from 'components/DashboardItem';
 import TimeAxisHighRes from 'components/TimeAxisHighRes';
 import CsvDownloadLink from 'components/CsvDownloadLink';
@@ -20,7 +20,7 @@ export default function ArbitrageBacktestChart({ pnl, is_end_date }) {
   const updatedData = pnl.map(d => {
     return {
       ts: d.ts,
-      v: d.v,
+      v: 100*d.v,
       is: d.is,
     };
   });
@@ -59,9 +59,9 @@ export default function ArbitrageBacktestChart({ pnl, is_end_date }) {
           <YAxis
             yAxisId="pnl"
             orientation="left"
-            tickFormatter={nFormatter}
+            tickFormatter={percentFormatter}
             stroke={theme.palette.primary.main}
-            domain={[-2000, 2000]}
+            domain={[-200, 200]}
           />
 
           <Tooltip labelFormatter={dateFormatter} />
