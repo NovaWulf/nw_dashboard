@@ -70,5 +70,5 @@ task update_arb_signal: :environment do
   mu.seed
   ArbitrageCalculator.run
   b = Backtest.new
-  b.run
+  b.run(1)
 end
