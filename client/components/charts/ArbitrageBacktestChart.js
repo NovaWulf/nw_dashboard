@@ -61,7 +61,7 @@ export default function ArbitrageBacktestChart({ pnl, is_end_date }) {
             orientation="left"
             tickFormatter={nFormatter}
             stroke={theme.palette.primary.main}
-            domain={[-500000, 1500000]}
+            domain={[-2000, 2000]}
           />
 
           <Tooltip labelFormatter={dateFormatter} />

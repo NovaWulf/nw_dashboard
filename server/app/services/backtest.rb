@@ -74,16 +74,16 @@ class Backtest
     if @log_prices
       @targets = (0..(@num_ownable_assets - 1)).map do |i|
         if signal_up(@cursor)
-          - @asset_weights[i] * MAX_TRADE_SIZE_DOLLARS
+          - @asset_weights[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
         elsif signal_down(@cursor)
-          @asset_weights[i] * MAX_TRADE_SIZE_DOLLARS
+          @asset_weights[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
         else
           @positions[i][@cursor]
         end
       end
     else
-      multiplier = n_shares_first_asset / @asset_weights[0]
       n_shares_first_asset = MAX_TRADE_SIZE_DOLLARS / prices[0][@cursor]
+      multiplier = n_shares_first_asset / @asset_weights[0]
       # NOTE: first asset weight should always be 0 using the urca package
       # but I'm writing it out here explicitly for clarity
       @targets = (0..(@num_ownable_assets - 1)).map do |i|

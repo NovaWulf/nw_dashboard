@@ -94,7 +94,7 @@ export default function ArbitrageSignalChart({
             orientation="left"
             tickFormatter={nFormatter}
             stroke={theme.palette.primary.main}
-            domain={[-150, 150]}
+            domain={[-1.5, 1.5]}
           />
 
           <Tooltip labelFormatter={dateFormatter} />

@@ -4,26 +4,28 @@ class ArbitrageCalculator < BaseService
 
     most_recent_model_id = most_recent_backtest_model&.model_id
     most_recent_model = CointegrationModel.where("uuid='#{most_recent_model_id}'").last
+    log_prices = most_recent_model&.log_prices
     res = most_recent_model&.resolution
     last_in_sample_timestamp = most_recent_model&.model_endtime
+    first_in_sample_timestamp = most_recent_model&.model_starttime
     assets = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}'")
     asset_weights = assets.pluck(:weight)
-    puts 'asset weights: ' + asset_weights.to_s
     asset_names = assets.pluck(:asset_name)
-    puts 'asset names: ' + asset_names.to_s
     det_index = asset_names.index('det')
     det_weight = asset_weights[det_index]
     asset_weights.delete_at(det_index)
     asset_names.delete('det')
-    puts 'asset names2: ' + asset_names.to_s
-
-    flat_records = PriceProcessor.new.run(asset_names)
+    flat_records = PriceProcessor.new.run(asset_names, first_in_sample_timestamp)
     starttimes = flat_records[0]
     prices = flat_records[1]
     for time_step in 0..(starttimes.length - 1)
       signal_value = det_weight
       for i in 0..(asset_weights.length - 1)
-        signal_value += asset_weights[i] * prices[i][time_step]
+        signal_value += if log_prices
+                          asset_weights[i] * Math.log(prices[i][time_step])
+                        else
+                          asset_weights[i] * prices[i][time_step]
+                        end
       end
       in_sample_flag = starttimes[time_step] <= last_in_sample_timestamp
       m = ModeledSignal.create(starttime: starttimes[time_step], model_id: most_recent_model_id, resolution: res, value: signal_value,

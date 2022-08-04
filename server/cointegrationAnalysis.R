@@ -66,13 +66,9 @@ bothDat$upper = bothDat$meanSpread+sigma*bothDat$sdSpread
 bothDat$lower = bothDat$meanSpread-sigma*bothDat$sdSpread
 bothDat$spread = spread
 
-xyplot(spread + meanSpread~start_datetime,bothDat,type = "l",auto.key = T,main= "mean reverting portfolio")
-
-
 realStartDate = min(bothDat$start_datetime)
 realEndDate = max(bothDat$start_datetime)
 currentTime = round(as.numeric(as.POSIXct(Sys.time())))
-
 
 forDigest = c(ecdet,
               spec,
