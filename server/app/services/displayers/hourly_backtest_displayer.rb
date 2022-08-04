@@ -8,7 +8,7 @@ module Displayers
         model = BacktestModel.where("version=#{version}").oldest_sequence_number_first.last&.model_id
       else
         Rails.logger.info 'using default model for displayer -- latest'
-        model = BacktestModel.oldest_version_first.last.oldest_sequence_number_first.last&.model_id
+        model = BacktestModel.oldest_version_first.oldest_sequence_number_first.last&.model_id
       end
       @model = model
     end
