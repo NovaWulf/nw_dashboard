@@ -1,4 +1,4 @@
-class Backtest
+class Backtest < BaseService
   @assets
   @asset_weights
   @cursor
