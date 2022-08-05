@@ -20,7 +20,7 @@ export default function ArbitrageBacktestChart({ pnl, is_end_date }) {
   const updatedData = pnl.map(d => {
     return {
       ts: d.ts,
-      v: 100*d.v,
+      v: Math.floor(100*d.v),
       is: d.is,
     };
   });
