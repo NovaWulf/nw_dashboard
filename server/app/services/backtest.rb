@@ -65,7 +65,7 @@ class Backtest
     @transactions = Array.new(@num_obs)
     @prices = Array.new(@num_ownable_assets) { Array.new(@num_obs) }
     @positions = Array.new(@num_ownable_assets) { Array.new(@num_obs) }
-    @prices = PriceProcessor.new.run(assets, signal_starttime, signal_endtime)[1]
+    @prices = PriceProcessor.run(assets, signal_starttime, signal_endtime)[1]
   end
 
   def target_positions

@@ -1,5 +1,6 @@
-class PriceProcessor
+class PriceProcessor < BaseService
   def run(asset_names, start_time = nil, end_time = nil)
+    puts 'running price processor'
     if asset_names.length != 2
       abort("price processor currently only works with 2 assets. you are trying to merge #{asset_names.length} asset timeseries")
     end
@@ -27,6 +28,7 @@ class PriceProcessor
         prices[i] = prices[i][0..end_index]
       end
     end
+
     new_len = starttimes.count
     if start_time
       start_index = starttimes.index(start_time)
