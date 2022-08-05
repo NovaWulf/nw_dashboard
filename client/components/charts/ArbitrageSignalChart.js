@@ -36,7 +36,7 @@ export default function ArbitrageSignalChart({
   console.log('in sample end date: ' + is_end_date);
   return (
     <DashboardItem
-      title="Arbitrage Indicator"
+      title="OP-ETH Arbitrage Indicator"
       helpText="Arbitrage Indicator looks at the value of the mean reverting portfolio of assets"
       downloadButton={
         <CsvDownloadLink data={updatedData} title="Arbitrage Indicator" />

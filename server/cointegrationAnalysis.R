@@ -13,8 +13,8 @@ print(file.exists("./public/data.csv"))
 startTime = startTimeString
 endTime = endTimeString
 if (class(startTimeString)=="character" && class(endTimeString)== "character"){
-  startTime = as.numeric(strptime(startTimeString, "%Y-%m-%d"))
-  endTime = as.numeric(strptime(endTimeString,"%Y-%m-%d")) 
+  startTime = as.numeric(strptime(startTimeString, "%Y-%m-%d",tz="EST"))
+  endTime = as.numeric(strptime(endTimeString,"%Y-%m-%d",tz="EST")) 
 }
 
 resolution = 60
