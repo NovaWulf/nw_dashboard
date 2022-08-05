@@ -14,7 +14,7 @@ import DashboardItem from 'components/DashboardItem';
 import TimeAxisHighRes from 'components/TimeAxisHighRes';
 import CsvDownloadLink from 'components/CsvDownloadLink';
 
-export default function ArbitrageBacktestChart({ pnl, is_end_date }) {
+export default function ArbitrageBacktestChart({ pnl, isEndDate }) {
   const theme = useTheme();
 
   const updatedData = pnl.map(d => {
@@ -41,7 +41,7 @@ export default function ArbitrageBacktestChart({ pnl, is_end_date }) {
           <ReferenceLine
             strokeDasharray="3 3"
             yAxisId="pnl"
-            x={is_end_date}
+            x={isEndDate}
             stroke="red"
             label="IS <-> OOS"
           />

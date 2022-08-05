@@ -53,10 +53,10 @@ export default function ArbitrageCharts() {
           <Skeleton variant="rectangular" />
         ) : (
           <ArbitrageSignalChart
-            arb_signal={arbSignalLatestModel}
+            arbSignal={arbSignalLatestModel}
             mean={cointegrationModelInfo[0].inSampleMean}
             sd={cointegrationModelInfo[0].inSampleSd}
-            is_end_date={cointegrationModelInfo[0].modelEndtime}
+            isEndDate={cointegrationModelInfo[0].modelEndtime}
           />
         )}
       </Grid>
@@ -66,7 +66,7 @@ export default function ArbitrageCharts() {
         ) : (
           <ArbitrageBacktestChart
             pnl={backtestLatestModel}
-            is_end_date={cointegrationModelInfo[0].modelEndtime}
+            isEndDate={cointegrationModelInfo[0].modelEndtime}
           />
         )}
       </Grid>

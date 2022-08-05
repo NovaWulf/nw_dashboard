@@ -15,15 +15,15 @@ import TimeAxisHighRes from 'components/TimeAxisHighRes';
 import CsvDownloadLink from 'components/CsvDownloadLink';
 
 export default function ArbitrageSignalChart({
-  arb_signal,
+  arbSignal,
   mean,
   sd,
-  is_end_date,
+  isEndDate,
 }) {
   const theme = useTheme();
   const SIGMA = 3;
   console.log('mean: ' + mean + ', sd: ' + sd);
-  const updatedData = arb_signal.map(d => {
+  const updatedData = arbSignal.map(d => {
     return {
       ts: d.ts,
       v: Math.floor(100*d.v),
@@ -33,7 +33,7 @@ export default function ArbitrageSignalChart({
       arbMean: Math.floor(100*mean),
     };
   });
-  console.log('in sample end date: ' + is_end_date);
+  console.log('in sample end date: ' + isEndDate);
   return (
     <DashboardItem
       title="OP-ETH Arbitrage Indicator"
@@ -50,7 +50,7 @@ export default function ArbitrageSignalChart({
           <ReferenceLine
             strokeDasharray="3 3"
             yAxisId="spread"
-            x={is_end_date}
+            x={isEndDate}
             stroke="red"
           />
           <Line
