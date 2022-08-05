@@ -1,5 +1,5 @@
 RSpec.describe PriceProcessor do
-  subject(:instance) { described_class.new }
+  subject { described_class.run(%w[eth-usd op-usd]) }
   before do
     Candle.create(starttime: 10_000_000,
                   pair: 'eth-usd',
@@ -15,8 +15,7 @@ RSpec.describe PriceProcessor do
   end
 
   it 'inner join works' do
-    result = instance.run(%w[eth-usd op-usd])
-    puts "result: #{result}"
+    result = subject.value
     expect(result.length).to eql 2
     expect(result[0][0]).to eql 10_000_000
     expect(result[1][0][0]).to eql 1.0

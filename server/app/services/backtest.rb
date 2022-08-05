@@ -65,7 +65,7 @@ class Backtest
     @transactions = Array.new(@num_obs)
     @prices = Array.new(@num_ownable_assets) { Array.new(@num_obs) }
     @positions = Array.new(@num_ownable_assets) { Array.new(@num_obs) }
-    @prices = PriceProcessor.run(assets, signal_starttime, signal_endtime)[1]
+    @prices =  PriceProcessor.run(assets, signal_starttime, signal_endtime).value[1]
   end
 
   def target_positions
@@ -137,9 +137,7 @@ class Backtest
   def set_initial_positions
     return unless @cursor == 0
 
-    for i in 0..(@num_ownable_assets - 1)
-      @positions[i][@cursor] = 0
-    end
+    @num_ownable_assets.times { |i| @positions[i][@cursor] = 0 }
   end
 
   def signal_up(index)

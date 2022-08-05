@@ -1,6 +1,14 @@
 class PriceProcessor < BaseService
-  def run(asset_names, start_time = nil, end_time = nil)
-    puts 'running price processor'
+  attr_reader :asset_names, :start_time, :end_time
+
+  def initialize(asset_names, start_time = nil, end_time = nil)
+    @asset_names = asset_names
+    @start_time = start_time
+    @end_time = end_time
+  end
+
+  def run
+    puts "asset_names: #{asset_names}"
     if asset_names.length != 2
       abort("price processor currently only works with 2 assets. you are trying to merge #{asset_names.length} asset timeseries")
     end

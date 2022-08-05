@@ -14,7 +14,7 @@ class ArbitrageCalculator < BaseService
     det_weight = asset_weights[det_index]
     asset_weights.delete_at(det_index)
     asset_names.delete('det')
-    flat_records = PriceProcessor.run(asset_names, first_in_sample_timestamp)
+    flat_records = PriceProcessor.run(asset_names, first_in_sample_timestamp).value
     starttimes = flat_records[0]
     prices = flat_records[1]
     for time_step in 0..(starttimes.length - 1)
