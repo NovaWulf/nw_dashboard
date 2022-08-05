@@ -5,7 +5,7 @@ library(digest)
 library(lattice)
 library(latticeExtra)
 
-fitModel = function(startTimeString,endTimeString,ecdet_param="const"){
+fitModel = function(startTimeString,endTimeString,ecdet_param="const",logPrices=TRUE){
 
 print("does file exist in r?")
 print(file.exists("./public/data.csv"))
@@ -13,8 +13,8 @@ print(file.exists("./public/data.csv"))
 startTime = startTimeString
 endTime = endTimeString
 if (class(startTimeString)=="character" && class(endTimeString)== "character"){
-  startTime = as.numeric(strptime(startTimeString, "%Y-%m-%d"))
-  endTime = as.numeric(strptime(endTimeString,"%Y-%m-%d")) 
+  startTime = as.numeric(strptime(startTimeString, "%Y-%m-%d",tz="EST"))
+  endTime = as.numeric(strptime(endTimeString,"%Y-%m-%d",tz="EST")) 
 }
 
 resolution = 60
@@ -26,10 +26,15 @@ ethDat = allDat[starttime>startTime & starttime<endTime & resolution == resoluti
 opDat =  allDat[starttime>startTime & starttime<endTime & resolution == resolution & pair == "op-usd"]
 
 bothDat = merge(ethDat,opDat,by = "starttime")
-bothDat = bothDat[starttime>startTime & starttime<endTime]
 bothDat = bothDat[order(bothDat$starttime)]
-print(dim(bothDat))
 bothDat$start_datetime = as_datetime(bothDat$starttime)    
+
+print(dim(bothDat))
+
+if (logPrices){
+  bothDat$close.x=log(bothDat$close.x)
+  bothDat$close.y=log(bothDat$close.y)
+} 
 
 dataMat = as.matrix(bothDat[,c("close.x","close.y")])
 ecdet = ecdet_param
@@ -50,29 +55,27 @@ if (ecdet_param == "none")
 
 meanSpread= mean(spread)
 sdSpread = sd(spread)
-sigma = 1
+sigma = 3
 
 plot1 = xyplot(close.x~start_datetime,bothDat,type="l", auto.key = TRUE, main = "double axis plot of OP vs ETH futures")
 plot2 = xyplot(close.y~start_datetime,bothDat,type="l",auto.key = TRUE)
 doubleYScale(plot1, plot2)
+bothDat$meanSpread = meanSpread
+bothDat$sdSpread = sdSpread
 bothDat$upper = bothDat$meanSpread+sigma*bothDat$sdSpread
 bothDat$lower = bothDat$meanSpread-sigma*bothDat$sdSpread
 bothDat$spread = spread
-bothDat$meanSpread = meanSpread
-bothDat$sdSpread = sdSpread
-xyplot(spread + meanSpread~start_datetime,bothDat,type = "l",auto.key = T,main= "mean reverting portfolio")
-
 
 realStartDate = min(bothDat$start_datetime)
 realEndDate = max(bothDat$start_datetime)
 currentTime = round(as.numeric(as.POSIXct(Sys.time())))
 
-
 forDigest = c(ecdet,
               spec,
               resolution,
               realStartDate,
-              realEndDate)
+              realEndDate,
+              logPrices)
 
 uid =digest(forDigest)
 
@@ -90,10 +93,11 @@ valueVec = c(
         realStartDate,
         realEndDate,
         meanSpread,
-        sdSpread
+        sdSpread,
+        logPrices
         )
 returnVals = list()
-colNameString = "(uuid, timestamp,ecdet,spec,cv_10_pct,cv_5_pct,cv_1_pct,test_stat,top_eig,resolution,model_starttime,model_endtime,in_sample_mean,in_sample_sd)"
+colNameString = "(uuid, timestamp,ecdet,spec,cv_10_pct,cv_5_pct,cv_1_pct,test_stat,top_eig,resolution,model_starttime,model_endtime,in_sample_mean,in_sample_sd,log_prices)"
 valueString = paste0(c("(",paste0(valueVec,collapse = ","),")"),collapse = "")
 queryString = paste0("insert into cointegration_models " , colNameString," values",valueString)
 returnVals[[1]] = colNameString

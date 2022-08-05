@@ -4,7 +4,6 @@ class CreateRepoCommits < ActiveRecord::Migration[6.1]
       t.date :day
       t.integer :count
       t.references :repo, null: false, foreign_key: true
-
       t.timestamps
     end
   end

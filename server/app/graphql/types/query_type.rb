@@ -7,12 +7,11 @@ module Types
     field :btc_mvrv, [Types::MetricType], null: false
     field :rhodl_ratio, [Types::MetricType], null: false
     field :jesse, [Types::MetricType], null: false
-    field :latest_cointegration_model_info, [Types::CointegrationModelType], null: false
     field :arb_signal_latest_model, [Types::ModeledSignalType], null: false
     field :backtest_latest_model, [Types::ModeledSignalType], null: false
 
     field :cointegration_model_info, [Types::CointegrationModelType], null: false do
-      argument :model, String
+      argument :version, Integer
     end
 
     field :smart_contract_active_users, [Types::MetricType], null: false do
@@ -131,20 +130,18 @@ module Types
       Displayers::WeeklyValueDisplayer.run(token: 'btc', metric: 'jesse').value
     end
 
-    def latest_cointegration_model_info
-      [CointegrationModel.newest_first.first]
-    end
-
-    def cointegration_model_info(model:)
+    def cointegration_model_info(version:)
+      model = BacktestModel.where("version=#{version}").oldest_sequence_number_first.last&.model_id
+      puts "model in cointegration_model_info: #{model}"
       [CointegrationModel.where("uuid = '#{model}'").first]
     end
 
     def arb_signal_latest_model
-      Displayers::HourlyValueDisplayer.run(model: nil).value
+      Displayers::HourlyValueDisplayer.run(1).value
     end
 
     def backtest_latest_model
-      Displayers::HourlyBacktestDisplayer.run(model: nil).value
+      Displayers::HourlyBacktestDisplayer.run(1).value
     end
 
     def smart_contract_contracts(token:)

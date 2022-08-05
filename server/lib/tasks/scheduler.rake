@@ -64,11 +64,11 @@ task update_arb_signal: :environment do
   tracked_pairs.each do |p|
     Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
   end
-  Rails.logger.info "writing candle data to CSV..."
+  Rails.logger.info 'writing candle data to CSV...'
   CsvWriter.run
   mu = ModelUpdate.new
   mu.seed
-  ArbitrageCalculator.run
+  ArbitrageCalculator.run(1)
   b = Backtest.new
-  b.run
+  b.run(1)
 end

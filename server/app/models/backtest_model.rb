@@ -16,5 +16,6 @@
 #
 class BacktestModel < ApplicationRecord
   scope :by_version, ->(v) { where(version: v) }
-  scope :oldest_first, -> { order(version: :asc) }
+  scope :oldest_version_first, -> { order(version: :asc) }
+  scope :oldest_sequence_number_first, -> {order(sequence_number: :asc)}
 end

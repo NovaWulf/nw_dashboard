@@ -9,34 +9,34 @@ import {
   YAxis,
   ReferenceLine,
 } from 'recharts';
-import { dateFormatter, nFormatter } from 'lib/formatters';
+import { dateFormatter, percentFormatter } from 'lib/formatters';
 import DashboardItem from 'components/DashboardItem';
 import TimeAxisHighRes from 'components/TimeAxisHighRes';
 import CsvDownloadLink from 'components/CsvDownloadLink';
 
 export default function ArbitrageSignalChart({
-  arb_signal,
+  arbSignal,
   mean,
   sd,
-  is_end_date,
+  isEndDate,
 }) {
   const theme = useTheme();
   const SIGMA = 3;
   console.log('mean: ' + mean + ', sd: ' + sd);
-  const updatedData = arb_signal.map(d => {
+  const updatedData = arbSignal.map(d => {
     return {
       ts: d.ts,
-      v: d.v,
+      v: Math.floor(100*d.v),
       // is: d.is,
-      arbLow: mean - SIGMA * sd,
-      arbHigh: mean + SIGMA * sd,
-      arbMean: mean,
+      arbLow: Math.floor(100*(mean - SIGMA * sd)),
+      arbHigh: Math.floor(100*(mean + SIGMA * sd)),
+      arbMean: Math.floor(100*mean),
     };
   });
-  console.log('in sample end date: ' + is_end_date);
+  console.log('in sample end date: ' + isEndDate);
   return (
     <DashboardItem
-      title="Arbitrage Indicator"
+      title="OP-ETH Arbitrage Indicator"
       helpText="Arbitrage Indicator looks at the value of the mean reverting portfolio of assets"
       downloadButton={
         <CsvDownloadLink data={updatedData} title="Arbitrage Indicator" />
@@ -50,7 +50,7 @@ export default function ArbitrageSignalChart({
           <ReferenceLine
             strokeDasharray="3 3"
             yAxisId="spread"
-            x={is_end_date}
+            x={isEndDate}
             stroke="red"
           />
           <Line
@@ -92,9 +92,9 @@ export default function ArbitrageSignalChart({
           <YAxis
             yAxisId="spread"
             orientation="left"
-            tickFormatter={nFormatter}
+            tickFormatter={percentFormatter}
             stroke={theme.palette.primary.main}
-            domain={[-150, 150]}
+            domain={[-50, 150]}
           />
 
           <Tooltip labelFormatter={dateFormatter} />

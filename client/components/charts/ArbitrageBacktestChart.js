@@ -9,18 +9,18 @@ import {
   YAxis,
   ReferenceLine,
 } from 'recharts';
-import { dateFormatter, nFormatter } from 'lib/formatters';
+import { dateFormatter, percentFormatter } from 'lib/formatters';
 import DashboardItem from 'components/DashboardItem';
 import TimeAxisHighRes from 'components/TimeAxisHighRes';
 import CsvDownloadLink from 'components/CsvDownloadLink';
 
-export default function ArbitrageBacktestChart({ pnl, is_end_date }) {
+export default function ArbitrageBacktestChart({ pnl, isEndDate }) {
   const theme = useTheme();
 
   const updatedData = pnl.map(d => {
     return {
       ts: d.ts,
-      v: d.v,
+      v: Math.floor(100*d.v),
       is: d.is,
     };
   });
@@ -41,7 +41,7 @@ export default function ArbitrageBacktestChart({ pnl, is_end_date }) {
           <ReferenceLine
             strokeDasharray="3 3"
             yAxisId="pnl"
-            x={is_end_date}
+            x={isEndDate}
             stroke="red"
             label="IS <-> OOS"
           />
@@ -59,9 +59,9 @@ export default function ArbitrageBacktestChart({ pnl, is_end_date }) {
           <YAxis
             yAxisId="pnl"
             orientation="left"
-            tickFormatter={nFormatter}
+            tickFormatter={percentFormatter}
             stroke={theme.palette.primary.main}
-            domain={[-500000, 1500000]}
+            domain={[-200, 200]}
           />
 
           <Tooltip labelFormatter={dateFormatter} />

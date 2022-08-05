@@ -1,7 +1,5 @@
 RSpec.describe ArbitrageCalculator do
-  subject do
-    described_class.run
-  end
+  subject(:instance) { described_class.new }
   let(:op_candle) { Candle.by_pair('op-usd').last&.close }
   let(:eth_candle) { Candle.by_pair('eth-usd').last&.close }
   let(:latest_model) { CointegrationModel.newest_first.first&.uuid }
@@ -88,7 +86,7 @@ RSpec.describe ArbitrageCalculator do
   end
 
   it 'persists' do
-    expect { subject }.to change { ModeledSignal.count }.by(1)
+    expect { instance.run(0) }.to change { ModeledSignal.count }.by(1)
     m = ModeledSignal.last
     expect(m.value.round(2)).to eql arb_signal_expected.round(2)
     expect(m.model_id).to eql 'id1'
