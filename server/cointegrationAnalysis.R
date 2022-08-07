@@ -38,11 +38,10 @@ if (logPrices){
   bothDat$close.y=log(bothDat$close.y)
 } 
 
-print(ecdet)
 dataMat = as.matrix(bothDat[,c("close.x","close.y")])
 spec = "transitory"
 type = "trace"
-jo=ca.jo(dataMat,type= type,spec=spec,ecdet = ecdet)
+jo=ca.jo(dataMat,type= type,spec=spec,ecdet = ecdet_param)
 summary(jo)
 
 vecs = jo@V
