@@ -68,7 +68,17 @@ task update_arb_signal: :environment do
   CsvWriter.run
   mu = ModelUpdate.new
   mu.seed
-  ArbitrageCalculator.run(1)
-  b = Backtest.new
-  b.run(1)
+  ArbitrageCalculator.new.run(1)
+  Backtest.new.run(1)
+end
+
+task scan_models: :environment do
+  tracked_pairs = %w[eth-usd op-usd]
+  tracked_pairs.each do |p|
+    Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
+  end
+  Rails.logger.info 'writing candle data to CSV...'
+  CsvWriter.run
+  mu = ModelUpdate.new
+  mu.calc_updated_model(version: 1, max_months_back: 2, min_months_back: 1, res_hours: 12)
 end

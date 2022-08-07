@@ -1,4 +1,4 @@
-class ArbitrageCalculator < BaseService
+class ArbitrageCalculator
   def run(version)
     most_recent_backtest_model = BacktestModel.where("version = #{version}").oldest_sequence_number_first.last
     puts "most recent #{most_recent_backtest_model}"
@@ -15,7 +15,11 @@ class ArbitrageCalculator < BaseService
     det_weight = asset_weights[det_index]
     asset_weights.delete_at(det_index)
     asset_names.delete('det')
-    flat_records = PriceProcessor.run(asset_names, first_in_sample_timestamp).value
+    last_timestamp = ModeledSignal.by_model(most_recent_model_id).last&.starttime
+    return if last_timestamp && last_timestamp > Time.now.to_i - res
+
+    start_time = last_timestamp ? last_timestamp + res : first_in_sample_timestamp
+    flat_records = PriceProcessor.run(asset_names, start_time).value
     starttimes = flat_records[0]
     prices = flat_records[1]
     for time_step in 0..(starttimes.length - 1)

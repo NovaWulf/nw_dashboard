@@ -5,7 +5,7 @@ library(digest)
 library(lattice)
 library(latticeExtra)
 
-fitModel = function(startTimeString,endTimeString,ecdet_param="const",logPrices=TRUE){
+fitModel = function(startTimeString,endTimeString,ecdet_param="trend",logPrices=TRUE){
 
 print("does file exist in r?")
 print(file.exists("./public/data.csv"))
@@ -19,6 +19,7 @@ if (class(startTimeString)=="character" && class(endTimeString)== "character"){
 
 resolution = 60
 allDat = data.table(read.csv("./public/data.csv"))
+
 print("counts of different pairs")
 print(table(allDat$pair,useNA="always"))
 
@@ -26,6 +27,7 @@ ethDat = allDat[starttime>startTime & starttime<endTime & resolution == resoluti
 opDat =  allDat[starttime>startTime & starttime<endTime & resolution == resolution & pair == "op-usd"]
 
 bothDat = merge(ethDat,opDat,by = "starttime")
+
 bothDat = bothDat[order(bothDat$starttime)]
 bothDat$start_datetime = as_datetime(bothDat$starttime)    
 
@@ -36,13 +38,12 @@ if (logPrices){
   bothDat$close.y=log(bothDat$close.y)
 } 
 
+print(ecdet)
 dataMat = as.matrix(bothDat[,c("close.x","close.y")])
-ecdet = ecdet_param
 spec = "transitory"
 type = "trace"
-jo=ca.jo(dataMat,type= type,ecdet = ecdet,spec=spec)
+jo=ca.jo(dataMat,type= type,spec=spec,ecdet = ecdet)
 summary(jo)
-
 
 vecs = jo@V
 
@@ -53,8 +54,24 @@ if (ecdet_param == "const")
 if (ecdet_param == "none")
  spread = vecs[1,1]*bothDat$close.x + vecs[2,1]*bothDat$close.y
 
+if (ecdet_param == "trend")
+ spread = vecs[1,1]*bothDat$close.x + vecs[2,1]*bothDat$close.y+vecs[3,1]*seq(1,nrow(dataMat))
+
+
 meanSpread= mean(spread)
 sdSpread = sd(spread)
+
+bothDat$meanSpread = meanSpread
+bothDat$sdSpread = sdSpread
+bothDat$upper = bothDat$meanSpread+sigma*bothDat$sdSpread
+bothDat$lower = bothDat$meanSpread-sigma*bothDat$sdSpread
+xyplot(spread + meanSpread + upper+lower~start_datetime,bothDat,type = "l",
+       auto.key = T,main= "mean reverting portfolio (log prices)",
+       panel = function(...) {
+         panel.abline(v = as_datetime("2022-07-12"), lty = 2)
+         panel.xyplot(...)
+       })
+
 sigma = 3
 
 plot1 = xyplot(close.x~start_datetime,bothDat,type="l", auto.key = TRUE, main = "double axis plot of OP vs ETH futures")
@@ -84,10 +101,10 @@ valueVec = c(
         currentTime,
         ecdet,
         spec,
-        jo@cval[1,1],
-        jo@cval[1,2],
-        jo@cval[1,3],
-        jo@teststat[1],
+        jo@cval[2,1],
+        jo@cval[2,2],
+        jo@cval[2,3],
+        jo@teststat[2],
         jo@lambda[1],
         resolution,
         realStartDate,

@@ -11,11 +11,11 @@ class RAdapter
     @R.pull return_val.to_s
   end
 
-  def cointegration_analysis(start_time_string:, end_time_string:)
+  def cointegration_analysis(start_time_string:, end_time_string:, ecdet_param:)
     @R.eval <<-EOF
         print(getwd())
         source("./cointegrationAnalysis.R")
-        returnVals = fitModel(#{start_time_string},#{end_time_string},ecdet_param = "const")
+        returnVals = fitModel(#{start_time_string},#{end_time_string},ecdet_param = #{ecdet_param})
     EOF
     return_vals = @R.pull 'returnVals'
     write_model_to_db(return_vals: return_vals)
