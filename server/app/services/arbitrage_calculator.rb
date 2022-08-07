@@ -1,5 +1,11 @@
-class ArbitrageCalculator
-  def run(version)
+class ArbitrageCalculator < BaseService
+  attr_reader :version
+
+  def initialize(version)
+    @version = version
+  end
+
+  def run
     most_recent_backtest_model = BacktestModel.where("version = #{version}").oldest_sequence_number_first.last
     puts "most recent #{most_recent_backtest_model}"
     most_recent_model_id = most_recent_backtest_model&.model_id

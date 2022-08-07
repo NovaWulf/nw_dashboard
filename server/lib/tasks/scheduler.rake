@@ -68,8 +68,8 @@ task update_arb_signal: :environment do
   CsvWriter.run
   mu = ModelUpdate.new
   mu.seed
-  ArbitrageCalculator.new.run(1)
-  Backtest.new.run(1)
+  ArbitrageCalculator.run(1)
+  Backtest.run(1)
 end
 
 task scan_models: :environment do
