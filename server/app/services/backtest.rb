@@ -22,7 +22,7 @@ class Backtest < BaseService
   attr_accessor :model_id, :resolution, :model_starttime, :model_endtime, :in_sample_mean, :in_sample_sd, :assets,
                 :asset_weights, :num_ownable_assets, :num_obs, :positions, :prices, :pnl, :targets, :version
 
-  def initialize(version)
+  def initialize(version:)
     @version = version
   end
 

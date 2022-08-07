@@ -53,7 +53,10 @@ class Coinbase
       first_time = responses.last[0]
       new_end_time = first_time - resolution
       while new_end_time > start_timestamp
+
         new_start_time = new_end_time - 299 * resolution
+        new_start_time = start_timestamp if new_start_time < start_timestamp
+
         Rails.logger.info "Num candles > 300. Calling Coinbase with start time: #{Time.at(new_start_time)}"
         responses.concat self.class.get(
           "#{path}?start=#{new_start_time}&end=#{new_end_time}&granularity=#{resolution}", headers: generate_headers(path)

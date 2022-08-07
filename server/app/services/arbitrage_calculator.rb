@@ -1,7 +1,7 @@
 class ArbitrageCalculator < BaseService
   attr_reader :version
 
-  def initialize(version)
+  def initialize(version:)
     @version = version
   end
 
