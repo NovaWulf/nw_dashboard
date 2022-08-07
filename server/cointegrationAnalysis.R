@@ -6,7 +6,7 @@ library(lattice)
 library(latticeExtra)
 
 fitModel = function(startTimeString,endTimeString,ecdet_param="trend",logPrices=TRUE){
-
+ecdet = ecdet_param
 print("does file exist in r?")
 print(file.exists("./public/data.csv"))
 
@@ -56,7 +56,7 @@ if (ecdet_param == "none")
 if (ecdet_param == "trend")
  spread = vecs[1,1]*bothDat$close.x + vecs[2,1]*bothDat$close.y+vecs[3,1]*seq(1,nrow(dataMat))
 
-
+sigma = 3
 meanSpread= mean(spread)
 sdSpread = sd(spread)
 
@@ -71,7 +71,6 @@ xyplot(spread + meanSpread + upper+lower~start_datetime,bothDat,type = "l",
          panel.xyplot(...)
        })
 
-sigma = 3
 
 plot1 = xyplot(close.x~start_datetime,bothDat,type="l", auto.key = TRUE, main = "double axis plot of OP vs ETH futures")
 plot2 = xyplot(close.y~start_datetime,bothDat,type="l",auto.key = TRUE)
