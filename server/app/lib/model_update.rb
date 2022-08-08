@@ -1,6 +1,8 @@
 class ModelUpdate < BaseService
   @r
   @RES_HOURS
+  SECS_PER_WEEK = 604_800
+  SECS_PER_HOUR = 3600
   def seed
     @r = RAdapter.new
     @r.cointegration_analysis(start_time_string: "'2022-07-18'", end_time_string: "'2022-08-02'",
@@ -29,17 +31,18 @@ class ModelUpdate < BaseService
     end
   end
 
-  def calc_updated_model(version:, max_months_back:, min_months_back:, res_hours:)
+  def calc_updated_model(version:, max_weeks_back:, min_weeks_back:, interval_mins:)
     last_candle_time = Candle.oldest_first.last&.starttime
-    sec_diff = 2_628_000 * (max_months_back - min_months_back)
+    sec_diff = SECS_PER_WEEK * (max_weeks_back - min_weeks_back)
     @r = RAdapter.new
-    num_models = sec_diff / (3600 * res_hours) - 1
-    start_time = last_candle_time - 2_628_000 * max_months_back
+    num_models = sec_diff / (60 * interval_mins) - 1
+    puts "num models: #{num_models} sec diff: #{sec_diff}"
+    start_time = last_candle_time - SECS_PER_WEEK * max_weeks_back
     for i in 1..num_models
-      start_time += i * res_hours * 3600
+      start_time += i * interval_mins * 60
       puts "start time: #{start_time}, end time: #{last_candle_time}"
-      @r.cointegration_analysis(start_time_string: start_time, end_time_string: last_candle_time,
-                                ecdet_param: "'const'")
+      # @r.cointegration_analysis(start_time_string: start_time, end_time_string: last_candle_time,
+      #                          ecdet_param: "'const'")
       @r.cointegration_analysis(start_time_string: start_time, end_time_string: last_candle_time,
                                 ecdet_param: "'trend'")
     end

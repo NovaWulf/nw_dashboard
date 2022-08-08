@@ -80,5 +80,5 @@ task scan_models: :environment do
   Rails.logger.info 'writing candle data to CSV...'
   CsvWriter.run
   mu = ModelUpdate.new
-  mu.calc_updated_model(version: 1, max_months_back: 2, min_months_back: 1, res_hours: 12)
+  mu.calc_updated_model(version: 1, max_weeks_back: 8, min_weeks_back: 1, interval_mins: 1440)
 end

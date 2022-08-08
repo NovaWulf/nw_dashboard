@@ -118,7 +118,7 @@ queryString = paste0("insert into cointegration_models " , colNameString," value
 returnVals[[1]] = colNameString
 returnVals[[2]] = valueString
 
-print(queryString)
+#print(queryString)
 
 assetNames = c("eth-usd","op-usd","det")
 assetWeights=c(vecs[1,1],vecs[2,1],vecs[3,1])
@@ -133,6 +133,6 @@ for (i in 1:3){
 totalValString = paste0(valStrings,collapse=",")
 returnVals[[4]] = totalValString
 returnVals = unlist(returnVals)
-print(returnVals)
+#print(returnVals)
 return (returnVals)
 }
