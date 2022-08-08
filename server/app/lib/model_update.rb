@@ -19,19 +19,7 @@ class ModelUpdate < BaseService
     end
   end
 
-  def update_model(version:)
-    last_model = BacktestModel.by_version(version).oldest_first.last&.model_id
-    last_model_time = CointegrationModel.where("uuid = '#{last_model}'").last&.model_endtime
-    last_candle_time = Candle.oldest_first.last&.starttime
-    @r = RAdapter.new
-    num_models = (last_candle_time - last_model_time) / (3600 * @RES_HOURS) - 1
-    for i in 1..num_models
-      new_end_time = last_model_time + 3600 * @RES_HOURS * i
-      @r.cointegration_analysis(start_time_string: last_model_time, end_time_string: new_end_time)
-    end
-  end
-
-  def calc_updated_model(version:, max_weeks_back:, min_weeks_back:, interval_mins:)
+  def update_model(version:, max_weeks_back:, min_weeks_back:, interval_mins:)
     last_candle_time = Candle.oldest_first.last&.starttime
     sec_diff = SECS_PER_WEEK * (max_weeks_back - min_weeks_back)
     @r = RAdapter.new

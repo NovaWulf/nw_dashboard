@@ -72,7 +72,7 @@ task update_arb_signal: :environment do
   Backtest.run(version: 1)
 end
 
-task scan_models: :environment do
+task try_update_model: :environment do
   tracked_pairs = %w[eth-usd op-usd]
   tracked_pairs.each do |p|
     Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
@@ -80,5 +80,5 @@ task scan_models: :environment do
   Rails.logger.info 'writing candle data to CSV...'
   CsvWriter.run
   mu = ModelUpdate.new
-  mu.calc_updated_model(version: 1, max_weeks_back: 8, min_weeks_back: 1, interval_mins: 1440)
+  mu.update_model(version: 1, max_weeks_back: 8, min_weeks_back: 1, interval_mins: 1440)
 end
