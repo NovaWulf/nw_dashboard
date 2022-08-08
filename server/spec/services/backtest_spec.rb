@@ -1,5 +1,5 @@
 RSpec.describe Backtest do
-  subject(:instance) { described_class.new }
+  subject { described_class }
   let(:op_candle_first) { Candle.by_pair('op-usd').first&.close }
   let(:eth_candle_first) { Candle.by_pair('eth-usd').first&.close }
   let(:op_candle_second) { Candle.by_pair('op-usd').last&.close }
@@ -175,12 +175,12 @@ RSpec.describe Backtest do
   end
 
   it 'pnl calculation is accurate for price-level model' do
-    expect { instance.run(0) }.to change { ModeledSignal.where("model_id = 'id1-b'").count }.by(1)
+    expect { subject.run(version: 0) }.to change { ModeledSignal.where("model_id = 'id1-b'").count }.by(1)
     m = ModeledSignal.last
     expect(m.value.round(2)).to eql pnl_expected.round(2)
   end
   it 'pnl calculation is accurate for log-price model' do
-    expect { instance.run(1) }.to change { ModeledSignal.where("model_id = 'id2-b'").count }.by(1)
+    expect { subject.run(version: 1) }.to change { ModeledSignal.where("model_id = 'id2-b'").count }.by(1)
     m = ModeledSignal.last
     expect(m.value.round(2)).to eql pnl_expected_log.round(2)
   end

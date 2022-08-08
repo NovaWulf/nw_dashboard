@@ -20,9 +20,13 @@ class Backtest < BaseService
   MULTIPLIER = 1
   MAX_TRADE_SIZE_DOLLARS = 1000
   attr_accessor :model_id, :resolution, :model_starttime, :model_endtime, :in_sample_mean, :in_sample_sd, :assets,
-                :asset_weights, :num_ownable_assets, :num_obs, :positions, :prices, :pnl, :targets
+                :asset_weights, :num_ownable_assets, :num_obs, :positions, :prices, :pnl, :targets, :version
 
-  def run(version)
+  def initialize(version:)
+    @version = version
+  end
+
+  def run
     @cursor = 0
     load_model(version)
     set_initial_positions
