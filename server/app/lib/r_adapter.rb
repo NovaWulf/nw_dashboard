@@ -18,8 +18,10 @@ class RAdapter
         returnVals = fitModel(#{start_time_string},#{end_time_string},ecdet_param = #{ecdet_param})
     EOF
     return_vals = @R.pull 'returnVals'
-    write_model_to_db(return_vals: return_vals)
+    model_vals = write_model_to_db(return_vals: return_vals)
     Rails.logger.info "number of cointegration models: #{CointegrationModel.count}"
+    puts "returning model vals: #{model_vals}"
+    model_vals
   end
 
   def write_model_to_db(return_vals:)
@@ -68,5 +70,8 @@ class RAdapter
         weight: this_cwv[3]
       )
     end
+    puts "returning model values: #{cv}"
+    puts "cv[9]: #{cv[9]} cv10: #{cv[10]}"
+    cv
   end
 end
