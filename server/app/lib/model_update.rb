@@ -36,10 +36,12 @@ class ModelUpdate < BaseService
     sec_diff = SECS_PER_WEEK * (max_weeks_back - min_weeks_back)
     @r = RAdapter.new
     num_models = sec_diff / (60 * interval_mins) - 1
+    step_size = 60 * interval_mins
     puts "num models: #{num_models} sec diff: #{sec_diff}"
     start_time = last_candle_time - SECS_PER_WEEK * max_weeks_back
-    for i in 1..num_models
-      start_time += i * interval_mins * 60
+    for i in 0..num_models
+      puts "i: #{i}"
+      start_time += i * step_size
       puts "start time: #{start_time}, end time: #{last_candle_time}"
       # @r.cointegration_analysis(start_time_string: start_time, end_time_string: last_candle_time,
       #                          ecdet_param: "'const'")
