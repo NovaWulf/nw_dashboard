@@ -11,13 +11,14 @@ import ModelSelector from 'components/ModelSelector'
 export default function ArbitrageCharts() {
   
   const [model,setModel] = React.useState()
+  const seqNumberOrNull = model?model.target.value:null
 
-  
+  console.log("model: " + seqNumberOrNull)
   return (
     <Grid container spacing={3}>
       <ModelSelector model={model} handleChange={setModel}/>
-      <ArbitrageSignalChart seqNumber={model} />
-      <ArbitrageBacktestChart seqNumber={model} />
+      <ArbitrageSignalChart seqNumber={seqNumberOrNull} />
+      <ArbitrageBacktestChart seqNumber={seqNumberOrNull} />
     </Grid>
   );
 }

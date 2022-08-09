@@ -20,14 +20,13 @@ import TimeAxisHighRes from 'components/TimeAxisHighRes';
 import CsvDownloadLink from 'components/CsvDownloadLink';
 
 export default function ArbitrageSignalChart({seqNumber}) {
-  const seqNumberOrNull  = seqNumber ? seqNumber.target.value : null
-  console.log("seqNumber in signal chart: " + seqNumberOrNull)
+  console.log("seqNumber in signal chart: " + seqNumber)
   
   // console.log("seqNumber in signal chart: " + JSON.stringify(seqNumber))
   const QUERY = gql`
-  query ($seqNumberOrNull: Int){
+  query ($seqNumber: Int){
 
-    cointegrationModelInfo(version:1,sequenceNumber:$seqNumberOrNull) {
+    cointegrationModelInfo(version:1,sequenceNumber:$seqNumber) {
       inSampleMean
       inSampleSd
       uuid
@@ -35,7 +34,7 @@ export default function ArbitrageSignalChart({seqNumber}) {
       modelEndtime
     }
 
-    arbSignalModel(version: 1,sequenceNumber:$seqNumberOrNull) {
+    arbSignalModel(version: 1,sequenceNumber:$seqNumber) {
       ts
       v
       is
