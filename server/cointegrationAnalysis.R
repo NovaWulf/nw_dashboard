@@ -7,7 +7,7 @@ library(latticeExtra)
 
 fitModel = function(startTimeString,endTimeString,ecdet_param="trend",logPrices=TRUE){
 ecdet = ecdet_param
-print("does file exist in r?")
+print("does file ./public/data.csv exist in r?")
 print(file.exists("./public/data.csv"))
 
 startTime = startTimeString

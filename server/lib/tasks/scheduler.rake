@@ -78,9 +78,12 @@ task try_update_model: :environment do
     Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
   end
   Rails.logger.info 'writing candle data to CSV...'
-  CsvWriter.run
+
   mu = ModelUpdate.new
   mu.update_model(version: 1, max_weeks_back: 4, min_weeks_back: 3, interval_mins: 1440, as_of_time: 1_659_976_080)
   ArbitrageCalculator.run(version: 1)
   Backtest.run(version: 1)
+end
+task write_csvs: :environment do
+  CsvWriter.run
 end

@@ -13,7 +13,6 @@ import {
 import { Skeleton } from '@mui/material';
 import Grid from '@mui/material/Grid';
 
-
 import { dateFormatter, percentFormatter } from 'lib/formatters';
 import DashboardItem from 'components/DashboardItem';
 import TimeAxisHighRes from 'components/TimeAxisHighRes';
