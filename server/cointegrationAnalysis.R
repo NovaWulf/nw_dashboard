@@ -41,19 +41,19 @@ if (logPrices){
 dataMat = as.matrix(bothDat[,c("close.x","close.y")])
 spec = "transitory"
 type = "trace"
-jo=ca.jo(dataMat,type= type,spec=spec,ecdet = ecdet_param)
+jo=ca.jo(dataMat,type= type,spec=spec,ecdet = ecdet)
 summary(jo)
 
 vecs = jo@V
 
 spread = NULL
-if (ecdet_param == "const")
+if (ecdet == "const")
  spread = vecs[1,1]*bothDat$close.x + vecs[2,1]*bothDat$close.y+vecs[3,1]
 
-if (ecdet_param == "none")
+if (ecdet == "none")
  spread = vecs[1,1]*bothDat$close.x + vecs[2,1]*bothDat$close.y
 
-if (ecdet_param == "trend")
+if (ecdet == "trend")
  spread = vecs[1,1]*bothDat$close.x + vecs[2,1]*bothDat$close.y+vecs[3,1]*seq(1,nrow(dataMat))
 
 sigma = 3

@@ -26,11 +26,11 @@ export default function ArbitrageSignalChart({
   const updatedData = arbSignal.map(d => {
     return {
       ts: d.ts,
-      v: Math.floor(100*d.v),
+      v: Math.floor(100*(d.v-mean)),
       // is: d.is,
-      arbLow: Math.floor(100*(mean - SIGMA * sd)),
-      arbHigh: Math.floor(100*(mean + SIGMA * sd)),
-      arbMean: Math.floor(100*mean),
+      arbLow: Math.floor(100*(- SIGMA * sd)),
+      arbHigh: Math.floor(100*( SIGMA * sd)),
+      arbMean: Math.floor(0),
     };
   });
   console.log('in sample end date: ' + isEndDate);
@@ -94,7 +94,7 @@ export default function ArbitrageSignalChart({
             orientation="left"
             tickFormatter={percentFormatter}
             stroke={theme.palette.primary.main}
-            domain={[-50, 150]}
+            domain={[-30, 30]}
           />
 
           <Tooltip labelFormatter={dateFormatter} />

@@ -6,17 +6,21 @@ class ArbitrageCalculator < BaseService
   end
 
   def run
+    puts "version: #{version}"
     most_recent_backtest_model = BacktestModel.where("version = #{version}").oldest_sequence_number_first.last
-    puts "most recent #{most_recent_backtest_model}"
     most_recent_model_id = most_recent_backtest_model&.model_id
     most_recent_model = CointegrationModel.where("uuid='#{most_recent_model_id}'").last
+    det_type = most_recent_model&.ecdet
     log_prices = most_recent_model&.log_prices
     res = most_recent_model&.resolution
     last_in_sample_timestamp = most_recent_model&.model_endtime
     first_in_sample_timestamp = most_recent_model&.model_starttime
-    assets = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}'")
-    asset_weights = assets.pluck(:weight)
-    asset_names = assets.pluck(:asset_name)
+    puts "most recent #{most_recent_model_id}, first_in_sample_timestamp: #{first_in_sample_timestamp}"
+
+    assets = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}'").pluck(:weight, :asset_name)
+    asset_weights = assets.map { |x| x[0] }
+    asset_names = assets.map { |x| x[1] }
+    puts " asset names: #{asset_names}  , asset weights: #{asset_weights}"
     det_index = asset_names.index('det')
     det_weight = asset_weights[det_index]
     asset_weights.delete_at(det_index)
@@ -25,11 +29,20 @@ class ArbitrageCalculator < BaseService
     return if last_timestamp && last_timestamp > Time.now.to_i - res
 
     start_time = last_timestamp ? last_timestamp + res : first_in_sample_timestamp
+    puts "start time: #{start_time}"
     flat_records = PriceProcessor.run(asset_names, start_time).value
     starttimes = flat_records[0]
     prices = flat_records[1]
+
+    signal_value_det = 0
     for time_step in 0..(starttimes.length - 1)
-      signal_value = det_weight
+      signal_value = if det_type == 'const'
+                       det_weight
+                     elsif det_type == 'trend'
+                       time_step * det_weight
+                     else
+                       0
+                     end
       for i in 0..(asset_weights.length - 1)
         signal_value += if log_prices
                           asset_weights[i] * Math.log(prices[i][time_step])
