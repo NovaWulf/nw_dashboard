@@ -10,9 +10,8 @@ const getModelsQuery = gql`
     }
 `;
 
-const  SelectModel = () => {
+const  SelectModel = ({model,handleChange}) => {
     const { loading, error, data } = useQuery(getModelsQuery);
-
     if (loading) return <p>Loading Query...</p>;
     if (error){
       console.log(error)
@@ -28,7 +27,7 @@ const  SelectModel = () => {
             <form id="select-model">
                 <div className="field">
                     <label>Model#:</label>
-                    <select>
+                    <select id="models" value={model} onChange={handleChange}>
                         <option>Select model</option>
                         {modelSequence.map(model => <option key={ model } value={ model }>{  model  }</option> 
                 )}
