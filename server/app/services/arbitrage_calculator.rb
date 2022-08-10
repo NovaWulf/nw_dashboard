@@ -28,6 +28,14 @@ class ArbitrageCalculator < BaseService
     last_timestamp = ModeledSignal.by_model(most_recent_model_id).last&.starttime
     return if last_timestamp && last_timestamp > Time.now.to_i - res
 
+    last_prices = [nil, nil]
+    if last_timestamp
+      last_prices = asset_names.map do |name|
+        Candle.where("starttime<=#{last_timestamp} and pair = #{name}").oldest_first.last&.close
+      end
+    end
+
+    puts "last_prices: #{last_prices}"
     start_time = last_timestamp ? last_timestamp + res : first_in_sample_timestamp
     puts "start time: #{start_time}"
     flat_records = PriceProcessor.run(asset_names, start_time).value
@@ -44,6 +52,15 @@ class ArbitrageCalculator < BaseService
                        0
                      end
       for i in 0..(asset_weights.length - 1)
+        if prices[i][time_step].nil?
+          prices[i][time_step] = last_prices[i]
+          Candle.create(starttime: last_prices[i], pair: asset_names[i], exchange: 'Coinbase', resolution: res,
+                        low: last_prices[i], high: last_prices[i], open: last_prices[i], close: last_prices[i], volume: last_prices[i])
+          Rails.logger.info "forward interpolating value for asset #{i}, time_step #{time_step} value: #{last_prices[i]}"
+        else
+          last_prices[i] = prices[i][time_step]
+        end
+
         signal_value += if log_prices
                           asset_weights[i] * Math.log(prices[i][time_step])
                         else

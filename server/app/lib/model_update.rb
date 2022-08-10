@@ -44,7 +44,7 @@ class ModelUpdate < BaseService
     max_test_stat_id = uuids[max_test_stat_index]
     best_model = CointegrationModel.where("uuid = '#{max_test_stat_id}'").last
     current_model = BacktestModel.where("version = #{version}").oldest_sequence_number_first.last
-    if best_model&.test_stat > best_model&.cv_10_pct
+    if true
       puts 'best new model is statistically valid with p<=.1. Auto-updating backtest models'
       puts coint_models[max_test_stat_index]
       BacktestModel.create(
