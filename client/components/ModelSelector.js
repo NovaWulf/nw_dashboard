@@ -11,7 +11,6 @@ const getModelsQuery = gql`
     }
 `;
 
-const  SelectModel = ({model,handleChange}) => {
     const { loading, error, data } = useQuery(getModelsQuery);
     if (loading) return <p>Loading Query...</p>;
     if (error){
@@ -27,6 +26,7 @@ const  SelectModel = ({model,handleChange}) => {
         return(
         );
 }
+const ModelSelector = ({ model, handleChange }) => {
     <Box sx={{ width: 120 }}>
       <FormControl fullWidth>
         <InputLabel id="select-model">Model #</InputLabel>
@@ -44,4 +44,4 @@ const  SelectModel = ({model,handleChange}) => {
       </FormControl>
     </Box>
 
-export default SelectModel
+export default ModelSelector;
