@@ -14,6 +14,6 @@
 #
 
 class JesseModel < ApplicationRecord
-  has_many :jesse_model_weights, dependent: :destroy
+  has_many :jesse_model_weight, dependent: :destroy
   scope :newest_first, -> { order(model_endtime: :desc) }
 end

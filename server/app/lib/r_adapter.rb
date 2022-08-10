@@ -104,11 +104,16 @@ class RAdapter
     names = jesse_model_weights['names']
     coefs = jesse_model_weights['coefs']
 
+    puts "names: #{names}"
+    puts "coefs: #{coefs}"
+    puts "id: #{j.id}"
     (0..(names.length - 1)).each do |w|
-      JesseModelWeight.create(
-        metric_name: names[w],
-        weight: coefs[w],
-        jesse_model: j
+      puts 'adding jesse model weight'
+      puts "name: #{names[w].to_f} coef: #{coefs[w].to_f} id: #{j&.id.to_i}"
+      JesseModelWeight.create!(
+        metric_name: names[w].to_f,
+        weight: coefs[w].to_f,
+        jesse_models_id: j
       )
     end
   end

@@ -72,7 +72,7 @@ ActiveRecord::Schema.define(version: 2022_08_10_044622) do
     t.string "metric_name"
     t.float "weight"
     t.float "p_vals"
-    t.bigint "jesse_models_id", null: false
+    t.bigint "jesse_models_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["jesse_models_id"], name: "index_jesse_model_weights_on_jesse_models_id"

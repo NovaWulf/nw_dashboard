@@ -8,7 +8,7 @@
 #  weight          :float
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
-#  jesse_models_id :bigint           not null
+#  jesse_models_id :bigint
 #
 # Indexes
 #
@@ -20,5 +20,5 @@
 #
 
 class JesseModelWeight < ApplicationRecord
-  belongs_to :jesse_models
+  belongs_to :jesse_model, optional: true
 end
