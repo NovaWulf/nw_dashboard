@@ -24,6 +24,8 @@ class CsvWriter < BaseService
         0
         google_trends = Metric.by_token('btc').by_metric('google_trends').by_day(day).all
         0
+        btc_price = Metric.by_token('btc').by_metric('price').by_day(day).all
+        0
         writer << s2f.first.attributes.map { |a, _v| a }
 
         s2f.find_each do |s|
@@ -36,6 +38,9 @@ class CsvWriter < BaseService
           writer << s.attributes.map { |_a, v| v }
         end
         google_trends.find_each do |s|
+          writer << s.attributes.map { |_a, v| v }
+        end
+        btc_price.find_each do |s|
           writer << s.attributes.map { |_a, v| v }
         end
       end
