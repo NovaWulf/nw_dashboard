@@ -74,4 +74,42 @@ class RAdapter
     puts "cv[9]: #{cv[9]} cv10: #{cv[10]}"
     cv
   end
+
+  def jesse_analysis(start_time_string:, end_time_string:)
+    @R.eval <<-EOF
+        print(getwd())
+        source("./calculateJesseModel.R")
+        finalJSON = fitJesseModel(#{start_time_string},#{end_time_string})
+    EOF
+    final_json = @R.pull 'finalJSON'
+    model_vals = write_jesse_model_to_db(final_json: final_json)
+    Rails.logger.info "number of jesse models: #{JesseModel.count}"
+  end
+
+  def write_jesse_model_to_db(final_json:)
+    parsed_json = JSON.parse(final_json)
+    puts "parsed json: #{parsed_json.keys}"
+    jesse_model = parsed_json['model']
+    jesse_model_weights = parsed_json['model_weights']
+    puts "jesse_model: #{jesse_model}"
+
+    j = JesseModel.create(
+      standard_error: jesse_model['standard_error'][0],
+      r_squared: jesse_model['r_squared'][0],
+      f_stat: jesse_model['f_stat'][0],
+      adj_r_squared: jesse_model['adj_r_squared'][0],
+      model_starttime: jesse_model['model_starttime'][0],
+      model_endtime: jesse_model['model_endtime'][0]
+    )
+    names = jesse_model_weights['names']
+    coefs = jesse_model_weights['coefs']
+
+    (0..(names.length - 1)).each do |w|
+      JesseModelWeight.create(
+        metric_name: names[w],
+        weight: coefs[w],
+        jesse_model: j
+      )
+    end
+  end
 end

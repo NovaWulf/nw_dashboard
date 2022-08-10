@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_08_10_034330) do
+ActiveRecord::Schema.define(version: 2022_08_10_044622) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -68,6 +68,16 @@ ActiveRecord::Schema.define(version: 2022_08_10_034330) do
     t.index ["uuid"], name: "index_cointegration_models_on_uuid", unique: true
   end
 
+  create_table "jesse_model_weights", force: :cascade do |t|
+    t.string "metric_name"
+    t.float "weight"
+    t.float "p_vals"
+    t.bigint "jesse_models_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["jesse_models_id"], name: "index_jesse_model_weights_on_jesse_models_id"
+  end
+
   create_table "jesse_models", force: :cascade do |t|
     t.float "standard_error", null: false
     t.float "r_squared", null: false
@@ -77,16 +87,6 @@ ActiveRecord::Schema.define(version: 2022_08_10_034330) do
     t.integer "model_endtime", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-  end
-
-  create_table "jesse_models_weights", force: :cascade do |t|
-    t.string "metric_name"
-    t.float "p_val"
-    t.float "weight"
-    t.bigint "jesse_models_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["jesse_models_id"], name: "index_jesse_models_weights_on_jesse_models_id"
   end
 
   create_table "metrics", force: :cascade do |t|
@@ -133,6 +133,6 @@ ActiveRecord::Schema.define(version: 2022_08_10_034330) do
     t.index ["user", "name", "token"], name: "index_repos_on_user_and_name_and_token", unique: true
   end
 
-  add_foreign_key "jesse_models_weights", "jesse_models", column: "jesse_models_id"
+  add_foreign_key "jesse_model_weights", "jesse_models", column: "jesse_models_id"
   add_foreign_key "repo_commits", "repos"
 end

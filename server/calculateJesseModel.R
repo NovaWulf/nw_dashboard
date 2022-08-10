@@ -1,4 +1,5 @@
 library(jsonlite)
+library(data.table)
 fitJesseModel = function(startTimeString,endTimeString){
   print("does file ./public/metrics.csv exist in r?")
   print(file.exists("./public/metrics.csv"))
@@ -36,11 +37,12 @@ fitJesseModel = function(startTimeString,endTimeString){
   fStat = model_summary$fstatistic
 
   coefs = model$coefficients
+  
   modelReturnVals = list()
-  modelReturnVals[["standardError"]] = standardError
-  modelReturnVals[["rSquared"]] = rSquared
-  modelReturnVals[["fStat"]] = fStat
-  modelReturnVals[["adjRSquared"]] = adjRSquared
+  modelReturnVals[["standard_error"]] = standardError
+  modelReturnVals[["r_squared"]] = rSquared
+  modelReturnVals[["f_stat"]] = fStat
+  modelReturnVals[["adj_r_squared"]] = adjRSquared
   modelReturnVals[["model_starttime"]] = startTime
   modelReturnVals[["model_endtime"]] = endTime
   
@@ -50,6 +52,8 @@ fitJesseModel = function(startTimeString,endTimeString){
   returnVals = list()
   returnVals[["model"]]=modelReturnVals
   returnVals[["model_weights"]] = modelWeightReturnVals
-  finalJSON = toJSON(returnVals)
+  finalJSON = as.character(toJSON(returnVals))
+  print("finalJSON")
+  print(finalJSON)
   return(finalJSON)
 } 

@@ -87,3 +87,7 @@ end
 task write_csvs: :environment do
   CsvWriter.run
 end
+task jesse_analysis: :environment do
+  r  = RAdapter.new
+  r.jesse_analysis(start_time_string: '2018-01-01', end_time_string: '2022-08-01')
+end
