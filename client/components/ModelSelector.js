@@ -1,5 +1,6 @@
 import React from 'react';
 import { useQuery, gql } from '@apollo/client'
+import { Box, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 
 const getModelsQuery = gql`
   query {
@@ -24,17 +25,23 @@ const  SelectModel = ({model,handleChange}) => {
     }    
     console.log("maxSeqNum: "+maxSeqNum)
         return(
-            <form id="select-model">
-                <div className="field">
-                    <label>Model#:</label>
-                    <select id="models" value={model} onChange={handleChange}>
-                        <option>Select model</option>
-                        {modelSequence.map(model => <option key={ model } value={ model }>{  model  }</option> 
-                )}
-                    </select>
-                </div>
-            </form>
         );
 }
+    <Box sx={{ width: 120 }}>
+      <FormControl fullWidth>
+        <InputLabel id="select-model">Model #</InputLabel>
+        <Select
+          labelId="select-model-label"
+          id="select-model-select"
+          value={model || 0}
+          label="Model #"
+          onChange={e => handleChange(e.target.value)}
+        >
+          {modelSequence.map(model => (
+            <MenuItem value={model}>{model}</MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </Box>
 
 export default SelectModel

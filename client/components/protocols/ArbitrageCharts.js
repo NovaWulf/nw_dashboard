@@ -12,7 +12,9 @@ export default function ArbitrageCharts() {
   console.log('model: ' + model);
   return (
     <Grid container spacing={3}>
-      <ModelSelector model={model} handleChange={setModel} />
+      <Grid item>
+        <ModelSelector model={model} handleChange={setModel} />
+      </Grid>
       <ArbitrageSignalChart seqNumber={model} />
       <ArbitrageBacktestChart seqNumber={model} />
     </Grid>
