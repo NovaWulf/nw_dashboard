@@ -21,9 +21,7 @@ class RAdapter
     EOF
     return_vals = @R.pull 'returnVals'
     Rails.logger.info "Return Vals from R: #{return_vals}"
-    model_vals = write_model_to_db(return_vals: return_vals)
-    puts "returning model vals: #{model_vals}"
-    model_vals
+    write_model_to_db(return_vals: return_vals)
   end
 
   def write_model_to_db(return_vals:)

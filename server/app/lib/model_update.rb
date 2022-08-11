@@ -6,9 +6,12 @@ class ModelUpdate < BaseService
   MODEL_VERSION = 2
   def seed
     @r = RAdapter.new
-    @r.cointegration_analysis(start_time_string: "'2022-06-13'", end_time_string: "'2022-07-12'",
-                              ecdet_param: "'const'")
-    first_model = CointegrationModel.last&.uuid
+    return_vals = @r.cointegration_analysis(start_time_string: "'2022-06-13'", end_time_string: "'2022-07-12'",
+                                            ecdet_param: "'const'")
+    first_model = return_vals[0]
+
+    Rails.logger.info "return val of seed model: #{return_vals}"
+    Rails.logger.info "first model id: #{first_model}"
     r_count = BacktestModel.where("version= #{MODEL_VERSION} and sequence_number= 0").count
     if r_count == 0
       puts "no model detected for version #{MODEL_VERSION} ... creating new seed model"

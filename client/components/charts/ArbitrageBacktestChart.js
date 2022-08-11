@@ -55,8 +55,6 @@ export default function ArbitrageBacktestChart({seqNumber}) {
   let updatedData;
   if (data) {
     updatedData = backtestModel.map(d => {
-      console.log("ts: " + d.ts +", v: " + Math.floor( d.v))
-
       return {
         ts: d.ts,
         v: Math.floor(100 * d.v),
