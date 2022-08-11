@@ -1,4 +1,4 @@
-RSpec.describe PriceProcessor do
+RSpec.describe PriceMerger do
   subject { described_class.run(%w[eth-usd op-usd]) }
   before do
     Candle.create(starttime: 10_000_000,

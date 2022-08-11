@@ -19,12 +19,21 @@ if (class(startTimeString)=="character" && class(endTimeString)== "character"){
 
 resolution = 60
 allDat = data.table(read.csv("./public/data.csv"))
-
+allDat$interpolated=as.logical(allDat$interpolated)
 print("counts of different pairs")
 print(table(allDat$pair,useNA="always"))
 
-ethDat = allDat[starttime>startTime & starttime<endTime & resolution == resolution & pair == "eth-usd"]
-opDat =  allDat[starttime>startTime & starttime<endTime & resolution == resolution & pair == "op-usd"]
+ethDat = allDat[starttime>startTime & 
+                  starttime<endTime &
+                  resolution == resolution &
+                  interpolated==FALSE &
+                  pair == "eth-usd" 
+                  ]
+opDat =  allDat[starttime>startTime &
+                  starttime<endTime &
+                  resolution == resolution &
+                  interpolated==FALSE &
+                  pair == "op-usd"]
 
 bothDat = merge(ethDat,opDat,by = "starttime")
 

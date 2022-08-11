@@ -20,11 +20,11 @@ import CsvDownloadLink from 'components/CsvDownloadLink';
 export default function ArbitrageBacktestChart({seqNumber}) {
 
   console.log("seqNumber in backtest: "+seqNumber)
-  
+  version = 2
 
   const QUERY = gql`
-  query ($seqNumber: Int){
-    cointegrationModelInfo(version:1,sequenceNumber:$seqNumber) {
+  query ($version:Int,$seqNumber: Int){
+    cointegrationModelInfo(version:$version,sequenceNumber:$seqNumber) {
       inSampleMean
       inSampleSd
       uuid
@@ -32,7 +32,7 @@ export default function ArbitrageBacktestChart({seqNumber}) {
       modelEndtime
     }
 
-    backtestModel(version: 1,sequenceNumber:$seqNumber) {
+    backtestModel(version: $version,sequenceNumber:$seqNumber) {
       ts
       v
       is

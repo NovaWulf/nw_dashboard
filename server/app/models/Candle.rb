@@ -2,18 +2,19 @@
 #
 # Table name: candles
 #
-#  id         :bigint           not null, primary key
-#  close      :float            not null
-#  exchange   :string           not null
-#  high       :float            not null
-#  low        :float            not null
-#  open       :float            not null
-#  pair       :string           not null
-#  resolution :integer          not null
-#  starttime  :integer          not null
-#  volume     :float            not null
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
+#  id           :bigint           not null, primary key
+#  close        :float            not null
+#  exchange     :string           not null
+#  high         :float            not null
+#  interpolated :boolean          default(FALSE)
+#  low          :float            not null
+#  open         :float            not null
+#  pair         :string           not null
+#  resolution   :integer          not null
+#  starttime    :integer          not null
+#  volume       :float            not null
+#  created_at   :datetime         not null
+#  updated_at   :datetime         not null
 #
 # Indexes
 #

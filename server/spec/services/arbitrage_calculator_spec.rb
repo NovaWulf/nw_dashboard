@@ -1,5 +1,5 @@
 RSpec.describe ArbitrageCalculator do
-  subject { described_class.run(version: 1) }
+  subject { described_class.run(version: MODEL_VERSION) }
   let(:op_candle) { Candle.by_pair('op-usd').last&.close }
   let(:eth_candle) { Candle.by_pair('eth-usd').last&.close }
   let(:latest_model) { CointegrationModel.newest_first.first&.uuid }
@@ -71,7 +71,7 @@ RSpec.describe ArbitrageCalculator do
       in_sample_sd: 100
     )
     BacktestModel.create(
-      version: 1,
+      version: MODEL_VERSION,
       model_id: 'id1',
       sequence_number: 0,
       name: 'seed_model'

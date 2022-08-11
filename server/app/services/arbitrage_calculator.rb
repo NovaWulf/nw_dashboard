@@ -38,7 +38,7 @@ class ArbitrageCalculator < BaseService
     first_timestamps = asset_names.map { |a| Candle.where("pair = '#{a}'").oldest_first.first&.starttime }
     later_first_timestamp = first_timestamps.max
     start_time = last_timestamp ? last_timestamp + res : later_first_timestamp
-    flat_records = PriceProcessor.run(asset_names, start_time).value
+    flat_records = PriceMerger.run(asset_names, start_time).value
     starttimes = flat_records[0]
     prices = flat_records[1]
     for time_step in 0..(starttimes.length - 1)
@@ -53,7 +53,7 @@ class ArbitrageCalculator < BaseService
         if prices[i][time_step].nil?
           prices[i][time_step] = last_prices[i]
           Candle.create(starttime: starttimes[time_step], pair: asset_names[i], exchange: 'Coinbase', resolution: res,
-                        low: last_prices[i], high: last_prices[i], open: last_prices[i], close: last_prices[i], volume: last_prices[i])
+                        low: last_prices[i], high: last_prices[i], open: last_prices[i], close: last_prices[i], volume: last_prices[i], interpolated: true)
           Rails.logger.info "forward interpolating value for asset #{i}, time_step #{time_step} value: #{last_prices[i]}"
         else
           last_prices[i] = prices[i][time_step]

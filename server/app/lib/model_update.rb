@@ -3,15 +3,16 @@ class ModelUpdate < BaseService
   @RES_HOURS
   SECS_PER_WEEK = 604_800
   SECS_PER_HOUR = 3600
+  MODEL_VERSION = 2
   def seed
     @r = RAdapter.new
     @r.cointegration_analysis(start_time_string: "'2022-06-13'", end_time_string: "'2022-07-12'",
                               ecdet_param: "'const'")
     first_model = CointegrationModel.last&.uuid
-    r_count = BacktestModel.where('version= 1 and sequence_number= 0').count
+    r_count = BacktestModel.where("version= #{MODEL_VERSION} and sequence_number= 0").count
     if r_count == 0
       BacktestModel.create(
-        version: 1,
+        version: MODEL_VERSION,
         model_id: first_model,
         sequence_number: 0,
         name: 'seed-log'
@@ -40,11 +41,10 @@ class ModelUpdate < BaseService
 
     max_test_stat = test_stats.max
     max_test_stat_index = test_stats.index(max_test_stat)
-    max_test_stat_time = start_times[max_test_stat_index]
     max_test_stat_id = uuids[max_test_stat_index]
     best_model = CointegrationModel.where("uuid = '#{max_test_stat_id}'").last
     current_model = BacktestModel.where("version = #{version}").oldest_sequence_number_first.last
-    if true
+    if best_model&.test_stat > best_model&.cv_10_pct
       puts 'best new model is statistically valid with p<=.1. Auto-updating backtest models'
       puts coint_models[max_test_stat_index]
       BacktestModel.create(

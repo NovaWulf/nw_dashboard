@@ -2,9 +2,10 @@ import React from 'react';
 import { useQuery, gql } from '@apollo/client';
 import { Box, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 
+version = 2 
 const getModelsQuery = gql`
-  query {
-    backtestModelInfo(version: 1) {
+  query($version: Int) {
+    backtestModelInfo(version:$version ) {
       version
       sequenceNumber
     }

@@ -21,12 +21,12 @@ import CsvDownloadLink from 'components/CsvDownloadLink';
 
 export default function ArbitrageSignalChart({seqNumber}) {
   console.log("seqNumber in signal chart: " + seqNumber)
-  
+  version = 2
   // console.log("seqNumber in signal chart: " + JSON.stringify(seqNumber))
   const QUERY = gql`
-  query ($seqNumber: Int){
+  query ($version: Int, $seqNumber: Int){
 
-    cointegrationModelInfo(version:1,sequenceNumber:$seqNumber) {
+    cointegrationModelInfo(version:$version,sequenceNumber:$seqNumber) {
       inSampleMean
       inSampleSd
       uuid
@@ -34,7 +34,7 @@ export default function ArbitrageSignalChart({seqNumber}) {
       modelEndtime
     }
 
-    arbSignalModel(version: 1,sequenceNumber:$seqNumber) {
+    arbSignalModel(version: $version,sequenceNumber:$seqNumber) {
       ts
       v
       is

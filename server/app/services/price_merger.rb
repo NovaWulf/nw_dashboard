@@ -1,4 +1,4 @@
-class PriceProcessor < BaseService
+class PriceMerger < BaseService
   attr_reader :asset_names, :start_time, :end_time
 
   def initialize(asset_names, start_time = nil, end_time = nil)
