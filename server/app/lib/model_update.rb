@@ -11,6 +11,9 @@ class ModelUpdate < BaseService
     first_model = CointegrationModel.last&.uuid
     r_count = BacktestModel.where("version= #{MODEL_VERSION} and sequence_number= 0").count
     if r_count == 0
+      puts "no model detected for version #{MODEL_VERSION} ... creating new seed model"
+      Rails.logger.info "no model detected for version #{MODEL_VERSION} ... creating new seed model"
+
       BacktestModel.create(
         version: MODEL_VERSION,
         model_id: first_model,

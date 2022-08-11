@@ -20,7 +20,7 @@ class ArbitrageCalculator < BaseService
     assets = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}'").pluck(:weight, :asset_name)
     asset_weights = assets.map { |x| x[0] }
     asset_names = assets.map { |x| x[1] }
-    puts " asset names: #{asset_names}  , asset weights: #{asset_weights}"
+    puts "asset names: #{asset_names}, asset weights: #{asset_weights}"
     det_index = asset_names.index('det')
     det_weight = asset_weights[det_index]
     asset_weights.delete_at(det_index)
@@ -41,6 +41,7 @@ class ArbitrageCalculator < BaseService
     flat_records = PriceMerger.run(asset_names, start_time).value
     starttimes = flat_records[0]
     prices = flat_records[1]
+    interp_count = 0
     for time_step in 0..(starttimes.length - 1)
       signal_value = if det_type == 'const'
                        det_weight
@@ -52,9 +53,9 @@ class ArbitrageCalculator < BaseService
       for i in 0..(asset_weights.length - 1)
         if prices[i][time_step].nil?
           prices[i][time_step] = last_prices[i]
+          interp_count += 1
           Candle.create(starttime: starttimes[time_step], pair: asset_names[i], exchange: 'Coinbase', resolution: res,
                         low: last_prices[i], high: last_prices[i], open: last_prices[i], close: last_prices[i], volume: last_prices[i], interpolated: true)
-          Rails.logger.info "forward interpolating value for asset #{i}, time_step #{time_step} value: #{last_prices[i]}"
         else
           last_prices[i] = prices[i][time_step]
         end
@@ -69,6 +70,8 @@ class ArbitrageCalculator < BaseService
       m = ModeledSignal.create(starttime: starttimes[time_step], model_id: most_recent_model_id, resolution: res, value: signal_value,
                                in_sample: in_sample_flag)
     end
+    Rails.logger.info "flat forward interpolated #{interp_count} value"
+
     email_notification(m) if m
   end
 
