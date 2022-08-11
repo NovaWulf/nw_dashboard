@@ -5,7 +5,7 @@ class ModelUpdate < BaseService
   SECS_PER_HOUR = 3600
   def seed
     @r = RAdapter.new
-    @r.cointegration_analysis(start_time_string: "'2022-07-18'", end_time_string: "'2022-08-02'",
+    @r.cointegration_analysis(start_time_string: "'2022-06-13'", end_time_string: "'2022-07-12'",
                               ecdet_param: "'const'")
     first_model = CointegrationModel.last&.uuid
     r_count = BacktestModel.where('version= 1 and sequence_number= 0').count
