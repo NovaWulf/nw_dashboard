@@ -1,5 +1,5 @@
 class ArbitrageCalculator < BaseService
-  attr_reader :version
+  attr_reader :version, :most_recent_model
 
   def initialize(version:)
     @version = version
@@ -9,7 +9,7 @@ class ArbitrageCalculator < BaseService
     puts "version: #{version}"
     most_recent_backtest_model = BacktestModel.where("version = #{version}").oldest_sequence_number_first.last
     most_recent_model_id = most_recent_backtest_model&.model_id
-    most_recent_model = CointegrationModel.where("uuid='#{most_recent_model_id}'").last
+    @most_recent_model = CointegrationModel.where("uuid='#{most_recent_model_id}'").last
     det_type = most_recent_model&.ecdet
     log_prices = most_recent_model&.log_prices
     res = most_recent_model&.resolution
@@ -31,7 +31,7 @@ class ArbitrageCalculator < BaseService
     last_prices = [nil, nil]
     if last_timestamp
       last_prices = asset_names.map do |name|
-        Candle.where("starttime<=#{last_timestamp} and pair = #{name}").oldest_first.last&.close
+        Candle.where("starttime<=#{last_timestamp} and pair = '#{name}'").oldest_first.last&.close
       end
     end
 
@@ -69,14 +69,16 @@ class ArbitrageCalculator < BaseService
       m = ModeledSignal.create(starttime: starttimes[time_step], model_id: most_recent_model_id, resolution: res, value: signal_value,
                                in_sample: in_sample_flag)
     end
-
+    puts 'at the end of arb signal creation, about to send email...'
     email_notification(m) if m
   end
 
   def email_notification(arb_signal, sigma = 1)
-    most_recent_model = CointegrationModel.newest_first.first
+    Rails.logger.info 'inside email notif'
+    Rails.logger.info "most_recent_model: #{most_recent_model&.uuid}"
     in_sample_mean = most_recent_model&.in_sample_mean
     in_sample_sd = most_recent_model&.in_sample_sd
+    puts "most_recent_model: #{most_recent_model&.uuid}"
     return unless arb_signal && most_recent_model
 
     signal_value = arb_signal.value

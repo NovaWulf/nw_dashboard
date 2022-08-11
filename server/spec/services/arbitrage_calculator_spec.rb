@@ -1,5 +1,5 @@
 RSpec.describe ArbitrageCalculator do
-  subject { described_class.run(version: MODEL_VERSION) }
+  subject { described_class.run(version: 2) }
   let(:op_candle) { Candle.by_pair('op-usd').last&.close }
   let(:eth_candle) { Candle.by_pair('eth-usd').last&.close }
   let(:latest_model) { CointegrationModel.newest_first.first&.uuid }
@@ -71,7 +71,7 @@ RSpec.describe ArbitrageCalculator do
       in_sample_sd: 100
     )
     BacktestModel.create(
-      version: MODEL_VERSION,
+      version: 2,
       model_id: 'id1',
       sequence_number: 0,
       name: 'seed_model'
@@ -115,9 +115,9 @@ RSpec.describe ArbitrageCalculator do
         low: 90, high: 90, open: 90, close: 90, volume: 90
       )
     end
-    # it 'does not send email' do
-    #   expect { subject }.to change { ActionMailer::Base.deliveries.count }.by(0)
-    # end
+    it 'does not send email' do
+      expect { subject }.to change { ActionMailer::Base.deliveries.count }.by(0)
+    end
   end
   context 'arb signal in range' do
     let!(:op_candle_create_new2) do
