@@ -20,24 +20,26 @@ import CsvDownloadLink from 'components/CsvDownloadLink';
 
 export default function ArbitrageSignalChart({seqNumber}) {
   console.log("seqNumber in signal chart: " + seqNumber)
-  version = 2
+  const version = 2
   // console.log("seqNumber in signal chart: " + JSON.stringify(seqNumber))
   const QUERY = gql`
-  query ($version: Int, $seqNumber: Int){
+  query ($seqNumber: Int){
 
-    cointegrationModelInfo(version:$version,sequenceNumber:$seqNumber) {
+    cointegrationModelInfo(version:2,sequenceNumber:$seqNumber) {
       inSampleMean
       inSampleSd
       uuid
       id
       modelEndtime
+      modelStarttime
     }
 
-    arbSignalModel(version: $version,sequenceNumber:$seqNumber) {
+    arbSignalModel(version: 2,sequenceNumber:$seqNumber) {
       ts
       v
       is
     }
+  }
   `;
   const { data, loading, error } = useQuery(QUERY, {
     variables: { seqNumber },
@@ -49,13 +51,15 @@ export default function ArbitrageSignalChart({seqNumber}) {
     console.error(error);
     return null;
   }
-  const SIGMA = 3;
+  const SIGMA = 1;
 
-  let mean, sd, isEndDate, updatedData;
+  let mean, sd, isEndDate,isStartDate, updatedData;
   if (data) {
     mean = cointegrationModelInfo[0].inSampleMean;
+    console.log("in sample mean: " + mean)
     sd = cointegrationModelInfo[0].inSampleSd;
     isEndDate = cointegrationModelInfo[0].modelEndtime;
+    isStartDate = cointegrationModelInfo[0].modelStarttime;
     updatedData = arbSignalModel.map(d => {
       console.log('sd: ' + Math.floor(100 * (-SIGMA * sd)));
       return {
@@ -93,6 +97,12 @@ export default function ArbitrageSignalChart({seqNumber}) {
                 strokeDasharray="3 3"
                 yAxisId="spread"
                 x={isEndDate}
+                stroke="red"
+              />
+               <ReferenceLine
+                strokeDasharray="3 3"
+                yAxisId="spread"
+                x={isStartDate}
                 stroke="red"
               />
               <Line

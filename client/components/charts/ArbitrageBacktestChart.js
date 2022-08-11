@@ -20,23 +20,24 @@ import CsvDownloadLink from 'components/CsvDownloadLink';
 export default function ArbitrageBacktestChart({seqNumber}) {
 
   console.log("seqNumber in backtest: "+seqNumber)
-  version = 2
 
   const QUERY = gql`
-  query ($version:Int,$seqNumber: Int){
-    cointegrationModelInfo(version:$version,sequenceNumber:$seqNumber) {
+  query ($seqNumber: Int){
+    cointegrationModelInfo(version:2,sequenceNumber:$seqNumber) {
       inSampleMean
       inSampleSd
       uuid
       id
       modelEndtime
+      modelStarttime
     }
 
-    backtestModel(version: $version,sequenceNumber:$seqNumber) {
+    backtestModel(version: 2,sequenceNumber:$seqNumber) {
       ts
       v
       is
     }
+  }
   `;
 
   const { data, loading, error } = useQuery(QUERY, {
@@ -49,12 +50,13 @@ export default function ArbitrageBacktestChart({seqNumber}) {
     console.error(error);
     return null;
   }
-
   const theme = useTheme();
 
   let updatedData;
   if (data) {
     updatedData = backtestModel.map(d => {
+      console.log("ts: " + d.ts +", v: " + Math.floor( d.v))
+
       return {
         ts: d.ts,
         v: Math.floor(100 * d.v),
@@ -85,7 +87,14 @@ export default function ArbitrageBacktestChart({seqNumber}) {
                 yAxisId="pnl"
                 x={cointegrationModelInfo[0].modelEndtime}
                 stroke="red"
-                label="IS <-> OOS"
+                label="IN-SAMPLE <----------> POST"
+              />
+              <ReferenceLine
+                strokeDasharray="3 3"
+                yAxisId="pnl"
+                x={cointegrationModelInfo[0].modelStarttime}
+                stroke="red"
+                label="PRE <----------> IN-SAMPLE"
               />
               <Line
                 type="monotone"

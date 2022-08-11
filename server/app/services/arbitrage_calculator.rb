@@ -37,7 +37,7 @@ class ArbitrageCalculator < BaseService
 
     first_timestamps = asset_names.map { |a| Candle.where("pair = '#{a}'").oldest_first.first&.starttime }
     later_first_timestamp = first_timestamps.max
-    start_time = last_timestamp ? last_timestamp + res : later_first_timestamp
+    start_time = last_timestamp ? last_timestamp + res : first_in_sample_timestamp
     flat_records = PriceMerger.run(asset_names, start_time).value
     starttimes = flat_records[0]
     prices = flat_records[1]
@@ -69,7 +69,6 @@ class ArbitrageCalculator < BaseService
       m = ModeledSignal.create(starttime: starttimes[time_step], model_id: most_recent_model_id, resolution: res, value: signal_value,
                                in_sample: in_sample_flag)
     end
-    puts 'at the end of arb signal creation, about to send email...'
     email_notification(m) if m
   end
 
