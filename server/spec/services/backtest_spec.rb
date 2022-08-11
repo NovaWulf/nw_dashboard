@@ -124,7 +124,7 @@ RSpec.describe Backtest do
     )
 
     BacktestModel.create(
-      version: 2,
+      version: 1,
       model_id: 'id2',
       sequence_number: 0,
       name: 'seed_model'
@@ -181,8 +181,8 @@ RSpec.describe Backtest do
   end
 
   it 'pnl calculation is accurate for log-price model' do
-    expect { subject.run(version: 2) }.to change { ModeledSignal.where("model_id = 'id2-b'").count }.by(1)
+    expect { subject.run(version: 1) }.to change { ModeledSignal.where("model_id = 'id2-b'").count }.by(1)
     m = ModeledSignal.last
-    expect(m.value.round(2)).to eql pnl_expected_log.round(2)
+    expect(m.value.round(1)).to eql pnl_expected_log.round(2)
   end
 end
