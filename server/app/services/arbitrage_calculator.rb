@@ -35,13 +35,12 @@ class ArbitrageCalculator < BaseService
       end
     end
 
-    puts "last_prices: #{last_prices}"
-    start_time = last_timestamp ? last_timestamp + res : first_in_sample_timestamp
-    puts "start time: #{start_time}"
+    first_timestamps = asset_names.map { |a| Candle.where("pair = '#{a}'").oldest_first.first&.starttime }
+    later_first_timestamp = first_timestamps.max
+    start_time = last_timestamp ? last_timestamp + res : later_first_timestamp
     flat_records = PriceProcessor.run(asset_names, start_time).value
     starttimes = flat_records[0]
     prices = flat_records[1]
-    puts "length of starttimes: #{starttimes.length}"
     for time_step in 0..(starttimes.length - 1)
       signal_value = if det_type == 'const'
                        det_weight
@@ -51,9 +50,7 @@ class ArbitrageCalculator < BaseService
                        0
                      end
       for i in 0..(asset_weights.length - 1)
-        puts "price when starttime= 1_656_000_000: #{prices[i][time_step]}" if starttimes[time_step] == 1_656_000_000
         if prices[i][time_step].nil?
-          puts 'is nil?' if starttimes[time_step] == 1_656_000_000
           prices[i][time_step] = last_prices[i]
           Candle.create(starttime: starttimes[time_step], pair: asset_names[i], exchange: 'Coinbase', resolution: res,
                         low: last_prices[i], high: last_prices[i], open: last_prices[i], close: last_prices[i], volume: last_prices[i])
@@ -73,7 +70,7 @@ class ArbitrageCalculator < BaseService
                                in_sample: in_sample_flag)
     end
 
-    # email_notification(m) if m
+    email_notification(m) if m
   end
 
   def email_notification(arb_signal, sigma = 1)

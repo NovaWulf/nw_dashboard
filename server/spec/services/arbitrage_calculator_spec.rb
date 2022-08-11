@@ -138,8 +138,8 @@ RSpec.describe ArbitrageCalculator do
         low: 300, high: 300, open: 300, close: 300, volume: 300
       )
     end
-    # it 'does send email' do
-    #   expect { subject }.to change { ActionMailer::Base.deliveries.count }.by(1)
-    # end
+    it 'does send email' do
+      expect { subject }.to change { ActionMailer::Base.deliveries.count }.by(1)
+    end
   end
 end

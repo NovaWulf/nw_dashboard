@@ -26,13 +26,10 @@ class PriceProcessor < BaseService
     "
     puts "start time in price processor: #{start_time}"
     records_array = ActiveRecord::Base.connection.execute(sql)
-    puts "number of records in processor (left join): #{records_array.count}"
+    puts "number of records in processor (outer join): #{records_array.count}"
     starttimes = records_array.pluck('starttime')
     prices = asset_aliases.map { |a| records_array.pluck(a) }
 
-    for i in 0..50
-      puts "start time: #{records_array[i]['starttime']} eth price:  + #{records_array[i]['eth_usd']}  op price: #{records_array[i]['op_usd']}"
-    end
     if end_time
       end_index = starttimes.index(end_time)
       starttimes = starttimes[0..end_index]
