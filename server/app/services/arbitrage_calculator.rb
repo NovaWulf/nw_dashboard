@@ -6,7 +6,6 @@ class ArbitrageCalculator < BaseService
   end
 
   def run
-    puts "version: #{version}"
     most_recent_backtest_model = BacktestModel.where("version = #{version}").oldest_sequence_number_first.last
     most_recent_model_id = most_recent_backtest_model&.model_id
     @most_recent_model = CointegrationModel.where("uuid='#{most_recent_model_id}'").last
@@ -15,12 +14,9 @@ class ArbitrageCalculator < BaseService
     res = most_recent_model&.resolution
     last_in_sample_timestamp = most_recent_model&.model_endtime
     first_in_sample_timestamp = most_recent_model&.model_starttime
-    puts "most recent #{most_recent_model_id}, first_in_sample_timestamp: #{first_in_sample_timestamp}"
-
     assets = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}'").pluck(:weight, :asset_name)
     asset_weights = assets.map { |x| x[0] }
     asset_names = assets.map { |x| x[1] }
-    puts "asset names: #{asset_names}, asset weights: #{asset_weights}"
     det_index = asset_names.index('det')
     det_weight = asset_weights[det_index]
     asset_weights.delete_at(det_index)
