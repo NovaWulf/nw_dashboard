@@ -12,14 +12,16 @@ class RAdapter
   end
 
   def cointegration_analysis(start_time_string:, end_time_string:, ecdet_param:)
+    Rails.logger.info "creating cointegration model with start time #{start_time_string},
+      end time #{end_time_string} ecdet_param #{ecdet_param}"
     @R.eval <<-EOF
         print(getwd())
         source("./cointegrationAnalysis.R")
         returnVals = fitModel(#{start_time_string},#{end_time_string},ecdet_param = #{ecdet_param})
     EOF
     return_vals = @R.pull 'returnVals'
+    Rails.logger.info "Return Vals from R: #{return_vals}"
     model_vals = write_model_to_db(return_vals: return_vals)
-    Rails.logger.info "number of cointegration models: #{CointegrationModel.count}"
     puts "returning model vals: #{model_vals}"
     model_vals
   end

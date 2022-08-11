@@ -66,7 +66,7 @@ class ArbitrageCalculator < BaseService
       m = ModeledSignal.create(starttime: starttimes[time_step], model_id: most_recent_model_id, resolution: res, value: signal_value,
                                in_sample: in_sample_flag)
     end
-    Rails.logger.info "flat forward interpolated #{interp_count} value"
+    Rails.logger.info "flat forward interpolated #{interp_count} values"
 
     email_notification(m) if m
   end

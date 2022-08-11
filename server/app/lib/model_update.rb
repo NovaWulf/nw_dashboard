@@ -33,8 +33,8 @@ class ModelUpdate < BaseService
     coint_models = []
     for i in 0..num_models
       start_time += step_size
-      @r.cointegration_analysis(start_time_string: start_time, end_time_string: last_candle_time,
-                                ecdet_param: "'const'")
+      coint_models.append(@r.cointegration_analysis(start_time_string: start_time, end_time_string: last_candle_time,
+                                                    ecdet_param: "'const'"))
       coint_models.append(@r.cointegration_analysis(start_time_string: start_time, end_time_string: last_candle_time,
                                                     ecdet_param: "'trend'"))
     end
