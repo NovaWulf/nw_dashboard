@@ -52,7 +52,6 @@ export default function ArbitrageSignalChart({seqNumber}) {
     return null;
   }
   const SIGMA = 2;
-  
 
   let mean, sd, isEndDate,isStartDate, updatedData;
   if (data) {

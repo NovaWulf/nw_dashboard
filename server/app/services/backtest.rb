@@ -84,6 +84,8 @@ class Backtest < BaseService
           - @asset_weights[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
         elsif signal_down(@cursor)
           @asset_weights[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
+        elsif @cursor > 0 && ((signal_up(@cursor) && signal_down(@cursor - 1)) || (signal_down(@cursor) && signal_up(@cursor - 1)))
+          @asset_weights[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
         else
           @positions[i][@cursor]
         end
