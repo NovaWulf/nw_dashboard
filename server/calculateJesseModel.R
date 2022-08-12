@@ -1,15 +1,10 @@
 library(jsonlite)
 library(data.table)
-fitJesseModel = function(startTimeString,endTimeString){
+fitJesseModel = function(){
   print("does file ./public/metrics.csv exist in r?")
   print(file.exists("./public/metrics.csv"))
   
-  startTime = startTimeString
-  endTime = endTimeString
-  if (class(startTimeString)=="character" && class(endTimeString)== "character"){
-    startTime = as.numeric(strptime(startTimeString, "%Y-%m-%d",tz="EST"))
-    endTime = as.numeric(strptime(endTimeString,"%Y-%m-%d",tz="EST")) 
-  }
+
   allDat = data.table(read.csv("./public/metrics.csv"))
   print(names(allDat))
   print(dim(allDat))
@@ -29,6 +24,8 @@ fitJesseModel = function(startTimeString,endTimeString){
   castDat$hash_rate=as.numeric(castDat$hash_rate)
   castDat$s2f_ratio=as.numeric(castDat$s2f_ratio)
   castDat$price = as.numeric(castDat$price)
+  modelStartDate = min(as.numeric(strptime(as.character(castDat$timestamp), "%Y-%m-%d",tz="EST")))
+  modelEndDate = max(as.numeric(strptime(as.character(castDat$timestamp), "%Y-%m-%d",tz="EST")))
   model = lm(price~active_addresses_sq + google_trends+hash_rate+s2f_ratio,castDat)
   model_summary = summary(model)
   rSquared = model_summary$r.squared
@@ -41,8 +38,8 @@ fitJesseModel = function(startTimeString,endTimeString){
   modelReturnVals[["r_squared"]] = rSquared
   modelReturnVals[["f_stat"]] = fStat
   modelReturnVals[["adj_r_squared"]] = adjRSquared
-  modelReturnVals[["model_starttime"]] = startTime
-  modelReturnVals[["model_endtime"]] = endTime
+  modelReturnVals[["model_starttime"]] = modelStartDate
+  modelReturnVals[["model_endtime"]] = modelEndDate
   modelWeightReturnVals = list()
   modelWeightReturnVals[["coefs"]] = coefs
   modelWeightReturnVals[["names"]] = names(coefs)
