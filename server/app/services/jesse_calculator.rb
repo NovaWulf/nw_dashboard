@@ -1,8 +1,13 @@
 class JesseCalculator < BaseService
+  @std_error
   def run
     fetch_required_data
 
     last_jesse_model = JesseModel.newest_first.last&.id
+    puts "last jesse model in calculator: #{last_jesse_model}"
+    @std_error = JesseModel.newest_first.last&.standard_error
+    puts "std error: #{@std_error}"
+
     assets = JesseModelWeight.where("jesse_models_id=#{last_jesse_model}").pluck(:weight, :metric_name)
     weights = assets.map { |x| x[0] }
     metric_names = assets.map { |x| x[1] }
@@ -73,12 +78,12 @@ class JesseCalculator < BaseService
     btc_value = btc_price.value
     jesse_value = jesse_metric.value
 
-    if btc_value > jesse_value + STD_ERROR
+    if btc_value > jesse_value + @std_error
       NotificationMailer.with(subject: 'Jesse Indicator Alert',
-                              text: "BTC (#{btc_value.round(2)}) is above the high band of Jesse's indicator (#{(jesse_value + STD_ERROR).round(2)})").notification.deliver_now
-    elsif btc_value < jesse_value - STD_ERROR
+                              text: "BTC (#{btc_value.round(2)}) is above the high band of Jesse's indicator (#{(jesse_value + @std_error).round(2)})").notification.deliver_now
+    elsif btc_value < jesse_value - @std_error
       NotificationMailer.with(subject: 'Jesse Indicator Alert',
-                              text: "BTC (#{btc_value.round(2)}) is below the low band of Jesse's indicator (#{(jesse_value - STD_ERROR).round(2)})").notification.deliver_now
+                              text: "BTC (#{btc_value.round(2)}) is below the low band of Jesse's indicator (#{(jesse_value - @std_error).round(2)})").notification.deliver_now
     end
   end
 end
