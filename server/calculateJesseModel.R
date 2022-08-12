@@ -1,15 +1,15 @@
 library(jsonlite)
 library(data.table)
-fitJesseModel = function(){
+fitJesseModel = function(startTimeString,endTimeString){
   print("does file ./public/metrics.csv exist in r?")
   print(file.exists("./public/metrics.csv"))
   
-  # startTime = startTimeString
-  # endTime = endTimeString
-  # if (class(startTimeString)=="character" && class(endTimeString)== "character"){
-  #   startTime = as.numeric(strptime(startTimeString, "%Y-%m-%d",tz="EST"))
-  #   endTime = as.numeric(strptime(endTimeString,"%Y-%m-%d",tz="EST")) 
-  # }
+  startTime = startTimeString
+  endTime = endTimeString
+  if (class(startTimeString)=="character" && class(endTimeString)== "character"){
+    startTime = as.numeric(strptime(startTimeString, "%Y-%m-%d",tz="EST"))
+    endTime = as.numeric(strptime(endTimeString,"%Y-%m-%d",tz="EST")) 
+  }
   allDat = data.table(read.csv("./public/metrics.csv"))
   print(names(allDat))
   print(dim(allDat))

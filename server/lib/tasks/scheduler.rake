@@ -90,7 +90,8 @@ task write_csvs: :environment do
   CsvWriter.run
 end
 task jesse_analysis: :environment do
-  r  = RAdapter.new
+  CsvWriter.run
+  r = RAdapter.new
   r.jesse_analysis
   JesseCalculator.run
 end

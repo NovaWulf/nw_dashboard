@@ -73,8 +73,6 @@ class ModelUpdate < BaseService
       ArbitrageCalculator.run(version: version)
       Backtest.run(version: version)
     end
-    ArbitrageCalculator.run(version: version)
-    Backtest.run(version: version)
   end
 
   def update_jesse_model
