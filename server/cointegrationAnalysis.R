@@ -7,7 +7,7 @@ library(latticeExtra)
 
 fitModel = function(startTimeString,endTimeString,ecdet_param="trend",logPrices=TRUE){
 ecdet = ecdet_param
-print("does file exist in r?")
+print("does file ./public/data.csv exist in r?")
 print(file.exists("./public/data.csv"))
 
 startTime = startTimeString
@@ -19,12 +19,21 @@ if (class(startTimeString)=="character" && class(endTimeString)== "character"){
 
 resolution = 60
 allDat = data.table(read.csv("./public/data.csv"))
-
+allDat$interpolated=as.logical(allDat$interpolated)
 print("counts of different pairs")
 print(table(allDat$pair,useNA="always"))
 
-ethDat = allDat[starttime>startTime & starttime<endTime & resolution == resolution & pair == "eth-usd"]
-opDat =  allDat[starttime>startTime & starttime<endTime & resolution == resolution & pair == "op-usd"]
+ethDat = allDat[starttime>startTime & 
+                  starttime<endTime &
+                  resolution == resolution &
+                  interpolated==FALSE &
+                  pair == "eth-usd" 
+                  ]
+opDat =  allDat[starttime>startTime &
+                  starttime<endTime &
+                  resolution == resolution &
+                  interpolated==FALSE &
+                  pair == "op-usd"]
 
 bothDat = merge(ethDat,opDat,by = "starttime")
 
@@ -41,19 +50,19 @@ if (logPrices){
 dataMat = as.matrix(bothDat[,c("close.x","close.y")])
 spec = "transitory"
 type = "trace"
-jo=ca.jo(dataMat,type= type,spec=spec,ecdet = ecdet_param)
+jo=ca.jo(dataMat,type= type,spec=spec,ecdet = ecdet)
 summary(jo)
 
 vecs = jo@V
 
 spread = NULL
-if (ecdet_param == "const")
+if (ecdet == "const")
  spread = vecs[1,1]*bothDat$close.x + vecs[2,1]*bothDat$close.y+vecs[3,1]
 
-if (ecdet_param == "none")
+if (ecdet == "none")
  spread = vecs[1,1]*bothDat$close.x + vecs[2,1]*bothDat$close.y
 
-if (ecdet_param == "trend")
+if (ecdet == "trend")
  spread = vecs[1,1]*bothDat$close.x + vecs[2,1]*bothDat$close.y+vecs[3,1]*seq(1,nrow(dataMat))
 
 sigma = 3
@@ -118,7 +127,7 @@ queryString = paste0("insert into cointegration_models " , colNameString," value
 returnVals[[1]] = colNameString
 returnVals[[2]] = valueString
 
-print(queryString)
+#print(queryString)
 
 assetNames = c("eth-usd","op-usd","det")
 assetWeights=c(vecs[1,1],vecs[2,1],vecs[3,1])
@@ -133,6 +142,6 @@ for (i in 1:3){
 totalValString = paste0(valStrings,collapse=",")
 returnVals[[4]] = totalValString
 returnVals = unlist(returnVals)
-print(returnVals)
+#print(returnVals)
 return (returnVals)
 }

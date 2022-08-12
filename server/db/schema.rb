@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_08_03_225854) do
+ActiveRecord::Schema.define(version: 2022_08_11_161226) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -37,6 +37,7 @@ ActiveRecord::Schema.define(version: 2022_08_03_225854) do
     t.float "high", null: false
     t.float "low", null: false
     t.float "volume", null: false
+    t.boolean "interpolated", default: false
     t.index ["exchange", "starttime", "pair", "resolution"], name: "index_candles_on_exchange_and_starttime_and_pair_and_resolution", unique: true
   end
 
@@ -66,6 +67,27 @@ ActiveRecord::Schema.define(version: 2022_08_03_225854) do
     t.string "name"
     t.boolean "log_prices"
     t.index ["uuid"], name: "index_cointegration_models_on_uuid", unique: true
+  end
+
+  create_table "jesse_model_weights", force: :cascade do |t|
+    t.string "metric_name"
+    t.float "weight"
+    t.float "p_vals"
+    t.bigint "jesse_models_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["jesse_models_id"], name: "index_jesse_model_weights_on_jesse_models_id"
+  end
+
+  create_table "jesse_models", force: :cascade do |t|
+    t.float "standard_error", null: false
+    t.float "r_squared", null: false
+    t.float "f_stat", null: false
+    t.float "adj_r_squared", null: false
+    t.integer "model_starttime", null: false
+    t.integer "model_endtime", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "metrics", force: :cascade do |t|
@@ -112,5 +134,6 @@ ActiveRecord::Schema.define(version: 2022_08_03_225854) do
     t.index ["user", "name", "token"], name: "index_repos_on_user_and_name_and_token", unique: true
   end
 
+  add_foreign_key "jesse_model_weights", "jesse_models", column: "jesse_models_id"
   add_foreign_key "repo_commits", "repos"
 end

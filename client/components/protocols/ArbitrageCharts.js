@@ -4,72 +4,19 @@ import Grid from '@mui/material/Grid';
 import * as React from 'react';
 import ArbitrageSignalChart from 'components/charts/ArbitrageSignalChart';
 import ArbitrageBacktestChart from 'components/charts/ArbitrageBacktestChart';
-
-const QUERY = gql`
-  query {
-    cointegrationModelInfo(version:1) {
-      inSampleMean
-      inSampleSd
-      uuid
-      id
-      modelEndtime
-    }
-
-    arbSignalLatestModel {
-      ts
-      v
-      is
-    }
-
-    backtestLatestModel {
-      ts
-      v
-      is
-    }
-  }
-`;
+import ModelSelector from 'components/ModelSelector';
 
 export default function ArbitrageCharts() {
-  const { data, loading, error } = useQuery(QUERY);
-  const {
-    cointegrationModelInfo,
-    arbSignalLatestModel,
-    backtestLatestModel,
-  } = data || {};
-  console.log(
-    'cointegrationModelInfo: ' +
-      JSON.stringify(cointegrationModelInfo),
-  );
+  const [model, setModel] = React.useState(0);
 
-  if (error) {
-    console.error(error);
-    return null;
-  }
-
+  console.log('model: ' + model);
   return (
     <Grid container spacing={3}>
-      <Grid item sx={{ display: 'flex' }} xs={12} md={12}>
-        {loading ? (
-          <Skeleton variant="rectangular" />
-        ) : (
-          <ArbitrageSignalChart
-            arbSignal={arbSignalLatestModel}
-            mean={cointegrationModelInfo[0].inSampleMean}
-            sd={cointegrationModelInfo[0].inSampleSd}
-            isEndDate={cointegrationModelInfo[0].modelEndtime}
-          />
-        )}
+      <Grid item>
+        <ModelSelector model={model} handleChange={setModel} />
       </Grid>
-      <Grid item sx={{ display: 'flex' }} xs={12} md={12}>
-        {loading ? (
-          <Skeleton variant="rectangular" />
-        ) : (
-          <ArbitrageBacktestChart
-            pnl={backtestLatestModel}
-            isEndDate={cointegrationModelInfo[0].modelEndtime}
-          />
-        )}
-      </Grid>
+      <ArbitrageSignalChart seqNumber={model} />
+      <ArbitrageBacktestChart seqNumber={model} />
     </Grid>
   );
 }

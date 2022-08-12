@@ -1,19 +1,33 @@
 class JesseCalculator < BaseService
-  S2F_COEFF = 0.309125136
-  HASHRATE_COEFF = 0.0000000000000000272474
-  GOOGLE_TRENDS_COEFF = 140.8315055
-  ACTIVE_ADDRESSES_COEFF = 0.00000000536975
-  Y_INTERCEPT = -983.3513177
-  STD_ERROR = 3985.11633
-
+  @std_error
   def run
     fetch_required_data
 
+    last_jesse_model = JesseModel.newest_first.last&.id
+    puts "last jesse model in calculator: #{last_jesse_model}"
+    @std_error = JesseModel.newest_first.last&.standard_error
+    puts "std error: #{@std_error}"
+
+    assets = JesseModelWeight.where("jesse_models_id=#{last_jesse_model}").pluck(:weight, :metric_name)
+    weights = assets.map { |x| x[0] }
+    metric_names = assets.map { |x| x[1] }
     last_date = Metric.by_token('btc').by_metric('jesse').last&.timestamp
     return if last_date && last_date >= Date.today
 
     start_date = last_date ? last_date + 1.day : Date.new(2017, 1, 1)
     m = nil
+    s2f_ind = metric_names.index('s2f_ratio')
+    hr_ind = metric_names.index('hash_rate')
+    aa_ind = metric_names.index('active_addresses_sq')
+    gt_ind = metric_names.index('google_trends')
+    intercept_ind = metric_names.index('(Intercept)')
+
+    s2f_coef = weights[s2f_ind]
+    hr_coef = weights[hr_ind]
+    aa_coef = weights[aa_ind]
+    gt_coef = weights[gt_ind]
+    intercept_coef = weights[intercept_ind]
+
     (start_date..Date.today).each do |day|
       s2f = Metric.by_token('btc').by_metric('s2f_ratio').by_day(day).first
       unless s2f&.value
@@ -38,13 +52,11 @@ class JesseCalculator < BaseService
         Rails.logger.error "can't generate Jesse metric, no google_trends for #{day}"
         next
       end
-
-      value = s2f.value * S2F_COEFF +
-              hash_rate.value * HASHRATE_COEFF +
-              google_trends.value * GOOGLE_TRENDS_COEFF +
-              (active_addresses.value * active_addresses.value) * ACTIVE_ADDRESSES_COEFF +
-              Y_INTERCEPT
-
+      value = s2f.value * s2f_coef +
+              hash_rate.value * hr_coef +
+              google_trends.value * gt_coef +
+              (active_addresses.value * active_addresses.value) * aa_coef +
+              intercept_coef
       m = Metric.create(timestamp: day, value: value, token: 'btc', metric: 'jesse')
     end
 
@@ -66,12 +78,12 @@ class JesseCalculator < BaseService
     btc_value = btc_price.value
     jesse_value = jesse_metric.value
 
-    if btc_value > jesse_value + STD_ERROR
+    if btc_value > jesse_value + @std_error
       NotificationMailer.with(subject: 'Jesse Indicator Alert',
-                              text: "BTC (#{btc_value.round(2)}) is above the high band of Jesse's indicator (#{(jesse_value + STD_ERROR).round(2)})").notification.deliver_now
-    elsif btc_value < jesse_value - STD_ERROR
+                              text: "BTC (#{btc_value.round(2)}) is above the high band of Jesse's indicator (#{(jesse_value + @std_error).round(2)})").notification.deliver_now
+    elsif btc_value < jesse_value - @std_error
       NotificationMailer.with(subject: 'Jesse Indicator Alert',
-                              text: "BTC (#{btc_value.round(2)}) is below the low band of Jesse's indicator (#{(jesse_value - STD_ERROR).round(2)})").notification.deliver_now
+                              text: "BTC (#{btc_value.round(2)}) is below the low band of Jesse's indicator (#{(jesse_value - @std_error).round(2)})").notification.deliver_now
     end
   end
 end

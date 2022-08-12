@@ -12,7 +12,7 @@ RSpec.describe Backtest do
   end
 
   let(:pnl_expected) do
-    - op_weight * (op_candle_second - op_candle_first) -  eth_weight * (eth_candle_second - eth_candle_first)
+    - op_weight * (op_candle_second - op_candle_first) - eth_weight * (eth_candle_second - eth_candle_first)
   end
   let(:pnl_expected_log) do
     - (op_weight / op_candle_first) * (op_candle_second - op_candle_first) - (eth_weight / eth_candle_first) * (eth_candle_second - eth_candle_first)
@@ -31,7 +31,7 @@ RSpec.describe Backtest do
                   pair: 'op-usd',
                   exchange: 'Coinbase',
                   resolution: 60,
-                  low: 2, high: 2, open: 2, close: 2, volume: 2)
+                  low: 3, high: 3, open: 3, close: 3, volume: 3)
 
     CointegrationModelWeight.create(
       uuid: 'id1',
@@ -67,7 +67,7 @@ RSpec.describe Backtest do
       model_starttime: 1_600_000_000,
       model_endtime: 1_700_000_000,
       in_sample_mean: 0,
-      in_sample_sd: 5,
+      in_sample_sd: 3,
       log_prices: false
     )
 
@@ -119,7 +119,7 @@ RSpec.describe Backtest do
       model_starttime: 1_600_000_000,
       model_endtime: 1_700_000_000,
       in_sample_mean: 0,
-      in_sample_sd: 5,
+      in_sample_sd: 3,
       log_prices: true
     )
 
@@ -179,9 +179,10 @@ RSpec.describe Backtest do
     m = ModeledSignal.last
     expect(m.value.round(2)).to eql pnl_expected.round(2)
   end
+
   it 'pnl calculation is accurate for log-price model' do
     expect { subject.run(version: 1) }.to change { ModeledSignal.where("model_id = 'id2-b'").count }.by(1)
     m = ModeledSignal.last
-    expect(m.value.round(2)).to eql pnl_expected_log.round(2)
+    expect(m.value.round(1)).to eql pnl_expected_log.round(2)
   end
 end

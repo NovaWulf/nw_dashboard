@@ -1,47 +1,83 @@
 class ModelUpdate < BaseService
   @r
   @RES_HOURS
+  SECS_PER_WEEK = 604_800
+  SECS_PER_HOUR = 3600
+  MODEL_VERSION = 2
+  MODEL_STARTDATES = ["'2022-06-13'", "'2022-06-11'", "'2022-07-12'"]
+  MODEL_ENDDATES = ["'2022-07-12'", "'2022-07-27'", "'2022-08-08'"]
   def seed
     @r = RAdapter.new
-    @r.cointegration_analysis(start_time_string: "'2022-07-18'", end_time_string: "'2022-08-02'",
-                              ecdet_param: "'const'")
-    first_model = CointegrationModel.last&.uuid
-    r_count = BacktestModel.where('version= 1 and sequence_number= 0').count
-    if r_count == 0
+    (0..(MODEL_STARTDATES.length - 1)).each do |date_ind|
+      return_vals = @r.cointegration_analysis(start_time_string: MODEL_STARTDATES[date_ind], end_time_string: MODEL_ENDDATES[date_ind],
+                                              ecdet_param: "'trend'")
+      first_model = return_vals[0]
+
+      puts "return val of seed model: #{return_vals}"
+      Rails.logger.info "return val of seed model: #{return_vals}"
+      Rails.logger.info "first model id: #{first_model}"
+      r_count = BacktestModel.where("version = #{MODEL_VERSION} and sequence_number= #{date_ind}").count
+      if r_count == 0
+        puts "no model detected for version #{MODEL_VERSION} ... creating new seed model"
+        Rails.logger.info "no model detected for version #{MODEL_VERSION} ... creating new seed model"
+
+        BacktestModel.create(
+          version: MODEL_VERSION,
+          model_id: first_model,
+          sequence_number: date_ind,
+          name: 'seed-log'
+        )
+      end
+      ArbitrageCalculator.run(version: MODEL_VERSION)
+      Backtest.run(version: MODEL_VERSION)
+    end
+
+    update_model
+  end
+
+  def update_model(version:, max_weeks_back:, min_weeks_back:, interval_mins:, as_of_time: nil)
+    ArbitrageCalculator.run(version: version)
+    Backtest.run(version: version)
+    last_candle_time = as_of_time || lastCandle.oldest_first.last&.starttime
+    sec_diff = SECS_PER_WEEK * (max_weeks_back - min_weeks_back)
+    @r = RAdapter.new
+    num_models = sec_diff / (60 * interval_mins) - 1
+    step_size = 60 * interval_mins
+    start_time = last_candle_time - SECS_PER_WEEK * max_weeks_back
+    coint_models = []
+    for i in 0..num_models
+      start_time += step_size
+      coint_models.append(@r.cointegration_analysis(start_time_string: start_time, end_time_string: last_candle_time,
+                                                    ecdet_param: "'const'"))
+      coint_models.append(@r.cointegration_analysis(start_time_string: start_time, end_time_string: last_candle_time,
+                                                    ecdet_param: "'trend'"))
+    end
+    test_stats = coint_models.map { |m| m[7].to_f }
+    start_times = coint_models.map { |m| m[10] }
+    uuids = coint_models.map { |m| m[0] }
+
+    max_test_stat = test_stats.max
+    max_test_stat_index = test_stats.index(max_test_stat)
+    max_test_stat_id = uuids[max_test_stat_index]
+    best_model = CointegrationModel.where("uuid = '#{max_test_stat_id}'").last
+    current_model = BacktestModel.where("version = #{version}").oldest_sequence_number_first.last
+    if best_model&.test_stat > best_model&.cv_10_pct
+      puts 'best new model is statistically valid with p<=.1. Auto-updating backtest models'
+      puts coint_models[max_test_stat_index]
       BacktestModel.create(
-        version: 1,
-        model_id: first_model,
-        sequence_number: 0,
-        name: 'seed-log'
+        version: version,
+        model_id: best_model&.uuid,
+        sequence_number: current_model&.sequence_number + 1,
+        name: "auto-update #{current_model&.sequence_number + 1}"
       )
+      ArbitrageCalculator.run(version: version)
+      Backtest.run(version: version)
     end
   end
 
-  def update_model(version:)
-    last_model = BacktestModel.by_version(version).oldest_first.last&.model_id
-    last_model_time = CointegrationModel.where("uuid = '#{last_model}'").last&.model_endtime
-    last_candle_time = Candle.oldest_first.last&.starttime
+  def update_jesse_model
     @r = RAdapter.new
-    num_models = (last_candle_time - last_model_time) / (3600 * @RES_HOURS) - 1
-    for i in 1..num_models
-      new_end_time = last_model_time + 3600 * @RES_HOURS * i
-      @r.cointegration_analysis(start_time_string: last_model_time, end_time_string: new_end_time)
-    end
-  end
-
-  def calc_updated_model(version:, max_months_back:, min_months_back:, res_hours:)
-    last_candle_time = Candle.oldest_first.last&.starttime
-    sec_diff = 2_628_000 * (max_months_back - min_months_back)
-    @r = RAdapter.new
-    num_models = sec_diff / (3600 * res_hours) - 1
-    start_time = last_candle_time - 2_628_000 * max_months_back
-    for i in 1..num_models
-      start_time += i * res_hours * 3600
-      puts "start time: #{start_time}, end time: #{last_candle_time}"
-      @r.cointegration_analysis(start_time_string: start_time, end_time_string: last_candle_time,
-                                ecdet_param: "'const'")
-      @r.cointegration_analysis(start_time_string: start_time, end_time_string: last_candle_time,
-                                ecdet_param: "'trend'")
-    end
+    resulVals = @r.jesse_analysis
+    JesseCalculator.run
   end
 end
