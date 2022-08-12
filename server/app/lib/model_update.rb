@@ -27,16 +27,16 @@ class ModelUpdate < BaseService
           sequence_number: date_ind,
           name: 'seed-log'
         )
+      else
+        Rails.logger.info "model detected for sequence_number= #{date_ind}... skipping creation of new seed model"
       end
-      ArbitrageCalculator.run(version: MODEL_VERSION)
+      ArbitrageCalculator.run(version: MODEL_VERSION, silent: true)
       Backtest.run(version: MODEL_VERSION)
     end
-
-    update_model
   end
 
   def update_model(version:, max_weeks_back:, min_weeks_back:, interval_mins:, as_of_time: nil)
-    ArbitrageCalculator.run(version: version)
+    ArbitrageCalculator.run(version: version, silent: true)
     Backtest.run(version: version)
     last_candle_time = as_of_time || lastCandle.oldest_first.last&.starttime
     sec_diff = SECS_PER_WEEK * (max_weeks_back - min_weeks_back)

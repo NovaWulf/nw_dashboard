@@ -1,8 +1,9 @@
 class ArbitrageCalculator < BaseService
-  attr_reader :version, :most_recent_model
+  attr_reader :version, :most_recent_model, :silent
 
-  def initialize(version:)
+  def initialize(version:, silent: false)
     @version = version
+    @silent = silent
   end
 
   def run
@@ -70,7 +71,7 @@ class ArbitrageCalculator < BaseService
     end
     Rails.logger.info "flat forward interpolated #{interp_count} values"
 
-    email_notification(m) if m
+    email_notification(m) if !silent && m
   end
 
   def email_notification(arb_signal, sigma = 1)

@@ -85,13 +85,3 @@ task try_update_models: :environment do
     mu.update_jesse_model
   end
 end
-
-task write_csvs: :environment do
-  CsvWriter.run
-end
-task jesse_analysis: :environment do
-  CsvWriter.run
-  r = RAdapter.new
-  r.jesse_analysis
-  JesseCalculator.run
-end
