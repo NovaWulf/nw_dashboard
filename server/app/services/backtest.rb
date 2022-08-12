@@ -1,5 +1,5 @@
 class Backtest < BaseService
-  @assets
+  @asset_names
   @asset_weights
   @cursor
   @model_starttime
@@ -17,7 +17,7 @@ class Backtest < BaseService
   @model_id
   @resolution
   @log_prices
-  MULTIPLIER = 1
+  MULTIPLIER = 2
   MAX_TRADE_SIZE_DOLLARS = 1000
   attr_accessor :model_id, :resolution, :model_starttime, :model_endtime, :in_sample_mean, :in_sample_sd, :assets,
                 :asset_weights, :num_ownable_assets, :num_obs, :positions, :prices, :pnl, :targets, :version
@@ -45,6 +45,7 @@ class Backtest < BaseService
 
   def load_model(version)
     @model_id = BacktestModel.where("version=#{version}").oldest_sequence_number_first.last&.model_id
+    puts "model id: #{@model_id}"
     model = CointegrationModel.where("uuid = '#{@model_id}'").last
     @log_prices = model&.log_prices
     @resolution = model.resolution
@@ -53,10 +54,12 @@ class Backtest < BaseService
     @in_sample_sd = model.in_sample_sd
     @in_sample_mean = model.in_sample_mean
     weights = CointegrationModelWeight.where("uuid = '#{@model_id}'")
-    @assets = weights.pluck(:asset_name)
-    @asset_weights = weights.pluck(:weight).uniq
-    @assets.delete('det')
-    @num_ownable_assets = @assets.length
+    assets = weights.pluck(:asset_name, :weight)
+    @asset_names = assets.map { |x| x[0] }
+    @asset_weights = assets.map { |x| x[1] }
+    @asset_names.delete('det')
+    Rails.logger.info "asset names class: #{@asset_names.class}"
+    @num_ownable_assets = @asset_names.length
     modeled_signal = ModeledSignal.where("model_id = '#{@model_id}'").oldest_first
     @signal = modeled_signal.pluck(:value)
     @starttimes = modeled_signal.pluck(:starttime)
@@ -69,7 +72,7 @@ class Backtest < BaseService
     @transactions = Array.new(@num_obs)
     @prices = Array.new(@num_ownable_assets) { Array.new(@num_obs) }
     @positions = Array.new(@num_ownable_assets) { Array.new(@num_obs) }
-    @prices =  PriceMerger.run(assets, signal_starttime, signal_endtime).value[1]
+    @prices =  PriceMerger.run(@asset_names, signal_starttime, signal_endtime).value[1]
   end
 
   def target_positions

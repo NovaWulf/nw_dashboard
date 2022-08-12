@@ -13,7 +13,7 @@ class CsvWriter < BaseService
     metric_file = "#{Rails.root}/public/metrics.csv"
     Rails.logger.info "writing csv to #{metric_file}"
     puts "writing csv to #{metric_file}"
-    start_date = Date.new(2022, 1, 1)
+    start_date = Date.new(2017, 1, 1)
     CSV.open(metric_file, 'w') do |writer|
       (start_date..Date.today).each do |day|
         s2f = Metric.by_token('btc').by_metric('s2f_ratio').by_day(day).all

@@ -4,8 +4,9 @@ class ModelUpdate < BaseService
   SECS_PER_WEEK = 604_800
   SECS_PER_HOUR = 3600
   MODEL_VERSION = 2
+  MODEL_VERSION = 2
   MODEL_STARTDATES = ["'2022-06-13'", "'2022-06-11'", "'2022-07-12'"]
-  MODEL_ENDDATES = ["'2022-07-12'", "'2022-07/27'", "'2022-08-08'"]
+  MODEL_ENDDATES = ["'2022-07-12'", "'2022-07-27'", "'2022-08-08'"]
   def seed
     @r = RAdapter.new
     (0..(MODEL_STARTDATES.length - 1)).each do |date_ind|
@@ -27,12 +28,16 @@ class ModelUpdate < BaseService
         sequence_number: date_ind,
         name: 'seed-log'
       )
+      ArbitrageCalculator.run(version: MODEL_VERSION)
+      Backtest.run(version: MODEL_VERSION)
     end
 
     update_model
   end
 
   def update_model(version:, max_weeks_back:, min_weeks_back:, interval_mins:, as_of_time: nil)
+    ArbitrageCalculator.run(version: version)
+    Backtest.run(version: version)
     last_candle_time = as_of_time || lastCandle.oldest_first.last&.starttime
     sec_diff = SECS_PER_WEEK * (max_weeks_back - min_weeks_back)
     @r = RAdapter.new
@@ -68,10 +73,13 @@ class ModelUpdate < BaseService
       ArbitrageCalculator.run(version: version)
       Backtest.run(version: version)
     end
+    ArbitrageCalculator.run(version: version)
+    Backtest.run(version: version)
   end
 
   def update_jesse_model
     @r = RAdapter.new
     resulVals = @r.jesse_analysis
+    JesseCalculator.run
   end
 end
