@@ -17,7 +17,7 @@ class Backtest < BaseService
   @model_id
   @resolution
   @log_prices
-  MULTIPLIER = 1
+  MULTIPLIER = 2
   MAX_TRADE_SIZE_DOLLARS = 1000
   attr_accessor :model_id, :resolution, :model_starttime, :model_endtime, :in_sample_mean, :in_sample_sd, :assets,
                 :asset_weights, :num_ownable_assets, :num_obs, :positions, :prices, :pnl, :targets, :version

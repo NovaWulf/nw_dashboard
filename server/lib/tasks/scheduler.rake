@@ -69,20 +69,18 @@ task update_arb_signal: :environment do
   CsvWriter.run
   mu = ModelUpdate.new
   mu.seed
-  ArbitrageCalculator.run(version: 2)
-  Backtest.run(version: 2)
 end
 
-task try_update_model: :environment do
-  tracked_pairs = %w[eth-usd op-usd]
-  tracked_pairs.each do |p|
-    Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
+task try_update_models: :environment do
+  if Time.now.sunday?
+    tracked_pairs = %w[eth-usd op-usd]
+    tracked_pairs.each do |p|
+      Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
+    end
+    Rails.logger.info 'writing candle data to CSV...'
+    CsvWriter.run
+    mu = ModelUpdate.new
+    mu.update_model(version: 2, max_weeks_back: 8, min_weeks_back: 3, interval_mins: 1440)
+    # ,  as_of_time: 1_659_976_080
   end
-  Rails.logger.info 'writing candle data to CSV...'
-  CsvWriter.run
-  mu = ModelUpdate.new
-  mu.update_model(version: 2, max_weeks_back: 4, min_weeks_back: 3, interval_mins: 1440,
-                  as_of_time: 1_659_976_080)
-  ArbitrageCalculator.run(version: 2)
-  Backtest.run(version: 2)
 end

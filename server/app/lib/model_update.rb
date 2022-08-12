@@ -4,25 +4,32 @@ class ModelUpdate < BaseService
   SECS_PER_WEEK = 604_800
   SECS_PER_HOUR = 3600
   MODEL_VERSION = 2
+  MODEL_VERSION = 2
+  MODEL_STARTDATES = ["'2022-06-13'", "'2022-06-11'", "'2022-07-12'"]
+  MODEL_ENDDATES = ["'2022-07-12'", "'2022-07-27'", "'2022-08-08'"]
   def seed
     @r = RAdapter.new
-    return_vals = @r.cointegration_analysis(start_time_string: "'2022-06-13'", end_time_string: "'2022-07-12'",
-                                            ecdet_param: "'const'")
-    first_model = return_vals[0]
+    (0..(MODEL_STARTDATES.length - 1)).each do |date_ind|
+      return_vals = @r.cointegration_analysis(start_time_string: MODEL_STARTDATES[date_ind], end_time_string: MODEL_ENDDATES[date_ind],
+                                              ecdet_param: "'trend'")
+      first_model = return_vals[0]
 
-    Rails.logger.info "return val of seed model: #{return_vals}"
-    Rails.logger.info "first model id: #{first_model}"
-    r_count = BacktestModel.where("version= #{MODEL_VERSION} and sequence_number= 0").count
-    if r_count == 0
+      Rails.logger.info "return val of seed model: #{return_vals}"
+      Rails.logger.info "first model id: #{first_model}"
+      r_count = BacktestModel.where("version = #{MODEL_VERSION} and sequence_number= #{date_ind}").count
+      next unless r_count == 0
+
       puts "no model detected for version #{MODEL_VERSION} ... creating new seed model"
       Rails.logger.info "no model detected for version #{MODEL_VERSION} ... creating new seed model"
 
       BacktestModel.create(
         version: MODEL_VERSION,
         model_id: first_model,
-        sequence_number: 0,
+        sequence_number: date_ind,
         name: 'seed-log'
       )
+      ArbitrageCalculator.run(version: MODEL_VERSION)
+      Backtest.run(version: MODEL_VERSION)
     end
   end
 
@@ -60,5 +67,7 @@ class ModelUpdate < BaseService
         name: "auto-update #{current_model&.sequence_number + 1}"
       )
     end
+    ArbitrageCalculator.run(version: version)
+    Backtest.run(version: version)
   end
 end
