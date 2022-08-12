@@ -4,7 +4,6 @@ class ModelUpdate < BaseService
   SECS_PER_WEEK = 604_800
   SECS_PER_HOUR = 3600
   MODEL_VERSION = 2
-  MODEL_VERSION = 2
   MODEL_STARTDATES = ["'2022-06-13'", "'2022-06-11'", "'2022-07-12'"]
   MODEL_ENDDATES = ["'2022-07-12'", "'2022-07-27'", "'2022-08-08'"]
   def seed
@@ -14,20 +13,21 @@ class ModelUpdate < BaseService
                                               ecdet_param: "'trend'")
       first_model = return_vals[0]
 
+      puts "return val of seed model: #{return_vals}"
       Rails.logger.info "return val of seed model: #{return_vals}"
       Rails.logger.info "first model id: #{first_model}"
       r_count = BacktestModel.where("version = #{MODEL_VERSION} and sequence_number= #{date_ind}").count
-      next unless r_count == 0
+      if r_count == 0
+        puts "no model detected for version #{MODEL_VERSION} ... creating new seed model"
+        Rails.logger.info "no model detected for version #{MODEL_VERSION} ... creating new seed model"
 
-      puts "no model detected for version #{MODEL_VERSION} ... creating new seed model"
-      Rails.logger.info "no model detected for version #{MODEL_VERSION} ... creating new seed model"
-
-      BacktestModel.create(
-        version: MODEL_VERSION,
-        model_id: first_model,
-        sequence_number: date_ind,
-        name: 'seed-log'
-      )
+        BacktestModel.create(
+          version: MODEL_VERSION,
+          model_id: first_model,
+          sequence_number: date_ind,
+          name: 'seed-log'
+        )
+      end
       ArbitrageCalculator.run(version: MODEL_VERSION)
       Backtest.run(version: MODEL_VERSION)
     end

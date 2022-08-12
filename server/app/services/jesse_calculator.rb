@@ -3,11 +3,9 @@ class JesseCalculator < BaseService
     fetch_required_data
 
     last_jesse_model = JesseModel.newest_first.last&.id
-    puts "last jesse model: #{last_jesse_model}"
     assets = JesseModelWeight.where("jesse_models_id=#{last_jesse_model}").pluck(:weight, :metric_name)
     weights = assets.map { |x| x[0] }
     metric_names = assets.map { |x| x[1] }
-    puts "metric names: #{metric_names}, weights: #{weights}"
     last_date = Metric.by_token('btc').by_metric('jesse').last&.timestamp
     return if last_date && last_date >= Date.today
 
@@ -19,7 +17,6 @@ class JesseCalculator < BaseService
     gt_ind = metric_names.index('google_trends')
     intercept_ind = metric_names.index('(Intercept)')
 
-    puts "aa ind: #{aa_ind} s2f ind: #{s2f_ind}"
     s2f_coef = weights[s2f_ind]
     hr_coef = weights[hr_ind]
     aa_coef = weights[aa_ind]
@@ -50,13 +47,11 @@ class JesseCalculator < BaseService
         Rails.logger.error "can't generate Jesse metric, no google_trends for #{day}"
         next
       end
-      puts "s2f_coef: #{s2f_coef} hr_coef: #{hr_coef} gt_coef: #{gt_coef} aa_coef: #{aa_coef}"
       value = s2f.value * s2f_coef +
               hash_rate.value * hr_coef +
               google_trends.value * gt_coef +
               (active_addresses.value * active_addresses.value) * aa_coef +
               intercept_coef
-      puts "value: #{value}"
       m = Metric.create(timestamp: day, value: value, token: 'btc', metric: 'jesse')
     end
 
