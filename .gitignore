@@ -2,4 +2,5 @@
 server/.RData
 server/.Rhistory
 server/public/data.csv
+server/public/metrics.csv
 server/*.png
