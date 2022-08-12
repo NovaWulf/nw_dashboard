@@ -12,16 +12,16 @@ class RAdapter
   end
 
   def cointegration_analysis(start_time_string:, end_time_string:, ecdet_param:)
+    Rails.logger.info "creating cointegration model with start time #{start_time_string},
+      end time #{end_time_string} ecdet_param #{ecdet_param}"
     @R.eval <<-EOF
         print(getwd())
         source("./cointegrationAnalysis.R")
         returnVals = fitModel(#{start_time_string},#{end_time_string},ecdet_param = #{ecdet_param})
     EOF
     return_vals = @R.pull 'returnVals'
-    model_vals = write_model_to_db(return_vals: return_vals)
-    Rails.logger.info "number of cointegration models: #{CointegrationModel.count}"
-    puts "returning model vals: #{model_vals}"
-    model_vals
+    Rails.logger.info "Return Vals from R: #{return_vals}"
+    write_model_to_db(return_vals: return_vals)
   end
 
   def write_model_to_db(return_vals:)
@@ -75,11 +75,11 @@ class RAdapter
     cv
   end
 
-  def jesse_analysis(start_time_string:, end_time_string:)
+  def jesse_analysis
     @R.eval <<-EOF
         print(getwd())
         source("./calculateJesseModel.R")
-        finalJSON = fitJesseModel(#{start_time_string},#{end_time_string})
+        finalJSON = fitJesseModel()
     EOF
     final_json = @R.pull 'finalJSON'
     model_vals = write_jesse_model_to_db(final_json: final_json)
@@ -91,7 +91,6 @@ class RAdapter
     puts "parsed json: #{parsed_json.keys}"
     jesse_model = parsed_json['model']
     jesse_model_weights = parsed_json['model_weights']
-    puts "jesse_model: #{jesse_model}"
 
     j = JesseModel.create(
       standard_error: jesse_model['standard_error'][0],
@@ -104,16 +103,13 @@ class RAdapter
     names = jesse_model_weights['names']
     coefs = jesse_model_weights['coefs']
 
-    puts "names: #{names}"
-    puts "coefs: #{coefs}"
-    puts "id: #{j.id}"
     (0..(names.length - 1)).each do |w|
       puts 'adding jesse model weight'
-      puts "name: #{names[w].to_f} coef: #{coefs[w].to_f} id: #{j&.id.to_i}"
+      puts "name: #{names[w]} coef: #{coefs[w].to_f} id: #{j&.id.to_i}"
       JesseModelWeight.create!(
-        metric_name: names[w].to_f,
+        metric_name: names[w].to_s,
         weight: coefs[w].to_f,
-        jesse_models_id: j
+        jesse_models_id: j&.id
       )
     end
   end

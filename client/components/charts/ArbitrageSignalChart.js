@@ -1,5 +1,5 @@
 import { useTheme } from '@mui/material';
-import { useQuery, gql } from '@apollo/client'
+import { useQuery, gql } from '@apollo/client';
 import {
   CartesianGrid,
   Legend,
@@ -8,7 +8,7 @@ import {
   ResponsiveContainer,
   Tooltip,
   YAxis,
-  ReferenceLine
+  ReferenceLine,
 } from 'recharts';
 import { Skeleton } from '@mui/material';
 import Grid from '@mui/material/Grid';
@@ -20,135 +20,141 @@ import CsvDownloadLink from 'components/CsvDownloadLink';
 
 export default function ArbitrageSignalChart({seqNumber}) {
   console.log("seqNumber in signal chart: " + seqNumber)
-  
+  const version = 2
   // console.log("seqNumber in signal chart: " + JSON.stringify(seqNumber))
   const QUERY = gql`
   query ($seqNumber: Int){
 
-    cointegrationModelInfo(version:1,sequenceNumber:$seqNumber) {
+    cointegrationModelInfo(version:2,sequenceNumber:$seqNumber) {
       inSampleMean
       inSampleSd
       uuid
       id
       modelEndtime
+      modelStarttime
     }
 
-    arbSignalModel(version: 1,sequenceNumber:$seqNumber) {
+    arbSignalModel(version: 2,sequenceNumber:$seqNumber) {
       ts
       v
       is
     }
   }
-`;
-  const { data, loading, error } = useQuery(QUERY);
+  `;
+  const { data, loading, error } = useQuery(QUERY, {
+    variables: { seqNumber },
+  });
 
-  const {
-    cointegrationModelInfo,
-    arbSignalModel,
-  } = data || {};
+  const { cointegrationModelInfo, arbSignalModel } = data || {};
 
   if (error) {
     console.error(error);
     return null;
   }
-  const SIGMA = 3;
+  const SIGMA = 1;
 
-  let mean,sd,isEndDate,updatedData
-  if (data){
-    mean=cointegrationModelInfo[0].inSampleMean
-    sd = cointegrationModelInfo[0].inSampleSd
-    isEndDate = cointegrationModelInfo[0].modelEndtime
+  let mean, sd, isEndDate,isStartDate, updatedData;
+  if (data) {
+    mean = cointegrationModelInfo[0].inSampleMean;
+    console.log("in sample mean: " + mean)
+    sd = cointegrationModelInfo[0].inSampleSd;
+    isEndDate = cointegrationModelInfo[0].modelEndtime;
+    isStartDate = cointegrationModelInfo[0].modelStarttime;
     updatedData = arbSignalModel.map(d => {
-      console.log("sd: " + Math.floor(100*(- SIGMA * sd)))
+      console.log('sd: ' + Math.floor(100 * (-SIGMA * sd)));
       return {
         ts: d.ts,
-        v: Math.floor(100*(d.v-mean)),
+        v: Math.floor(100 * (d.v - mean)),
         // is: d.is,
-        arbLow: Math.floor(100*(- SIGMA * sd)),
-        arbHigh: Math.floor(100*( SIGMA * sd)),
+        arbLow: Math.floor(100 * (-SIGMA * sd)),
+        arbHigh: Math.floor(100 * (SIGMA * sd)),
         arbMean: Math.floor(0),
       };
     });
-  } 
+  }
 
   const theme = useTheme();
   console.log('mean: ' + mean + ', sd: ' + sd);
-  
 
   return (
     <Grid item sx={{ display: 'flex' }} xs={12} md={12}>
-        {loading ? (
-          <Skeleton variant="rectangular" />
-        ) : (
-          <DashboardItem
-            title="OP-ETH Arbitrage Indicator"
-            helpText="Arbitrage Indicator looks at the value of the mean reverting portfolio of assets"
-            downloadButton={
-              <CsvDownloadLink data={updatedData} title="Arbitrage Indicator" />
-            }
-          >
-            <ResponsiveContainer width="99%" height={300}>
-              <LineChart
-                data={updatedData}
-                margin={{ top: 5, right: 15, bottom: 5, left: 0 }}
-              >
-                <ReferenceLine
-                  strokeDasharray="3 3"
-                  yAxisId="spread"
-                  x={isEndDate}
-                  stroke="red"
-                />
-                <Line
-                  type="monotone"
-                  dataKey="arbMean"
-                  name="mean spread"
-                  stroke="red"
-                  yAxisId="spread"
-                  dot={false}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="arbLow"
-                  name="Low Range"
-                  stroke="green"
-                  dot={false}
-                  yAxisId="spread"
-                />
-                <Line
-                  type="monotone"
-                  dataKey="arbHigh"
-                  name="High Range"
-                  stroke="green"
-                  dot={false}
-                  yAxisId="spread"
-                />
-                <Line
-                  type="monotone"
-                  dataKey="v"
-                  name="spread value"
-                  stroke={theme.palette.secondary.secondary}
-                  yAxisId="spread"
-                  dot={false}
-                />
+      {loading ? (
+        <Skeleton variant="rectangular" />
+      ) : (
+        <DashboardItem
+          title="OP-ETH Arbitrage Indicator"
+          helpText="Arbitrage Indicator looks at the value of the mean reverting portfolio of assets"
+          downloadButton={
+            <CsvDownloadLink data={updatedData} title="Arbitrage Indicator" />
+          }
+        >
+          <ResponsiveContainer width="99%" height={300}>
+            <LineChart
+              data={updatedData}
+              margin={{ top: 5, right: 15, bottom: 5, left: 0 }}
+            >
+              <ReferenceLine
+                strokeDasharray="3 3"
+                yAxisId="spread"
+                x={isEndDate}
+                stroke="red"
+              />
+               <ReferenceLine
+                strokeDasharray="3 3"
+                yAxisId="spread"
+                x={isStartDate}
+                stroke="red"
+              />
+              <Line
+                type="monotone"
+                dataKey="arbMean"
+                name="mean spread"
+                stroke="red"
+                yAxisId="spread"
+                dot={false}
+              />
+              <Line
+                type="monotone"
+                dataKey="arbLow"
+                name="Low Range"
+                stroke="green"
+                dot={false}
+                yAxisId="spread"
+              />
+              <Line
+                type="monotone"
+                dataKey="arbHigh"
+                name="High Range"
+                stroke="green"
+                dot={false}
+                yAxisId="spread"
+              />
+              <Line
+                type="monotone"
+                dataKey="v"
+                name="spread value"
+                stroke={theme.palette.secondary.secondary}
+                yAxisId="spread"
+                dot={false}
+              />
 
-                <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-                {TimeAxisHighRes()}
+              <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
+              {TimeAxisHighRes()}
 
-                <YAxis
-                  yAxisId="spread"
-                  orientation="left"
-                  tickFormatter={percentFormatter}
-                  stroke={theme.palette.primary.main}
-                  domain={[-30, 30]}
-                />
+              <YAxis
+                yAxisId="spread"
+                orientation="left"
+                tickFormatter={percentFormatter}
+                stroke={theme.palette.primary.main}
+                domain={[-30, 30]}
+              />
 
-                <Tooltip labelFormatter={dateFormatter} />
-                <Legend />
-              </LineChart>
-            </ResponsiveContainer>
-          </DashboardItem>
-        )}
-      </Grid>
-    
+              <Tooltip labelFormatter={dateFormatter} />
+              <Legend />
+            </LineChart>
+          </ResponsiveContainer>
+        </DashboardItem>
+      )}
+    </Grid>
   );
 }

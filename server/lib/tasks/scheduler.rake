@@ -65,11 +65,12 @@ task update_arb_signal: :environment do
     Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
   end
   Rails.logger.info 'writing candle data to CSV...'
+  puts 'writing candle data to CSV...'
   CsvWriter.run
   mu = ModelUpdate.new
   mu.seed
-  ArbitrageCalculator.run(version: 1)
-  Backtest.run(version: 1)
+  ArbitrageCalculator.run(version: 2)
+  Backtest.run(version: 2)
 end
 
 task try_update_model: :environment do
@@ -80,14 +81,17 @@ task try_update_model: :environment do
   Rails.logger.info 'writing candle data to CSV...'
 
   mu = ModelUpdate.new
-  mu.update_model(version: 1, max_weeks_back: 4, min_weeks_back: 3, interval_mins: 1440, as_of_time: 1_659_976_080)
-  ArbitrageCalculator.run(version: 1)
-  Backtest.run(version: 1)
+  mu.update_model(version: 2, max_weeks_back: 8, min_weeks_back: 3, interval_mins: 1440,
+                  as_of_time: 1659947993)
+  mu.update_jesse_model
+  ArbitrageCalculator.run(version: 2)
+  Backtest.run(version: 2)
 end
 task write_csvs: :environment do
   CsvWriter.run
 end
 task jesse_analysis: :environment do
   r  = RAdapter.new
-  r.jesse_analysis(start_time_string: '2018-01-01', end_time_string: '2022-08-01')
+  r.jesse_analysis
+  JesseCalculator.run
 end

@@ -21,4 +21,6 @@
 
 class JesseModelWeight < ApplicationRecord
   belongs_to :jesse_model, optional: true
+  ->(p) { where(asset_name: p) }
+  scope :by_id, ->(id) { where("jesse_models_id=#{id}") }
 end

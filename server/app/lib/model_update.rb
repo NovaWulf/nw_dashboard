@@ -3,20 +3,33 @@ class ModelUpdate < BaseService
   @RES_HOURS
   SECS_PER_WEEK = 604_800
   SECS_PER_HOUR = 3600
+  MODEL_VERSION = 2
+  MODEL_STARTDATES = ["'2022-06-13'", "'2022-06-11'", "'2022-07-12'"]
+  MODEL_ENDDATES = ["'2022-07-12'", "'2022-07/27'", "'2022-08-08'"]
   def seed
     @r = RAdapter.new
-    @r.cointegration_analysis(start_time_string: "'2022-07-18'", end_time_string: "'2022-08-02'",
-                              ecdet_param: "'const'")
-    first_model = CointegrationModel.last&.uuid
-    r_count = BacktestModel.where('version= 1 and sequence_number= 0').count
-    if r_count == 0
+    (0..(MODEL_STARTDATES.length - 1)).each do |date_ind|
+      return_vals = @r.cointegration_analysis(start_time_string: MODEL_STARTDATES[date_ind], end_time_string: MODEL_ENDDATES[date_ind],
+                                              ecdet_param: "'trend'")
+      first_model = return_vals[0]
+
+      Rails.logger.info "return val of seed model: #{return_vals}"
+      Rails.logger.info "first model id: #{first_model}"
+      r_count = BacktestModel.where("version = #{MODEL_VERSION} and sequence_number= #{date_ind}").count
+      next unless r_count == 0
+
+      puts "no model detected for version #{MODEL_VERSION} ... creating new seed model"
+      Rails.logger.info "no model detected for version #{MODEL_VERSION} ... creating new seed model"
+
       BacktestModel.create(
-        version: 1,
+        version: MODEL_VERSION,
         model_id: first_model,
-        sequence_number: 0,
+        sequence_number: date_ind,
         name: 'seed-log'
       )
     end
+
+    update_model
   end
 
   def update_model(version:, max_weeks_back:, min_weeks_back:, interval_mins:, as_of_time: nil)
@@ -29,8 +42,8 @@ class ModelUpdate < BaseService
     coint_models = []
     for i in 0..num_models
       start_time += step_size
-      @r.cointegration_analysis(start_time_string: start_time, end_time_string: last_candle_time,
-                                ecdet_param: "'const'")
+      coint_models.append(@r.cointegration_analysis(start_time_string: start_time, end_time_string: last_candle_time,
+                                                    ecdet_param: "'const'"))
       coint_models.append(@r.cointegration_analysis(start_time_string: start_time, end_time_string: last_candle_time,
                                                     ecdet_param: "'trend'"))
     end
@@ -40,7 +53,6 @@ class ModelUpdate < BaseService
 
     max_test_stat = test_stats.max
     max_test_stat_index = test_stats.index(max_test_stat)
-    max_test_stat_time = start_times[max_test_stat_index]
     max_test_stat_id = uuids[max_test_stat_index]
     best_model = CointegrationModel.where("uuid = '#{max_test_stat_id}'").last
     current_model = BacktestModel.where("version = #{version}").oldest_sequence_number_first.last
@@ -53,6 +65,13 @@ class ModelUpdate < BaseService
         sequence_number: current_model&.sequence_number + 1,
         name: "auto-update #{current_model&.sequence_number + 1}"
       )
+      ArbitrageCalculator.run(version: version)
+      Backtest.run(version: version)
     end
+  end
+
+  def update_jesse_model
+    @r = RAdapter.new
+    resulVals = @r.jesse_analysis
   end
 end

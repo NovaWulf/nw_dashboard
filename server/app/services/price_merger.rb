@@ -1,4 +1,4 @@
-class PriceProcessor < BaseService
+class PriceMerger < BaseService
   attr_reader :asset_names, :start_time, :end_time
 
   def initialize(asset_names, start_time = nil, end_time = nil)
@@ -18,14 +18,15 @@ class PriceProcessor < BaseService
     t1.close as #{asset_aliases[0]},
     t2.close as #{asset_aliases[1]}
     from candles t1
-    inner join candles t2
+    full outer join candles t2
     on t1.starttime=t2.starttime
-    where t1.pair='#{asset_names[0]}' and t2.pair='#{asset_names[1]}'
+    and t1.pair='#{asset_names[0]}' and t2.pair='#{asset_names[1]}'
+    where t1.pair='#{asset_names[0]}' or t2.pair='#{asset_names[1]}'
     order by t1.starttime asc
     "
     puts "start time in price processor: #{start_time}"
     records_array = ActiveRecord::Base.connection.execute(sql)
-    puts "number of records in processor (inner join): #{records_array.count}"
+    puts "number of records in processor (outer join): #{records_array.count}"
     starttimes = records_array.pluck('starttime')
     prices = asset_aliases.map { |a| records_array.pluck(a) }
 

@@ -1,26 +1,22 @@
 class ArbitrageCalculator < BaseService
-  attr_reader :version
+  attr_reader :version, :most_recent_model
 
   def initialize(version:)
     @version = version
   end
 
   def run
-    puts "version: #{version}"
     most_recent_backtest_model = BacktestModel.where("version = #{version}").oldest_sequence_number_first.last
     most_recent_model_id = most_recent_backtest_model&.model_id
-    most_recent_model = CointegrationModel.where("uuid='#{most_recent_model_id}'").last
+    @most_recent_model = CointegrationModel.where("uuid='#{most_recent_model_id}'").last
     det_type = most_recent_model&.ecdet
     log_prices = most_recent_model&.log_prices
     res = most_recent_model&.resolution
     last_in_sample_timestamp = most_recent_model&.model_endtime
     first_in_sample_timestamp = most_recent_model&.model_starttime
-    puts "most recent #{most_recent_model_id}, first_in_sample_timestamp: #{first_in_sample_timestamp}"
-
     assets = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}'").pluck(:weight, :asset_name)
     asset_weights = assets.map { |x| x[0] }
     asset_names = assets.map { |x| x[1] }
-    puts " asset names: #{asset_names}  , asset weights: #{asset_weights}"
     det_index = asset_names.index('det')
     det_weight = asset_weights[det_index]
     asset_weights.delete_at(det_index)
@@ -28,13 +24,20 @@ class ArbitrageCalculator < BaseService
     last_timestamp = ModeledSignal.by_model(most_recent_model_id).last&.starttime
     return if last_timestamp && last_timestamp > Time.now.to_i - res
 
+    last_prices = [nil, nil]
+    if last_timestamp
+      last_prices = asset_names.map do |name|
+        Candle.where("starttime<=#{last_timestamp} and pair = '#{name}'").oldest_first.last&.close
+      end
+    end
+
+    first_timestamps = asset_names.map { |a| Candle.where("pair = '#{a}'").oldest_first.first&.starttime }
+    later_first_timestamp = first_timestamps.max
     start_time = last_timestamp ? last_timestamp + res : first_in_sample_timestamp
-    puts "start time: #{start_time}"
-    flat_records = PriceProcessor.run(asset_names, start_time).value
+    flat_records = PriceMerger.run(asset_names, start_time).value
     starttimes = flat_records[0]
     prices = flat_records[1]
-
-    signal_value_det = 0
+    interp_count = 0
     for time_step in 0..(starttimes.length - 1)
       signal_value = if det_type == 'const'
                        det_weight
@@ -44,6 +47,15 @@ class ArbitrageCalculator < BaseService
                        0
                      end
       for i in 0..(asset_weights.length - 1)
+        if prices[i][time_step].nil?
+          prices[i][time_step] = last_prices[i]
+          interp_count += 1
+          Candle.create(starttime: starttimes[time_step], pair: asset_names[i], exchange: 'Coinbase', resolution: res,
+                        low: last_prices[i], high: last_prices[i], open: last_prices[i], close: last_prices[i], volume: last_prices[i], interpolated: true)
+        else
+          last_prices[i] = prices[i][time_step]
+        end
+
         signal_value += if log_prices
                           asset_weights[i] * Math.log(prices[i][time_step])
                         else
@@ -54,14 +66,17 @@ class ArbitrageCalculator < BaseService
       m = ModeledSignal.create(starttime: starttimes[time_step], model_id: most_recent_model_id, resolution: res, value: signal_value,
                                in_sample: in_sample_flag)
     end
+    Rails.logger.info "flat forward interpolated #{interp_count} values"
 
-    # email_notification(m) if m
+    email_notification(m) if m
   end
 
   def email_notification(arb_signal, sigma = 1)
-    most_recent_model = CointegrationModel.newest_first.first
+    Rails.logger.info 'inside email notif'
+    Rails.logger.info "most_recent_model: #{most_recent_model&.uuid}"
     in_sample_mean = most_recent_model&.in_sample_mean
     in_sample_sd = most_recent_model&.in_sample_sd
+    puts "most_recent_model: #{most_recent_model&.uuid}"
     return unless arb_signal && most_recent_model
 
     signal_value = arb_signal.value
