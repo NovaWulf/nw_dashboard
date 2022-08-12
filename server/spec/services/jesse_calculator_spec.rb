@@ -59,7 +59,7 @@ RSpec.describe JesseCalculator do
     JesseModelWeight.create(
       jesse_models_id: 1,
       metric_name: 'active_addresses_sq',
-      weight: 0.4
+      weight: 0.00000000000000004
     )
     JesseModelWeight.create(
       jesse_models_id: 1,
@@ -69,7 +69,7 @@ RSpec.describe JesseCalculator do
     JesseModelWeight.create(
       jesse_models_id: 1,
       metric_name: 'hash_rate',
-      weight: 0.6
+      weight: 0.000000000000000006
     )
 
     Rails.logger.info "number of jesse models in test: #{JesseModel.count}"
@@ -80,6 +80,8 @@ RSpec.describe JesseCalculator do
     m = Metric.last
     expect(m.token).to eql 'btc'
     expect(m.metric).to eql 'jesse'
+    puts "m value: #{m.value.round(2)}"
+    puts "intended: #{jesse_intended_price.round}"
     expect(m.value.round(2)).to eql jesse_intended_price.round(2)
     expect(m.timestamp).to eql Date.today
   end
