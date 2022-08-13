@@ -13,9 +13,8 @@ class ModelUpdate < BaseService
                                               ecdet_param: "'trend'")
       first_model = return_vals[0]
 
-      puts "return val of seed model: #{return_vals}"
       Rails.logger.info "return val of seed model: #{return_vals}"
-      Rails.logger.info "first model id: #{first_model}"
+      Rails.logger.info "MODEL ID: #{first_model}"
       r_count = BacktestModel.where("version = #{MODEL_VERSION} and sequence_number= #{date_ind}").count
       if r_count == 0
         puts "no model detected for version #{MODEL_VERSION} ... creating new seed model"
@@ -30,7 +29,7 @@ class ModelUpdate < BaseService
       else
         Rails.logger.info "model detected for sequence_number= #{date_ind}... skipping creation of new seed model"
       end
-      puts "num backtest models: #{BacktestModel.where("version=#{version}").count}" 
+      puts "num backtest models: #{BacktestModel.where("version=#{version}").count}"
       puts "unique model_ids: #{BacktestModel.pluck(:model_id).uniq}"
       ArbitrageCalculator.run(version: MODEL_VERSION, silent: true)
       Backtest.run(version: MODEL_VERSION)
