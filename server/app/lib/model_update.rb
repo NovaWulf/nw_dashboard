@@ -29,7 +29,7 @@ class ModelUpdate < BaseService
       else
         Rails.logger.info "model detected for sequence_number= #{date_ind}... skipping creation of new seed model"
       end
-      puts "num backtest models: #{BacktestModel.where("version=#{version}").count}"
+      puts "num backtest models: #{BacktestModel.where("version=#{MODEL_VERSION}").count}"
       puts "unique model_ids: #{BacktestModel.pluck(:model_id).uniq}"
       ArbitrageCalculator.run(version: MODEL_VERSION, silent: true)
       Backtest.run(version: MODEL_VERSION)
