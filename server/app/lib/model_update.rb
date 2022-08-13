@@ -30,6 +30,8 @@ class ModelUpdate < BaseService
       else
         Rails.logger.info "model detected for sequence_number= #{date_ind}... skipping creation of new seed model"
       end
+      puts "num backtest models: #{BacktestModel.where("version=#{version}").count}" 
+      puts "unique model_ids: #{BacktestModel.pluck(:model_id).uniq}"
       ArbitrageCalculator.run(version: MODEL_VERSION, silent: true)
       Backtest.run(version: MODEL_VERSION)
     end
@@ -38,7 +40,7 @@ class ModelUpdate < BaseService
   def update_model(version:, max_weeks_back:, min_weeks_back:, interval_mins:, as_of_time: nil)
     ArbitrageCalculator.run(version: version, silent: true)
     Backtest.run(version: version)
-    last_candle_time = as_of_time || lastCandle.oldest_first.last&.starttime
+    last_candle_time = as_of_time || Candle.oldest_first.last&.starttime
     sec_diff = SECS_PER_WEEK * (max_weeks_back - min_weeks_back)
     @r = RAdapter.new
     num_models = sec_diff / (60 * interval_mins) - 1

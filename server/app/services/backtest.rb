@@ -44,8 +44,8 @@ class Backtest < BaseService
   private
 
   def load_model(version)
+    Rai "num backtest models in load_model: #{BacktestModel.count}"
     @model_id = BacktestModel.where("version=#{version}").oldest_sequence_number_first.last&.model_id
-    puts "model id: #{@model_id}"
     model = CointegrationModel.where("uuid = '#{@model_id}'").last
     @log_prices = model&.log_prices
     @resolution = model.resolution
