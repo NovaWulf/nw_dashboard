@@ -8,34 +8,86 @@ class ModelUpdate < BaseService
   MODEL_ENDDATES = ["'2022-07-12'", "'2022-07-27'", "'2022-08-08'"]
   def seed
     @r = RAdapter.new
-    (0..(MODEL_STARTDATES.length - 1)).each do |date_ind|
-      return_vals = @r.cointegration_analysis(start_time_string: MODEL_STARTDATES[date_ind], end_time_string: MODEL_ENDDATES[date_ind],
-                                              ecdet_param: "'trend'")
-      first_model = return_vals[0]
+    return_vals = @r.cointegration_analysis(start_time_string: MODEL_STARTDATES[0], end_time_string: MODEL_ENDDATES[0],
+                                            ecdet_param: "'trend'")
+    first_model = return_vals[0]
 
-      Rails.logger.info "return val of seed model: #{return_vals}"
-      Rails.logger.info "MODEL ID: #{first_model}"
-      r_count = BacktestModel.where("version = #{MODEL_VERSION} and sequence_number= #{date_ind}").count
-      if r_count == 0
-        Rails.logger.info "no model detected for version #{MODEL_VERSION} seq #{date_ind}... creating new seed model"
+    Rails.logger.info "return val of seed model: #{return_vals}"
+    Rails.logger.info "MODEL ID: #{first_model}"
+    r_count = BacktestModel.where("version = #{MODEL_VERSION} and sequence_number= 0").count
+    if r_count == 0
+      Rails.logger.info "no model detected for version #{MODEL_VERSION} seq 0... creating new seed model"
 
-        BacktestModel.create(
-          version: MODEL_VERSION,
-          model_id: first_model,
-          sequence_number: date_ind,
-          name: 'seed-log'
-        )
-      else
-        model_detected = BacktestModel.where("version = #{MODEL_VERSION} and sequence_number= #{date_ind}").last&.model_id
-        Rails.logger.info "model #{model_detected} detected for sequence_number= #{date_ind}... skipping creation of new seed model"
-      end
-      Rails.logger.info "num backtest models: #{BacktestModel.where("version=#{MODEL_VERSION}").count}"
-      Rails.logger.info "unique model_ids: #{BacktestModel.pluck(:model_id).uniq}"
-      ArbitrageCalculator.run(version: MODEL_VERSION, silent: true)
-      Rails.logger.info "arbitrage calculator complete for seed model #{date_ind}"
-      Backtest.run(version: MODEL_VERSION)
-      Rails.logger.info "backtester complete for seed model #{date_ind}"
+      BacktestModel.create(
+        version: MODEL_VERSION,
+        model_id: first_model,
+        sequence_number: 0,
+        name: 'seed-log'
+      )
+    else
+      model_detected = BacktestModel.where("version = #{MODEL_VERSION} and sequence_number= 0").last&.model_id
+      Rails.logger.info "model #{model_detected} detected for sequence_number= 0... skipping creation of new seed model"
     end
+    Rails.logger.info "num backtest models: #{BacktestModel.where("version=#{MODEL_VERSION}").count}"
+    Rails.logger.info "unique model_ids: #{BacktestModel.pluck(:model_id).uniq}"
+    ArbitrageCalculator.run(version: MODEL_VERSION, silent: true)
+    Rails.logger.info 'arbitrage calculator complete for seed model 0'
+    Backtest.run(version: MODEL_VERSION)
+    Rails.logger.info 'backtester complete for seed model 0'
+
+    return_vals = @r.cointegration_analysis(start_time_string: MODEL_STARTDATES[1], end_time_string: MODEL_ENDDATES[1],
+                                            ecdet_param: "'trend'")
+    first_model = return_vals[0]
+
+    Rails.logger.info "return val of seed model: #{return_vals}"
+    Rails.logger.info "MODEL ID: #{first_model}"
+    r_count = BacktestModel.where("version = #{MODEL_VERSION} and sequence_number= 1").count
+    if r_count == 0
+      Rails.logger.info "no model detected for version #{MODEL_VERSION} seq 1... creating new seed model"
+
+      BacktestModel.create(
+        version: MODEL_VERSION,
+        model_id: first_model,
+        sequence_number: 1,
+        name: 'seed-log'
+      )
+    else
+      model_detected = BacktestModel.where("version = #{MODEL_VERSION} and sequence_number= 1").last&.model_id
+      Rails.logger.info "model #{model_detected} detected for sequence_number= 1... skipping creation of new seed model"
+    end
+    Rails.logger.info "num backtest models: #{BacktestModel.where("version=#{MODEL_VERSION}").count}"
+    Rails.logger.info "unique model_ids: #{BacktestModel.pluck(:model_id).uniq}"
+    ArbitrageCalculator.run(version: MODEL_VERSION, silent: true)
+    Rails.logger.info 'arbitrage calculator complete for seed model 1'
+    Backtest.run(version: MODEL_VERSION)
+    Rails.logger.info 'backtester complete for seed model 1'
+
+    return_vals = @r.cointegration_analysis(start_time_string: MODEL_STARTDATES[2], end_time_string: MODEL_ENDDATES[2],
+                                            ecdet_param: "'trend'")
+    first_model = return_vals[0]
+
+    Rails.logger.info "return val of seed model: #{return_vals}"
+    Rails.logger.info "MODEL ID: #{first_model}"
+    r_count = BacktestModel.where("version = #{MODEL_VERSION} and sequence_number= 2").count
+    if r_count == 0
+      Rails.logger.info "no model detected for version #{MODEL_VERSION} seq 2... creating new seed model"
+
+      BacktestModel.create(
+        version: MODEL_VERSION,
+        model_id: first_model,
+        sequence_number: 2,
+        name: 'seed-log'
+      )
+    else
+      model_detected = BacktestModel.where("version = #{MODEL_VERSION} and sequence_number= 2").last&.model_id
+      Rails.logger.info "model #{model_detected} detected for sequence_number= 2... skipping creation of new seed model"
+    end
+    Rails.logger.info "num backtest models: #{BacktestModel.where("version=#{MODEL_VERSION}").count}"
+    Rails.logger.info "unique model_ids: #{BacktestModel.pluck(:model_id).uniq}"
+    ArbitrageCalculator.run(version: MODEL_VERSION, silent: true)
+    Rails.logger.info 'arbitrage calculator complete for seed model 2'
+    Backtest.run(version: MODEL_VERSION)
+    Rails.logger.info 'backtester complete for seed model 2'
   end
 
   def update_model(version:, max_weeks_back:, min_weeks_back:, interval_mins:, as_of_time: nil)
