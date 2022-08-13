@@ -8,7 +8,7 @@ class ArbitrageCalculator < BaseService
 
   def run
     most_recent_backtest_model = BacktestModel.where("version = #{version}").oldest_sequence_number_first.last
-    puts "running arb calculator on sequence number #{most_recent_backtest_model&.sequence_number}"
+    Rails.logger.info "running arb calculator on sequence number #{most_recent_backtest_model&.sequence_number}"
 
     most_recent_model_id = most_recent_backtest_model&.model_id
     @most_recent_model = CointegrationModel.where("uuid='#{most_recent_model_id}'").last
