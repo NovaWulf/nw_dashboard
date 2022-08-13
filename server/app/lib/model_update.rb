@@ -8,9 +8,11 @@ class ModelUpdate < BaseService
   MODEL_ENDDATES = ["'2022-07-12'", "'2022-07-27'", "'2022-08-08'"]
   def seed
     @r = RAdapter.new
+    Rails.logger.info "number backtest models before model 1: #{BacktestModel.count}"
     return_vals = @r.cointegration_analysis(start_time_string: MODEL_STARTDATES[0], end_time_string: MODEL_ENDDATES[0],
                                             ecdet_param: "'trend'")
     first_model = return_vals[0]
+    Rails.logger.info "number backtest models after model 1: #{BacktestModel.count}"
 
     Rails.logger.info "return val of seed model: #{return_vals}"
     Rails.logger.info "MODEL ID: #{first_model}"
@@ -35,8 +37,12 @@ class ModelUpdate < BaseService
     Backtest.run(version: MODEL_VERSION)
     Rails.logger.info 'backtester complete for seed model 0'
 
+    Rails.logger.info "number backtest models before model 2: #{BacktestModel.count}"
+
     return_vals = @r.cointegration_analysis(start_time_string: MODEL_STARTDATES[1], end_time_string: MODEL_ENDDATES[1],
                                             ecdet_param: "'trend'")
+    Rails.logger.info "number backtest models after model 2: #{BacktestModel.count}"
+
     first_model = return_vals[0]
 
     Rails.logger.info "return val of seed model: #{return_vals}"
@@ -62,8 +68,12 @@ class ModelUpdate < BaseService
     Backtest.run(version: MODEL_VERSION)
     Rails.logger.info 'backtester complete for seed model 1'
 
+    Rails.logger.info "number backtest models before model 3: #{BacktestModel.count}"
+
     return_vals = @r.cointegration_analysis(start_time_string: MODEL_STARTDATES[2], end_time_string: MODEL_ENDDATES[2],
                                             ecdet_param: "'trend'")
+    Rails.logger.info "number backtest models after model 3: #{BacktestModel.count}"
+
     first_model = return_vals[0]
 
     Rails.logger.info "return val of seed model: #{return_vals}"
