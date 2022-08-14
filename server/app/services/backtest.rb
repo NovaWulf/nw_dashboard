@@ -33,7 +33,10 @@ class Backtest < BaseService
     while true
       target_positions
       generate_orders
+      Rails.logger.info "ts: #{@cursor}, pnl: #{@pnl[@cursor]}" if @cursor.remainer(100)
+
       @cursor += 1 # time moves forward after setting target positions, before actually updating positions
+
       break if @cursor == @num_obs
 
       execute_trades
@@ -44,8 +47,9 @@ class Backtest < BaseService
   private
 
   def load_model(version)
-    Rails.logger.info "num backtest models in load_model: #{BacktestModel.count}"
     @model_id = BacktestModel.where("version=#{version}").oldest_sequence_number_first.last&.model_id
+    seq_num = BacktestModel.where("version=#{version}").oldest_sequence_number_first.last&.sequence_number
+    Rails.logger.info "backtesting model #{@model_id} with sequence number #{seq_num}"
     model = CointegrationModel.where("uuid = '#{@model_id}'").last
     @log_prices = model&.log_prices
     @resolution = model.resolution
