@@ -39,7 +39,7 @@ class ModelUpdate < BaseService
   end
 
   def update_model(version:, max_weeks_back:, min_weeks_back:, interval_mins:, as_of_date: nil)
-    DateTime.strptime(as_of_date, '%Y-%m-%d').to_i if as_of_time?
+    as_of_time = DateTime.strptime(as_of_date, '%Y-%m-%d').to_i unless as_of_date.nil?
     ArbitrageCalculator.run(version: version, silent: true)
     Backtest.run(version: version)
     puts "as_of_time: #{as_of_time}"
@@ -86,16 +86,14 @@ class ModelUpdate < BaseService
                                             ecdet_param: "'trend'")
 
     new_model_id = return_vals[0]
-    puts "model_id: #{new_model_id}}}"
     current_model = BacktestModel.where("version = #{version}").oldest_sequence_number_first.last
-    puts 'best new model is statistically valid with p<=.1. Auto-updating backtest models'
     BacktestModel.create(
       version: version,
       model_id: new_model_id,
       sequence_number: current_model&.sequence_number + 1,
       name: "manual update #{current_model&.sequence_number + 1}"
     )
-    ArbitrageCalculator.run(version: version)
+    ArbitrageCalculator.run(version: version, silent: true)
     Rails.logger.info 'arbitrage calculator complete'
     Backtest.run(version: version)
     Rails.logger.info 'backtester complete'
