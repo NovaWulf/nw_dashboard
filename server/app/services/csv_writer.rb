@@ -1,7 +1,8 @@
 class CsvWriter < BaseService
   attr_reader :table
 
-  def initialize(table: 'both')
+  DEFAULT_CSV_TABLE = 'both'
+  def initialize(table: DEFAULT_CSV_TABLE)
     @table = table
   end
 

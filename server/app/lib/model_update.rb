@@ -39,8 +39,7 @@ class ModelUpdate < BaseService
   end
 
   def update_model(version:, max_weeks_back:, min_weeks_back:, interval_mins:, as_of_date: nil)
-    puts "as_of_date: #{as_of_date}"
-    as_of_time = DateTime.strptime(as_of_date, '%Y-%m-%d').to_i
+    DateTime.strptime(as_of_date, '%Y-%m-%d').to_i if as_of_time?
     ArbitrageCalculator.run(version: version, silent: true)
     Backtest.run(version: version)
     puts "as_of_time: #{as_of_time}"

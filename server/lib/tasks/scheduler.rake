@@ -91,7 +91,7 @@ task try_update_model_as_of: :environment do
     Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
   end
   Rails.logger.info 'writing candle data to CSV...'
-  CsvWriter.run('candles')
+  CsvWriter.run(table: 'candles')
   mu = ModelUpdate.new
   puts ENV['as_of_date']
   mu.update_model(version: 2, max_weeks_back: 8, min_weeks_back: 3, interval_mins: 1440, as_of_date: ENV['as_of_date'])
@@ -103,7 +103,7 @@ task add_model_with_dates: :environment do
     Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
   end
   Rails.logger.info 'writing candle data to CSV...'
-  CsvWriter.run('candles')
+  CsvWriter.run(table: 'candles')
   mu = ModelUpdate.new
   mu.add_trend_model_with_dates(version: 2, start_time_string: ENV['start'], end_time_string: ENV['end'])
 end
