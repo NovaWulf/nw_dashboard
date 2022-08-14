@@ -3,6 +3,7 @@
 # Table name: backtest_models
 #
 #  id              :bigint           not null, primary key
+#  epoch           :string
 #  name            :string
 #  sequence_number :integer          not null
 #  version         :integer          not null

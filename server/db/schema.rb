@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_08_11_161226) do
+ActiveRecord::Schema.define(version: 2022_08_14_234121) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -22,6 +22,7 @@ ActiveRecord::Schema.define(version: 2022_08_11_161226) do
     t.integer "sequence_number", null: false
     t.integer "version", null: false
     t.string "name"
+    t.string "epoch"
     t.index ["version", "sequence_number"], name: "index_backtest_models_on_version_and_sequence_number", unique: true
   end
 

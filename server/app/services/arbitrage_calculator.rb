@@ -1,13 +1,14 @@
 class ArbitrageCalculator < BaseService
-  attr_reader :version, :most_recent_model, :silent
+  attr_reader :version, :most_recent_model, :silent, :assets
 
-  def initialize(version:, silent: false)
+  def initialize(version:, epoch:, silent: false)
     @version = version
     @silent = silent
+    @epoch = epoch
   end
 
   def run
-    most_recent_backtest_model = BacktestModel.where("version = #{version}").oldest_sequence_number_first.last
+    most_recent_backtest_model = BacktestModel.where("version = #{version} and epoch=#{epoch}").oldest_sequence_number_first.last
     Rails.logger.info "running arb calculator on sequence number #{most_recent_backtest_model&.sequence_number}"
 
     most_recent_model_id = most_recent_backtest_model&.model_id
@@ -83,10 +84,10 @@ class ArbitrageCalculator < BaseService
     lower = in_sample_mean - sigma * in_sample_sd
     if signal_value > upper
       NotificationMailer.with(subject: 'Statistical Arbitrage Indicator Alert',
-                              text: "OP-ETH spread value (#{signal_value.round(2)}) is above the high band of Paul's indicator (#{upper.round(2)}). Recommend buying OP and shorting ETH").notification.deliver_now
+                              text: "#{epoch} spread value (#{signal_value.round(2)}) is above the high band of Paul's indicator (#{upper.round(2)}). Recommend buying OP and shorting ETH").notification.deliver_now
     elsif signal_value < lower
       NotificationMailer.with(subject: 'Statistical Arbitrage Indicator Alert',
-                              text: "OP-ETH (#{signal_value.round(2)}) is below the low band of Paul's indicator (#{lower.round(2)}). Recommend buying ETH and shorting OP").notification.deliver_now
+                              text: "#{epoch} (#{signal_value.round(2)}) is below the low band of Paul's indicator (#{lower.round(2)}). Recommend buying ETH and shorting OP").notification.deliver_now
     end
   end
 end
