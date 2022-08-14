@@ -33,7 +33,7 @@ class Backtest < BaseService
     while true
       target_positions
       generate_orders
-      Rails.logger.info "ts: #{@cursor}, pnl: #{@pnl[@cursor]}" if @cursor.remainer(100)
+      Rails.logger.info "ts: #{@cursor}, pnl: #{@pnl[@cursor]}" if @cursor.remainder(100)
 
       @cursor += 1 # time moves forward after setting target positions, before actually updating positions
 

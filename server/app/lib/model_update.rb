@@ -36,68 +36,6 @@ class ModelUpdate < BaseService
     Rails.logger.info 'arbitrage calculator complete for seed model 0'
     Backtest.run(version: MODEL_VERSION)
     Rails.logger.info 'backtester complete for seed model 0'
-
-    Rails.logger.info "number backtest models before model 2: #{BacktestModel.count}"
-
-    return_vals = @r.cointegration_analysis(start_time_string: MODEL_STARTDATES[1], end_time_string: MODEL_ENDDATES[1],
-                                            ecdet_param: "'trend'")
-    Rails.logger.info "number backtest models after model 2: #{BacktestModel.count}"
-
-    first_model = return_vals[0]
-
-    Rails.logger.info "return val of seed model: #{return_vals}"
-    Rails.logger.info "MODEL ID: #{first_model}"
-    r_count = BacktestModel.where("version = #{MODEL_VERSION} and sequence_number= 1").count
-    if r_count == 0
-      Rails.logger.info "no model detected for version #{MODEL_VERSION} seq 1... creating new seed model"
-
-      BacktestModel.create(
-        version: MODEL_VERSION,
-        model_id: first_model,
-        sequence_number: 1,
-        name: 'seed-log'
-      )
-    else
-      model_detected = BacktestModel.where("version = #{MODEL_VERSION} and sequence_number= 1").last&.model_id
-      Rails.logger.info "model #{model_detected} detected for sequence_number= 1... skipping creation of new seed model"
-    end
-    Rails.logger.info "num backtest models: #{BacktestModel.where("version=#{MODEL_VERSION}").count}"
-    Rails.logger.info "unique model_ids: #{BacktestModel.pluck(:model_id).uniq}"
-    ArbitrageCalculator.run(version: MODEL_VERSION, silent: true)
-    Rails.logger.info 'arbitrage calculator complete for seed model 1'
-    Backtest.run(version: MODEL_VERSION)
-    Rails.logger.info 'backtester complete for seed model 1'
-
-    Rails.logger.info "number backtest models before model 3: #{BacktestModel.count}"
-
-    return_vals = @r.cointegration_analysis(start_time_string: MODEL_STARTDATES[2], end_time_string: MODEL_ENDDATES[2],
-                                            ecdet_param: "'trend'")
-    Rails.logger.info "number backtest models after model 3: #{BacktestModel.count}"
-
-    first_model = return_vals[0]
-
-    Rails.logger.info "return val of seed model: #{return_vals}"
-    Rails.logger.info "MODEL ID: #{first_model}"
-    r_count = BacktestModel.where("version = #{MODEL_VERSION} and sequence_number= 2").count
-    if r_count == 0
-      Rails.logger.info "no model detected for version #{MODEL_VERSION} seq 2... creating new seed model"
-
-      BacktestModel.create(
-        version: MODEL_VERSION,
-        model_id: first_model,
-        sequence_number: 2,
-        name: 'seed-log'
-      )
-    else
-      model_detected = BacktestModel.where("version = #{MODEL_VERSION} and sequence_number= 2").last&.model_id
-      Rails.logger.info "model #{model_detected} detected for sequence_number= 2... skipping creation of new seed model"
-    end
-    Rails.logger.info "num backtest models: #{BacktestModel.where("version=#{MODEL_VERSION}").count}"
-    Rails.logger.info "unique model_ids: #{BacktestModel.pluck(:model_id).uniq}"
-    ArbitrageCalculator.run(version: MODEL_VERSION, silent: true)
-    Rails.logger.info 'arbitrage calculator complete for seed model 2'
-    Backtest.run(version: MODEL_VERSION)
-    Rails.logger.info 'backtester complete for seed model 2'
   end
 
   def update_model(version:, max_weeks_back:, min_weeks_back:, interval_mins:, as_of_time: nil)

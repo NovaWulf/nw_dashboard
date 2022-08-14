@@ -8,7 +8,6 @@ class PriceMerger < BaseService
   end
 
   def run
-    puts "asset_names: #{asset_names}"
     if asset_names.length != 2
       abort("price processor currently only works with 2 assets. you are trying to merge #{asset_names.length} asset timeseries")
     end
@@ -24,9 +23,8 @@ class PriceMerger < BaseService
     where t1.pair='#{asset_names[0]}' or t2.pair='#{asset_names[1]}'
     order by t1.starttime asc
     "
-    puts "start time in price processor: #{start_time}"
     records_array = ActiveRecord::Base.connection.execute(sql)
-    puts "number of records in processor (outer join): #{records_array.count}"
+    Rails.logger.info "number of records after merge (outer join): #{records_array.count}"
     starttimes = records_array.pluck('starttime')
     prices = asset_aliases.map { |a| records_array.pluck(a) }
 
