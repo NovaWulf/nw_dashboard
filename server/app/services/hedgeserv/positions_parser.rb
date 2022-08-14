@@ -18,6 +18,8 @@ module Hedgeserv
                          format_header_cell(summary, 8, 18),
                          format_header_cell(summary, 9, 19)]]
 
+        rows.reject { |r| r[2].include?('Fee') } # ignore fees
+
         Rails.logger.info "Found #{rows.count} positions"
 
         rows.group_by { |r| r[12] }.each do |strategy, positions|
