@@ -55,7 +55,7 @@ dataMat = as.matrix(bothDat[,c("close.x","close.y")])
 spec = "transitory"
 type = "trace"
 jo=ca.jo(dataMat,type= type,spec=spec,ecdet = ecdet)
-summary(jo)
+print(summary(jo))
 
 vecs = jo@V
 

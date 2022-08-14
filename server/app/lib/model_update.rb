@@ -54,8 +54,8 @@ class ModelUpdate < BaseService
       start_time += step_size
       coint_models.append(@r.cointegration_analysis(start_time_string: start_time, end_time_string: last_candle_time,
                                                     ecdet_param: "'const'"))
-      coint_models.append(@r.cointegration_analysis(start_time_string: start_time, end_time_string: last_candle_time,
-                                                    ecdet_param: "'trend'"))
+      # coint_models.append(@r.cointegration_analysis(start_time_string: start_time, end_time_string: last_candle_time,
+      #                                             ecdet_param: "'trend'"))
     end
     test_stats = coint_models.map { |m| m[7].to_f }
     start_times = coint_models.map { |m| m[10] }
@@ -80,10 +80,10 @@ class ModelUpdate < BaseService
     end
   end
 
-  def add_trend_model_with_dates(version:, start_time_string:, end_time_string:)
+  def add_model_with_dates(version:, start_time_string:, end_time_string:)
     @r = RAdapter.new
     return_vals = @r.cointegration_analysis(start_time_string: start_time_string, end_time_string: end_time_string,
-                                            ecdet_param: "'trend'")
+                                            ecdet_param: "'const'")
 
     new_model_id = return_vals[0]
     current_model = BacktestModel.where("version = #{version}").oldest_sequence_number_first.last

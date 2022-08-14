@@ -105,5 +105,5 @@ task add_model_with_dates: :environment do
   Rails.logger.info 'writing candle data to CSV...'
   CsvWriter.run(table: 'candles')
   mu = ModelUpdate.new
-  mu.add_trend_model_with_dates(version: 2, start_time_string: ENV['start'], end_time_string: ENV['end'])
+  mu.add_model_with_dates(version: 2, start_time_string: ENV['start'], end_time_string: ENV['end'])
 end

@@ -1,4 +1,4 @@
-my_packages = c("data.table","urca","lubridate","digest","lattice","latticeExtra")
+my_packages = c("data.table","urca","lubridate","digest","lattice","latticeExtra","jsonlite")
 
 install_if_missing = function(p) {
   if (p %in% rownames(installed.packages()) == FALSE) {
