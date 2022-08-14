@@ -12,6 +12,8 @@ print(file.exists("./public/data.csv"))
 
 startTime = startTimeString
 endTime = endTimeString
+print(startTimeString)
+print(endTimeString)
 if (class(startTimeString)=="character" && class(endTimeString)== "character"){
   startTime = as.numeric(strptime(startTimeString, "%Y-%m-%d",tz="EST"))
   endTime = as.numeric(strptime(endTimeString,"%Y-%m-%d",tz="EST")) 
@@ -35,8 +37,10 @@ opDat =  allDat[starttime>startTime &
                   interpolated==FALSE &
                   pair == "op-usd"]
 
+print(dim(ethDat))
+print(dim(opDat))
 bothDat = merge(ethDat,opDat,by = "starttime")
-
+print(dim(bothDat))
 bothDat = bothDat[order(bothDat$starttime)]
 bothDat$start_datetime = as_datetime(bothDat$starttime)    
 

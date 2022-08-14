@@ -14,6 +14,7 @@ class RAdapter
   def cointegration_analysis(start_time_string:, end_time_string:, ecdet_param:)
     Rails.logger.info "creating cointegration model with start time #{start_time_string},
       end time #{end_time_string} ecdet_param #{ecdet_param}"
+    puts("start_time_string: #{start_time_string}  end time string: #{end_time_string}")
     @R.eval <<-EOF
         print(getwd())
         source("./cointegrationAnalysis.R")

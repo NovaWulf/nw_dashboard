@@ -38,9 +38,12 @@ class ModelUpdate < BaseService
     Rails.logger.info 'backtester complete for seed model 0'
   end
 
-  def update_model(version:, max_weeks_back:, min_weeks_back:, interval_mins:, as_of_time: nil)
+  def update_model(version:, max_weeks_back:, min_weeks_back:, interval_mins:, as_of_date: nil)
+    puts "as_of_date: #{as_of_date}"
+    as_of_time = DateTime.strptime(as_of_date, '%Y-%m-%d').to_i
     ArbitrageCalculator.run(version: version, silent: true)
     Backtest.run(version: version)
+    puts "as_of_time: #{as_of_time}"
     last_candle_time = as_of_time || Candle.oldest_first.last&.starttime
     sec_diff = SECS_PER_WEEK * (max_weeks_back - min_weeks_back)
     @r = RAdapter.new
@@ -76,6 +79,27 @@ class ModelUpdate < BaseService
       ArbitrageCalculator.run(version: version)
       Backtest.run(version: version)
     end
+  end
+
+  def add_trend_model_with_dates(version:, start_time_string:, end_time_string:)
+    @r = RAdapter.new
+    return_vals = @r.cointegration_analysis(start_time_string: start_time_string, end_time_string: end_time_string,
+                                            ecdet_param: "'trend'")
+
+    new_model_id = return_vals[0]
+    puts "model_id: #{new_model_id}}}"
+    current_model = BacktestModel.where("version = #{version}").oldest_sequence_number_first.last
+    puts 'best new model is statistically valid with p<=.1. Auto-updating backtest models'
+    BacktestModel.create(
+      version: version,
+      model_id: new_model_id,
+      sequence_number: current_model&.sequence_number + 1,
+      name: "manual update #{current_model&.sequence_number + 1}"
+    )
+    ArbitrageCalculator.run(version: version)
+    Rails.logger.info 'arbitrage calculator complete'
+    Backtest.run(version: version)
+    Rails.logger.info 'backtester complete'
   end
 
   def update_jesse_model
