@@ -9,7 +9,8 @@ class PriceMerger < BaseService
 
   def run
     if asset_names.length != 2
-      abort("price processor currently only works with 2 assets. you are trying to merge #{asset_names.length} asset timeseries")
+      Rails.logger.info "price processor currently only works with 2 assets. you are trying to merge #{asset_names.length} asset timeseries"
+      return
     end
     asset_aliases = asset_names.map { |e| e.gsub('-', '_') }
     sql = "Select
