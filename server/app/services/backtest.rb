@@ -45,7 +45,8 @@ class Backtest < BaseService
 
   def load_model(version)
     @model_id = BacktestModel.where("version=#{version}").oldest_sequence_number_first.last&.model_id
-    puts "model id: #{@model_id}"
+    seq_num = BacktestModel.where("version=#{version}").oldest_sequence_number_first.last&.sequence_number
+    Rails.logger.info "backtesting model #{@model_id} with sequence number #{seq_num}"
     model = CointegrationModel.where("uuid = '#{@model_id}'").last
     @log_prices = model&.log_prices
     @resolution = model.resolution

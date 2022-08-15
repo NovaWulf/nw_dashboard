@@ -81,17 +81,29 @@ task try_update_models: :environment do
     CsvWriter.run
     mu = ModelUpdate.new
     mu.update_model(version: 2, max_weeks_back: 8, min_weeks_back: 3, interval_mins: 1440)
-    # ,  as_of_time: 1_659_976_080
     mu.update_jesse_model
   end
 end
 
-task write_csvs: :environment do
-  CsvWriter.run
+task try_update_model_as_of: :environment do
+  tracked_pairs = %w[eth-usd op-usd]
+  tracked_pairs.each do |p|
+    Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
+  end
+  Rails.logger.info 'writing candle data to CSV...'
+  CsvWriter.run(table: 'candles')
+  mu = ModelUpdate.new
+  puts ENV['as_of_date']
+  mu.update_model(version: 2, max_weeks_back: 8, min_weeks_back: 3, interval_mins: 1440, as_of_date: ENV['as_of_date'])
 end
-task jesse_analysis: :environment do
-  CsvWriter.run
-  r = RAdapter.new
-  r.jesse_analysis
-  JesseCalculator.run
+
+task add_model_with_dates: :environment do
+  tracked_pairs = %w[eth-usd op-usd]
+  tracked_pairs.each do |p|
+    Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
+  end
+  Rails.logger.info 'writing candle data to CSV...'
+  CsvWriter.run(table: 'candles')
+  mu = ModelUpdate.new
+  mu.add_model_with_dates(version: 2, start_time_string: ENV['start'], end_time_string: ENV['end'])
 end

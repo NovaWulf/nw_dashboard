@@ -1,13 +1,14 @@
 class ArbitrageCalculator < BaseService
-  attr_reader :version, :most_recent_model
+  attr_reader :version, :most_recent_model, :silent
 
-  def initialize(version:)
+  def initialize(version:, silent: false)
     @version = version
+    @silent = silent
   end
 
   def run
     most_recent_backtest_model = BacktestModel.where("version = #{version}").oldest_sequence_number_first.last
-    puts "running arb calculator on sequence number #{most_recent_backtest_model&.sequence_number}"
+    Rails.logger.info "running arb calculator on sequence number #{most_recent_backtest_model&.sequence_number}"
 
     most_recent_model_id = most_recent_backtest_model&.model_id
     @most_recent_model = CointegrationModel.where("uuid='#{most_recent_model_id}'").last
@@ -34,7 +35,6 @@ class ArbitrageCalculator < BaseService
     end
 
     first_timestamps = asset_names.map { |a| Candle.where("pair = '#{a}'").oldest_first.first&.starttime }
-    later_first_timestamp = first_timestamps.max
     start_time = last_timestamp ? last_timestamp + res : first_in_sample_timestamp
     flat_records = PriceMerger.run(asset_names, start_time).value
     starttimes = flat_records[0]
@@ -70,15 +70,12 @@ class ArbitrageCalculator < BaseService
     end
     Rails.logger.info "flat forward interpolated #{interp_count} values"
 
-    email_notification(m) if m
+    email_notification(m) if !silent && m
   end
 
   def email_notification(arb_signal, sigma = 1)
-    Rails.logger.info 'inside email notif'
-    Rails.logger.info "most_recent_model: #{most_recent_model&.uuid}"
     in_sample_mean = most_recent_model&.in_sample_mean
     in_sample_sd = most_recent_model&.in_sample_sd
-    puts "most_recent_model: #{most_recent_model&.uuid}"
     return unless arb_signal && most_recent_model
 
     signal_value = arb_signal.value

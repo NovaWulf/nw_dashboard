@@ -12,7 +12,9 @@ RSpec.describe JesseCalculator do
   let(:gt_coef) { weights[metric_names.index('google_trends')] }
   let(:intercept) { weights[metric_names.index('(Intercept)')] }
 
-  let!(:jesse_yesterday) { Metric.create(token: 'btc', metric: 'jesse', timestamp: Date.yesterday, value: 1.0).value }
+  let!(:jesse_yesterday) do
+    Metric.create(token: 'btc', metric: 'jesse', timestamp: Date.today.advance(days: -1), value: 1.0).value
+  end
 
   let!(:s2f) { Metric.create(token: 'btc', metric: 's2f_ratio', timestamp: Date.today, value: 1.0).value }
   let!(:hashrate) do
@@ -71,8 +73,6 @@ RSpec.describe JesseCalculator do
       metric_name: 'hash_rate',
       weight: 0.000000000000000006
     )
-
-    Rails.logger.info "number of jesse models in test: #{JesseModel.count}"
   end
 
   it 'persists' do
@@ -80,8 +80,6 @@ RSpec.describe JesseCalculator do
     m = Metric.last
     expect(m.token).to eql 'btc'
     expect(m.metric).to eql 'jesse'
-    puts "m value: #{m.value.round(2)}"
-    puts "intended: #{jesse_intended_price.round}"
     expect(m.value.round(2)).to eql jesse_intended_price.round(2)
     expect(m.timestamp).to eql Date.today
   end

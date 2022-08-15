@@ -29,7 +29,10 @@ class RAdapter
     cv = return_vals[1].tr('()', '').split(',')
     correct_fields = %w[uuid timestamp ecdet spec cv_10_pct cv_5_pct cv_1_pct test_stat
                         top_eig resolution model_starttime model_endtime in_sample_mean in_sample_sd, log_prices]
-    abort('cointegration model fields are not in the right order!') if cf[0] != correct_fields[0]
+    if cf[0] != correct_fields[0]
+      Rails.logger.info 'cointegration model fields are not in the right order!'
+      return
+    end
     puts "correct fields: #{correct_fields[0]}"
     model_count = CointegrationModel.where("uuid='#{cv[0]}'").count
     if model_count == 0
@@ -54,7 +57,8 @@ class RAdapter
     cwf = return_vals[2].tr('()', '').split(',')
 
     if cwf != %w[uuid timestamp asset_name weight]
-      abort('cointegration model weight fields are not in the right order!')
+      Rails.logger.info 'cointegration model weight fields are not in the right order!'
+      return
     end
 
     cwv = return_vals[3].split('),(')

@@ -61,6 +61,7 @@ export default function ArbitrageBacktestChart({seqNumber}) {
         is: d.is,
       };
     });
+
   }
 
   return (

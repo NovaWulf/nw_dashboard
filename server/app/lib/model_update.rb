@@ -8,37 +8,42 @@ class ModelUpdate < BaseService
   MODEL_ENDDATES = ["'2022-07-12'", "'2022-07-27'", "'2022-08-08'"]
   def seed
     @r = RAdapter.new
-    (0..(MODEL_STARTDATES.length - 1)).each do |date_ind|
-      return_vals = @r.cointegration_analysis(start_time_string: MODEL_STARTDATES[date_ind], end_time_string: MODEL_ENDDATES[date_ind],
-                                              ecdet_param: "'trend'")
-      first_model = return_vals[0]
+    Rails.logger.info "number backtest models before model 1: #{BacktestModel.count}"
+    return_vals = @r.cointegration_analysis(start_time_string: MODEL_STARTDATES[0], end_time_string: MODEL_ENDDATES[0],
+                                            ecdet_param: "'trend'")
+    first_model = return_vals[0]
+    Rails.logger.info "number backtest models after model 1: #{BacktestModel.count}"
 
-      puts "return val of seed model: #{return_vals}"
-      Rails.logger.info "return val of seed model: #{return_vals}"
-      Rails.logger.info "first model id: #{first_model}"
-      r_count = BacktestModel.where("version = #{MODEL_VERSION} and sequence_number= #{date_ind}").count
-      if r_count == 0
-        puts "no model detected for version #{MODEL_VERSION} ... creating new seed model"
-        Rails.logger.info "no model detected for version #{MODEL_VERSION} ... creating new seed model"
+    Rails.logger.info "return val of seed model: #{return_vals}"
+    Rails.logger.info "MODEL ID: #{first_model}"
+    r_count = BacktestModel.where("version = #{MODEL_VERSION} and sequence_number= 0").count
+    if r_count == 0
+      Rails.logger.info "no model detected for version #{MODEL_VERSION} seq 0... creating new seed model"
 
-        BacktestModel.create(
-          version: MODEL_VERSION,
-          model_id: first_model,
-          sequence_number: date_ind,
-          name: 'seed-log'
-        )
-      end
-      ArbitrageCalculator.run(version: MODEL_VERSION)
-      Backtest.run(version: MODEL_VERSION)
+      BacktestModel.create(
+        version: MODEL_VERSION,
+        model_id: first_model,
+        sequence_number: 0,
+        name: 'seed-log'
+      )
+    else
+      model_detected = BacktestModel.where("version = #{MODEL_VERSION} and sequence_number= 0").last&.model_id
+      Rails.logger.info "model #{model_detected} detected for sequence_number= 0... skipping creation of new seed model"
     end
-
-    update_model
+    Rails.logger.info "num backtest models: #{BacktestModel.where("version=#{MODEL_VERSION}").count}"
+    Rails.logger.info "unique model_ids: #{BacktestModel.pluck(:model_id).uniq}"
+    ArbitrageCalculator.run(version: MODEL_VERSION, silent: true)
+    Rails.logger.info 'arbitrage calculator complete for seed model 0'
+    Backtest.run(version: MODEL_VERSION)
+    Rails.logger.info 'backtester complete for seed model 0'
   end
 
-  def update_model(version:, max_weeks_back:, min_weeks_back:, interval_mins:, as_of_time: nil)
-    ArbitrageCalculator.run(version: version)
+  def update_model(version:, max_weeks_back:, min_weeks_back:, interval_mins:, as_of_date: nil)
+    as_of_time = DateTime.strptime(as_of_date, '%Y-%m-%d').to_i unless as_of_date.nil?
+    ArbitrageCalculator.run(version: version, silent: true)
     Backtest.run(version: version)
-    last_candle_time = as_of_time || lastCandle.oldest_first.last&.starttime
+    puts "as_of_time: #{as_of_time}"
+    last_candle_time = as_of_time || Candle.oldest_first.last&.starttime
     sec_diff = SECS_PER_WEEK * (max_weeks_back - min_weeks_back)
     @r = RAdapter.new
     num_models = sec_diff / (60 * interval_mins) - 1
@@ -49,8 +54,8 @@ class ModelUpdate < BaseService
       start_time += step_size
       coint_models.append(@r.cointegration_analysis(start_time_string: start_time, end_time_string: last_candle_time,
                                                     ecdet_param: "'const'"))
-      coint_models.append(@r.cointegration_analysis(start_time_string: start_time, end_time_string: last_candle_time,
-                                                    ecdet_param: "'trend'"))
+      # coint_models.append(@r.cointegration_analysis(start_time_string: start_time, end_time_string: last_candle_time,
+      #                                             ecdet_param: "'trend'"))
     end
     test_stats = coint_models.map { |m| m[7].to_f }
     start_times = coint_models.map { |m| m[10] }
@@ -73,6 +78,25 @@ class ModelUpdate < BaseService
       ArbitrageCalculator.run(version: version)
       Backtest.run(version: version)
     end
+  end
+
+  def add_model_with_dates(version:, start_time_string:, end_time_string:)
+    @r = RAdapter.new
+    return_vals = @r.cointegration_analysis(start_time_string: start_time_string, end_time_string: end_time_string,
+                                            ecdet_param: "'const'")
+
+    new_model_id = return_vals[0]
+    current_model = BacktestModel.where("version = #{version}").oldest_sequence_number_first.last
+    BacktestModel.create(
+      version: version,
+      model_id: new_model_id,
+      sequence_number: current_model&.sequence_number + 1,
+      name: "manual update #{current_model&.sequence_number + 1}"
+    )
+    ArbitrageCalculator.run(version: version, silent: true)
+    Rails.logger.info 'arbitrage calculator complete'
+    Backtest.run(version: version)
+    Rails.logger.info 'backtester complete'
   end
 
   def update_jesse_model
