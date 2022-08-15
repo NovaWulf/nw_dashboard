@@ -11,6 +11,7 @@ class CsvWriter < BaseService
     asset_string = "('" + assets.join("','") + "')"
     puts "asset string: #{asset_string}"
     if table == 'both' || table == 'candles'
+      # add timestamp here
       file = "#{Rails.root}/public/data.csv"
       Rails.logger.info "writing csv to #{file}"
       CSV.open(file, 'w') do |writer|

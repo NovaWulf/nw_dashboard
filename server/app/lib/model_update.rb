@@ -1,5 +1,5 @@
 class ModelUpdate < BaseService
-  attr_reader :r, :epoch, :asset_names
+  attr_reader :r, :basket, :asset_names
 
   @r
   SECS_PER_WEEK = 604_800
@@ -7,28 +7,29 @@ class ModelUpdate < BaseService
   MODEL_VERSION = 2
   MODEL_STARTDATES = ["'2022-06-13'", "'2022-06-11'", "'2022-07-12'"]
   MODEL_ENDDATES = ["'2022-07-12'", "'2022-07-27'", "'2022-08-08'"]
-  def initialize(epoch:)
+  def initialize(basket:)
     @r = RAdapter.new
-    @epoch = epoch
+    @basket = basket
     @asset_names = []
-    if epoch == 'OP-ETH'
+    if basket == 'OP_ETH'
       @asset_names = %w[eth-usd op-usd]
-    elsif epoch == 'UNI-ETH'
+    elsif basket == 'UNI_ETH'
       @asset_names = %w[eth-usd uni-usd]
     else
-      Rails.logger.info "not one of the registered epochs... can't create asset list"
+      Rails.logger.info "not one of the registered baskets... can't create asset list"
       raise e
     end
   end
 
   def seed
-    return_vals = r.cointegration_analysis(asset_names: asset_names, start_time_string: MODEL_STARTDATES[0], end_time_string: MODEL_ENDDATES[0],
-                                           ecdet_param: "'trend'")
-    first_model = return_vals[0]
-    Rails.logger.info "return val of seed model: #{return_vals}"
-    Rails.logger.info "MODEL ID: #{first_model}"
-    r_count = BacktestModel.where("version = #{MODEL_VERSION} and sequence_number= 0").count
+    r_count = BacktestModel.where("version = #{MODEL_VERSION} and basket = #{basket} and sequence_number= 0").count
     if r_count == 0
+      CsvWriter.run(table: candles)
+      return_vals = r.cointegration_analysis(asset_names: asset_names, start_time_string: MODEL_STARTDATES[0], end_time_string: MODEL_ENDDATES[0],
+                                             ecdet_param: "'trend'")
+      first_model = return_vals[0]
+      Rails.logger.info "return val of seed model: #{return_vals}"
+      Rails.logger.info "MODEL ID: #{first_model}"
       Rails.logger.info "no model detected for version #{MODEL_VERSION} seq 0... creating new seed model"
 
       BacktestModel.create(
@@ -36,22 +37,18 @@ class ModelUpdate < BaseService
         model_id: first_model,
         sequence_number: 0,
         name: 'seed-log',
-        epoch: epoch
+        basket: basket
       )
     else
       model_detected = BacktestModel.where("version = #{MODEL_VERSION} and sequence_number= 0").last&.model_id
       Rails.logger.info "model #{model_detected} detected for sequence_number= 0... skipping creation of new seed model"
     end
-    ArbitrageCalculator.run(version: MODEL_VERSION, silent: true)
-    Rails.logger.info 'arbitrage calculator complete for seed model'
-    Backtest.run(version: MODEL_VERSION)
-    Rails.logger.info 'backtester complete for seed model'
   end
 
   def update_model(version:, max_weeks_back:, min_weeks_back:, interval_mins:, as_of_date: nil)
     as_of_time = DateTime.strptime(as_of_date, '%Y-%m-%d').to_i unless as_of_date.nil?
     ArbitrageCalculator.run(version: version, silent: true)
-    Backtest.run(version: version)
+    Backtester.run(version: version)
     puts "as_of_time: #{as_of_time}"
     last_candle_time = as_of_time || Candle.oldest_first.last&.starttime
     sec_diff = SECS_PER_WEEK * (max_weeks_back - min_weeks_back)
@@ -83,10 +80,10 @@ class ModelUpdate < BaseService
         model_id: best_model&.uuid,
         sequence_number: current_model&.sequence_number + 1,
         name: "auto-update #{current_model&.sequence_number + 1}",
-        epoch: epoch
+        basket: basket
       )
       ArbitrageCalculator.run(version: version)
-      Backtest.run(version: version)
+      Backtester.run(version: version)
     end
   end
 
@@ -102,11 +99,11 @@ class ModelUpdate < BaseService
       model_id: new_model_id,
       sequence_number: current_model&.sequence_number + 1,
       name: "manual update #{current_model&.sequence_number + 1}",
-      epoch: epoch
+      basket: basket
     )
     ArbitrageCalculator.run(version: version, silent: true)
     Rails.logger.info 'arbitrage calculator complete'
-    Backtest.run(version: version)
+    Backtester.run(version: version)
     Rails.logger.info 'backtester complete'
   end
 

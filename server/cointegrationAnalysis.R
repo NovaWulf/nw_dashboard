@@ -6,6 +6,7 @@ library(lattice)
 library(latticeExtra)
 
 fitModel = function(asset_names,startTimeString,endTimeString,ecdet_param="trend",logPrices=TRUE){
+
 ecdet = ecdet_param
 asset_names = asset_names[order(asset_names)]
 print("does file ./public/data.csv exist in r?")
@@ -37,7 +38,8 @@ opDat =  allDat[starttime>startTime &
                   starttime<endTime &
                   resolution == resolution &
                   interpolated==FALSE &
-                  pair == asset_names[2]]
+                  pair == asset_names[2]
+                ]
 
 print(dim(ethDat))
 print(dim(opDat))

@@ -14,10 +14,11 @@ class RAdapter
   def cointegration_analysis(asset_names:, start_time_string:, end_time_string:, ecdet_param:)
     Rails.logger.info "creating cointegration model for pair #{asset_names} with start time #{start_time_string},
       end time #{end_time_string} ecdet_param #{ecdet_param}"
+    asset_string = "c('" + asset_names.join("','") + "')"
     @R.eval <<-EOF
         print(getwd())
         source("./cointegrationAnalysis.R")
-        returnVals = fitModel(#{asset_names},#{start_time_string},#{end_time_string},ecdet_param = #{ecdet_param})
+        returnVals = fitModel(#{asset_string},#{start_time_string},#{end_time_string},ecdet_param = #{ecdet_param})
     EOF
     return_vals = @R.pull 'returnVals'
     Rails.logger.info "Return Vals from R: #{return_vals}"
