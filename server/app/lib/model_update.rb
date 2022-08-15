@@ -1,5 +1,5 @@
 class ModelUpdate < BaseService
-  attr_reader :r, :epoch
+  attr_reader :r, :epoch, :asset_names
 
   @r
   SECS_PER_WEEK = 604_800
@@ -10,10 +10,19 @@ class ModelUpdate < BaseService
   def initialize(epoch:)
     @r = RAdapter.new
     @epoch = epoch
+    @asset_names = []
+    if epoch == 'OP-ETH'
+      @asset_names = %w[eth-usd op-usd]
+    elsif epoch == 'UNI-ETH'
+      @asset_names = %w[eth-usd uni-usd]
+    else
+      Rails.logger.info "not one of the registered epochs... can't create asset list"
+      raise e
+    end
   end
 
   def seed
-    return_vals = r.cointegration_analysis(start_time_string: MODEL_STARTDATES[0], end_time_string: MODEL_ENDDATES[0],
+    return_vals = r.cointegration_analysis(asset_names: asset_names, start_time_string: MODEL_STARTDATES[0], end_time_string: MODEL_ENDDATES[0],
                                            ecdet_param: "'trend'")
     first_model = return_vals[0]
     Rails.logger.info "return val of seed model: #{return_vals}"
@@ -26,7 +35,8 @@ class ModelUpdate < BaseService
         version: MODEL_VERSION,
         model_id: first_model,
         sequence_number: 0,
-        name: 'seed-log'
+        name: 'seed-log',
+        epoch: epoch
       )
     else
       model_detected = BacktestModel.where("version = #{MODEL_VERSION} and sequence_number= 0").last&.model_id
@@ -51,7 +61,7 @@ class ModelUpdate < BaseService
     coint_models = []
     for i in 0..num_models
       start_time += step_size
-      coint_models.append(@r.cointegration_analysis(start_time_string: start_time, end_time_string: last_candle_time,
+      coint_models.append(@r.cointegration_analysis(asset_names: asset_names, start_time_string: start_time, end_time_string: last_candle_time,
                                                     ecdet_param: "'const'"))
       # coint_models.append(@r.cointegration_analysis(start_time_string: start_time, end_time_string: last_candle_time,
       #                                             ecdet_param: "'trend'"))
@@ -72,7 +82,8 @@ class ModelUpdate < BaseService
         version: version,
         model_id: best_model&.uuid,
         sequence_number: current_model&.sequence_number + 1,
-        name: "auto-update #{current_model&.sequence_number + 1}"
+        name: "auto-update #{current_model&.sequence_number + 1}",
+        epoch: epoch
       )
       ArbitrageCalculator.run(version: version)
       Backtest.run(version: version)
@@ -81,7 +92,7 @@ class ModelUpdate < BaseService
 
   def add_model_with_dates(version:, start_time_string:, end_time_string:)
     @r = RAdapter.new
-    return_vals = @r.cointegration_analysis(start_time_string: start_time_string, end_time_string: end_time_string,
+    return_vals = @r.cointegration_analysis(asset_names: asset_names, start_time_string: start_time_string, end_time_string: end_time_string,
                                             ecdet_param: "'const'")
 
     new_model_id = return_vals[0]
@@ -90,7 +101,8 @@ class ModelUpdate < BaseService
       version: version,
       model_id: new_model_id,
       sequence_number: current_model&.sequence_number + 1,
-      name: "manual update #{current_model&.sequence_number + 1}"
+      name: "manual update #{current_model&.sequence_number + 1}",
+      epoch: epoch
     )
     ArbitrageCalculator.run(version: version, silent: true)
     Rails.logger.info 'arbitrage calculator complete'

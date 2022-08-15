@@ -5,8 +5,9 @@ library(digest)
 library(lattice)
 library(latticeExtra)
 
-fitModel = function(startTimeString,endTimeString,ecdet_param="trend",logPrices=TRUE){
+fitModel = function(asset_names,startTimeString,endTimeString,ecdet_param="trend",logPrices=TRUE){
 ecdet = ecdet_param
+asset_names = asset_names[order(asset_names)]
 print("does file ./public/data.csv exist in r?")
 print(file.exists("./public/data.csv"))
 
@@ -14,6 +15,7 @@ startTime = startTimeString
 endTime = endTimeString
 print(startTimeString)
 print(endTimeString)
+
 if (class(startTimeString)=="character" && class(endTimeString)== "character"){
   startTime = as.numeric(strptime(startTimeString, "%Y-%m-%d",tz="EST"))
   endTime = as.numeric(strptime(endTimeString,"%Y-%m-%d",tz="EST")) 
@@ -29,13 +31,13 @@ ethDat = allDat[starttime>startTime &
                   starttime<endTime &
                   resolution == resolution &
                   interpolated==FALSE &
-                  pair == "eth-usd" 
+                  pair == asset_names[1]
                   ]
 opDat =  allDat[starttime>startTime &
                   starttime<endTime &
                   resolution == resolution &
                   interpolated==FALSE &
-                  pair == "op-usd"]
+                  pair == asset_names[2]]
 
 print(dim(ethDat))
 print(dim(opDat))
@@ -98,7 +100,8 @@ realStartDate = min(bothDat$start_datetime)
 realEndDate = max(bothDat$start_datetime)
 currentTime = round(as.numeric(as.POSIXct(Sys.time())))
 
-forDigest = c(ecdet,
+forDigest = c(asset_names,
+              ecdet,
               spec,
               resolution,
               realStartDate,

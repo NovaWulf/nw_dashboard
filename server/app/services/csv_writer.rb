@@ -1,17 +1,20 @@
 class CsvWriter < BaseService
-  attr_reader :table
+  attr_reader :table, :assets
 
   DEFAULT_CSV_TABLE = 'both'
-  def initialize(table: DEFAULT_CSV_TABLE)
+  def initialize(table: DEFAULT_CSV_TABLE, assets: %w[eth-usd uni-usd])
     @table = table
+    @assets = assets
   end
 
   def run
+    asset_string = "('" + assets.join("','") + "')"
+    puts "asset string: #{asset_string}"
     if table == 'both' || table == 'candles'
       file = "#{Rails.root}/public/data.csv"
       Rails.logger.info "writing csv to #{file}"
       CSV.open(file, 'w') do |writer|
-        table = Candle.all
+        table = Candle.where("pair in #{asset_string}")
         0
         writer << table.first.attributes.map { |a, _v| a }
         table.find_each do |s|

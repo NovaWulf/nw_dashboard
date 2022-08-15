@@ -62,12 +62,13 @@ end
 task update_arb_signal: :environment do
   tracked_pairs = %w[eth-usd op-usd btc-usd uni-usd snx-usd]
   tracked_pairs.each do |p|
+    puts "getting pair #{p}"
     Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
   end
   Rails.logger.info 'writing candle data to CSV...'
   puts 'writing candle data to CSV...'
   CsvWriter.run
-  mu = ModelUpdate.new(epoch: 'OP-ETH')
+  mu = ModelUpdate.new(epoch: 'UNI-ETH')
   mu.seed
 end
 
@@ -104,6 +105,6 @@ task add_model_with_dates: :environment do
   end
   Rails.logger.info 'writing candle data to CSV...'
   CsvWriter.run(table: 'candles')
-  mu = ModelUpdate.new
+  mu = ModelUpdate.new(epoch: 'OP-ETH')
   mu.add_model_with_dates(version: 2, start_time_string: ENV['start'], end_time_string: ENV['end'])
 end
