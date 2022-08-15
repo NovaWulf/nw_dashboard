@@ -1,19 +1,21 @@
 class ModelUpdate < BaseService
+  attr_reader :r, :epoch
+
   @r
-  @RES_HOURS
   SECS_PER_WEEK = 604_800
   SECS_PER_HOUR = 3600
   MODEL_VERSION = 2
   MODEL_STARTDATES = ["'2022-06-13'", "'2022-06-11'", "'2022-07-12'"]
   MODEL_ENDDATES = ["'2022-07-12'", "'2022-07-27'", "'2022-08-08'"]
-  def seed
+  def initialize(epoch:)
     @r = RAdapter.new
-    Rails.logger.info "number backtest models before model 1: #{BacktestModel.count}"
-    return_vals = @r.cointegration_analysis(start_time_string: MODEL_STARTDATES[0], end_time_string: MODEL_ENDDATES[0],
-                                            ecdet_param: "'trend'")
-    first_model = return_vals[0]
-    Rails.logger.info "number backtest models after model 1: #{BacktestModel.count}"
+    @epoch = epoch
+  end
 
+  def seed
+    return_vals = r.cointegration_analysis(start_time_string: MODEL_STARTDATES[0], end_time_string: MODEL_ENDDATES[0],
+                                           ecdet_param: "'trend'")
+    first_model = return_vals[0]
     Rails.logger.info "return val of seed model: #{return_vals}"
     Rails.logger.info "MODEL ID: #{first_model}"
     r_count = BacktestModel.where("version = #{MODEL_VERSION} and sequence_number= 0").count
@@ -30,12 +32,10 @@ class ModelUpdate < BaseService
       model_detected = BacktestModel.where("version = #{MODEL_VERSION} and sequence_number= 0").last&.model_id
       Rails.logger.info "model #{model_detected} detected for sequence_number= 0... skipping creation of new seed model"
     end
-    Rails.logger.info "num backtest models: #{BacktestModel.where("version=#{MODEL_VERSION}").count}"
-    Rails.logger.info "unique model_ids: #{BacktestModel.pluck(:model_id).uniq}"
     ArbitrageCalculator.run(version: MODEL_VERSION, silent: true)
-    Rails.logger.info 'arbitrage calculator complete for seed model 0'
+    Rails.logger.info 'arbitrage calculator complete for seed model'
     Backtest.run(version: MODEL_VERSION)
-    Rails.logger.info 'backtester complete for seed model 0'
+    Rails.logger.info 'backtester complete for seed model'
   end
 
   def update_model(version:, max_weeks_back:, min_weeks_back:, interval_mins:, as_of_date: nil)
@@ -45,7 +45,6 @@ class ModelUpdate < BaseService
     puts "as_of_time: #{as_of_time}"
     last_candle_time = as_of_time || Candle.oldest_first.last&.starttime
     sec_diff = SECS_PER_WEEK * (max_weeks_back - min_weeks_back)
-    @r = RAdapter.new
     num_models = sec_diff / (60 * interval_mins) - 1
     step_size = 60 * interval_mins
     start_time = last_candle_time - SECS_PER_WEEK * max_weeks_back

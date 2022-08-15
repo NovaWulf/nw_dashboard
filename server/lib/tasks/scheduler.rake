@@ -67,7 +67,7 @@ task update_arb_signal: :environment do
   Rails.logger.info 'writing candle data to CSV...'
   puts 'writing candle data to CSV...'
   CsvWriter.run
-  mu = ModelUpdate.new
+  mu = ModelUpdate.new(epoch: 'OP-ETH')
   mu.seed
 end
 
@@ -79,7 +79,7 @@ task try_update_models: :environment do
     end
     Rails.logger.info 'writing candle data to CSV...'
     CsvWriter.run
-    mu = ModelUpdate.new
+    mu = ModelUpdate.new(epoch: 'OP-ETH')
     mu.update_model(version: 2, max_weeks_back: 8, min_weeks_back: 3, interval_mins: 1440)
     mu.update_jesse_model
   end
@@ -92,7 +92,7 @@ task try_update_model_as_of: :environment do
   end
   Rails.logger.info 'writing candle data to CSV...'
   CsvWriter.run(table: 'candles')
-  mu = ModelUpdate.new
+  mu = ModelUpdate.new(epoch: 'OP-ETH')
   puts ENV['as_of_date']
   mu.update_model(version: 2, max_weeks_back: 8, min_weeks_back: 3, interval_mins: 1440, as_of_date: ENV['as_of_date'])
 end

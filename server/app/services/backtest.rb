@@ -20,10 +20,11 @@ class Backtest < BaseService
   MULTIPLIER = 2
   MAX_TRADE_SIZE_DOLLARS = 1000
   attr_accessor :model_id, :resolution, :model_starttime, :model_endtime, :in_sample_mean, :in_sample_sd, :assets,
-                :asset_weights, :num_ownable_assets, :num_obs, :positions, :prices, :pnl, :targets, :version
+                :asset_weights, :num_ownable_assets, :num_obs, :positions, :prices, :pnl, :targets, :version, :epoch
 
-  def initialize(version:)
+  def initialize(version:, epoch:)
     @version = version
+    @epoch = epoch
   end
 
   def run
@@ -44,8 +45,8 @@ class Backtest < BaseService
   private
 
   def load_model(version)
-    @model_id = BacktestModel.where("version=#{version}").oldest_sequence_number_first.last&.model_id
-    seq_num = BacktestModel.where("version=#{version}").oldest_sequence_number_first.last&.sequence_number
+    @model_id = BacktestModel.where("version=#{version} and epoch = #{epoch}").oldest_sequence_number_first.last&.model_id
+    seq_num = BacktestModel.where("version=#{version} and epoch=#{epoch}").oldest_sequence_number_first.last&.sequence_number
     Rails.logger.info "backtesting model #{@model_id} with sequence number #{seq_num}"
     model = CointegrationModel.where("uuid = '#{@model_id}'").last
     @log_prices = model&.log_prices
