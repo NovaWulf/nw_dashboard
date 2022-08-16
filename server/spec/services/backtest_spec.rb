@@ -1,4 +1,4 @@
-RSpec.describe Backtest do
+RSpec.describe Backtester do
   subject { described_class }
   let(:op_candle_first) { Candle.by_pair('op-usd').first&.close }
   let(:eth_candle_first) { Candle.by_pair('eth-usd').first&.close }
@@ -75,7 +75,8 @@ RSpec.describe Backtest do
       version: 0,
       model_id: 'id1',
       sequence_number: 0,
-      name: 'seed_model'
+      name: 'seed_model',
+      basket: 'OP_ETH'
     )
 
     ModeledSignal.create(
@@ -127,7 +128,8 @@ RSpec.describe Backtest do
       version: 1,
       model_id: 'id2',
       sequence_number: 0,
-      name: 'seed_model'
+      name: 'seed_model',
+      basket: 'OP_ETH'
     )
 
     ModeledSignal.create(
@@ -175,13 +177,17 @@ RSpec.describe Backtest do
   end
 
   it 'pnl calculation is accurate for price-level model' do
-    expect { subject.run(version: 0) }.to change { ModeledSignal.where("model_id = 'id1-b'").count }.by(1)
+    expect { subject.run(version: 0, basket: 'OP_ETH') }.to change {
+                                                              ModeledSignal.where("model_id = 'id1-b'").count
+                                                            }.by(1)
     m = ModeledSignal.last
     expect(m.value.round(2)).to eql pnl_expected.round(2)
   end
 
   it 'pnl calculation is accurate for log-price model' do
-    expect { subject.run(version: 1) }.to change { ModeledSignal.where("model_id = 'id2-b'").count }.by(1)
+    expect { subject.run(version: 1, basket: 'OP_ETH') }.to change {
+                                                              ModeledSignal.where("model_id = 'id2-b'").count
+                                                            }.by(1)
     m = ModeledSignal.last
     expect(m.value.round(1)).to eql pnl_expected_log.round(2)
   end

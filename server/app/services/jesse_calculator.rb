@@ -4,19 +4,12 @@ class JesseCalculator < BaseService
     fetch_required_data
 
     last_jesse_model = JesseModel.newest_first.last&.id
-    puts "last jesse model in calculator: #{last_jesse_model}"
     @std_error = JesseModel.newest_first.last&.standard_error
-    puts "std error: #{@std_error}"
-    puts "jesse model count: #{JesseModel.count}"
-
     assets = JesseModelWeight.where("jesse_models_id=#{last_jesse_model}").pluck(:weight, :metric_name)
     weights = assets.map { |x| x[0] }
     metric_names = assets.map { |x| x[1] }
     last_date = Metric.by_token('btc').by_metric('jesse').last&.timestamp
-    puts "last date: #{last_date}"
     return if last_date && last_date >= Date.today
-
-    puts "jesse model count: #{JesseModel.count}"
 
     start_date = last_date ? last_date + 1.day : Date.new(2017, 1, 1)
     m = nil
@@ -31,7 +24,6 @@ class JesseCalculator < BaseService
     aa_coef = weights[aa_ind]
     gt_coef = weights[gt_ind]
     intercept_coef = weights[intercept_ind]
-    puts "jesse model count: #{JesseModel.count}"
     (start_date..Date.today).each do |day|
       s2f = Metric.by_token('btc').by_metric('s2f_ratio').by_day(day).first
       unless s2f&.value
