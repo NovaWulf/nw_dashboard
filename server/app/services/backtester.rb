@@ -2,7 +2,7 @@ class Backtester < BaseService
   MULTIPLIER = 2
   MAX_TRADE_SIZE_DOLLARS = 1000
   attr_reader :model_id, :resolution, :model_starttime, :model_endtime, :in_sample_mean, :in_sample_sd, :assets,
-              :asset_weights, :num_ownable_assets, :num_obs, :positions, :prices, :pnl, :targets, :version, :basket
+              :asset_weights, :num_ownable_assets, :num_obs, :positions, :prices, :pnl, :targets, :version, :basket, :cursor, :starttimes
 
   def initialize(version:, basket:)
     @version = version
@@ -41,19 +41,19 @@ class Backtester < BaseService
     @in_sample_mean = model.in_sample_mean
     weights = CointegrationModelWeight.where("uuid = '#{@model_id}'")
     assets = weights.pluck(:asset_name, :weight)
-    puts "assets: #{assets}"
     @asset_names = assets.map { |x| x[0] }
     @asset_weights = assets.map { |x| x[1] }
     det_index = @asset_names.index('det')
     @asset_names.delete_at(det_index)
     @asset_weights.delete_at(det_index)
-    Rails.logger.info "asset names class: #{@asset_names.class}"
     @num_ownable_assets = @asset_names.length
-    modeled_signal = ModeledSignal.where("model_id = '#{@model_id}'").oldest_first
-    @signal = modeled_signal.pluck(:value)
-    @starttimes = modeled_signal.pluck(:starttime)
-    signal_starttime = @starttimes[0]
+    modeled_signal = ModeledSignal.where("model_id = '#{@model_id}'").oldest_first.pluck(:value, :starttime)
+    @signal = modeled_signal.map { |x| x[0] }
+    @starttimes = modeled_signal.map { |x| x[1] }
+    start_ind = @starttimes.index(@model_starttime)
+    signal_starttime = @starttimes[start_ind]
     signal_endtime = @starttimes.last
+    @signal = @signal[start_ind..(@signal.length - 1)]
     @num_obs = @signal.length
     @pnl = Array.new(@num_obs)
     @targets = Array.new(@num_ownable_assets)

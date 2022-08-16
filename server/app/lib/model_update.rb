@@ -82,8 +82,8 @@ class ModelUpdate < BaseService
         name: "auto-update #{current_model&.sequence_number + 1}",
         basket: basket
       )
-      ArbitrageCalculator.run(version: version)
-      Backtester.run(version: version)
+      ArbitrageCalculator.run(version: version, basket: basket)
+      Backtester.run(version: version, basket: basket)
     end
   end
 
@@ -101,9 +101,9 @@ class ModelUpdate < BaseService
       name: "manual update #{current_model&.sequence_number + 1}",
       basket: basket
     )
-    ArbitrageCalculator.run(version: version, silent: true)
+    ArbitrageCalculator.run(version: version, silent: true, basket: basket)
     Rails.logger.info 'arbitrage calculator complete'
-    Backtester.run(version: version)
+    Backtester.run(version: version, basket: basket)
     Rails.logger.info 'backtester complete'
   end
 

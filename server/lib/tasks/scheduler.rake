@@ -70,9 +70,11 @@ task update_arb_signal: :environment do
   mu = ModelUpdate.new(basket: 'OP_ETH')
   mu.seed
   ArbitrageCalculator.run(version: 2, silent: true, basket: 'OP_ETH')
-  Rails.logger.info 'arbitrage calculator complete for seed model'
   Backtester.run(version: 2, basket: 'OP_ETH')
-  Rails.logger.info 'backtester complete for seed model'
+  mu = ModelUpdate.new(basket: 'UNI_ETH')
+  mu.seed
+  ArbitrageCalculator.run(version: 2, silent: true, basket: 'UNI_ETH')
+  Backtester.run(version: 2, basket: 'UNI_ETH')
 end
 
 task try_update_models: :environment do
@@ -97,8 +99,8 @@ task try_update_model_as_of: :environment do
   Rails.logger.info 'writing candle data to CSV...'
   CsvWriter.run(table: 'candles')
   mu = ModelUpdate.new(basket: 'OP_ETH')
-  puts ENV['as_of_date']
-  mu.update_model(version: 2, max_weeks_back: 8, min_weeks_back: 3, interval_mins: 1440, as_of_date: ENV['as_of_date'])
+  puts ENV['end']
+  mu.update_model(version: 2, max_weeks_back: 8, min_weeks_back: 3, interval_mins: 1440, as_of_date: ENV['end'])
 end
 
 task add_model_with_dates: :environment do

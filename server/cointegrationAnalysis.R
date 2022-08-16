@@ -18,8 +18,8 @@ print(startTimeString)
 print(endTimeString)
 
 if (class(startTimeString)=="character" && class(endTimeString)== "character"){
-  startTime = as.numeric(strptime(startTimeString, "%Y-%m-%d",tz="EST"))
-  endTime = as.numeric(strptime(endTimeString,"%Y-%m-%d",tz="EST")) 
+  startTime = as.numeric(strptime(startTimeString, "%Y-%m-%d",tz="UTC"))
+  endTime = as.numeric(strptime(endTimeString,"%Y-%m-%d",tz="UTC")) 
 }
 
 resolution = 60
@@ -53,7 +53,7 @@ print(dim(bothDat))
 if (logPrices){
   bothDat$close.x=log(bothDat$close.x)
   bothDat$close.y=log(bothDat$close.y)
-} 
+}
 
 plot1 = xyplot(close.x~start_datetime,bothDat,type="l", auto.key = TRUE, main = "double axis plot of OP vs ETH futures")
 plot2 = xyplot(close.y~start_datetime,bothDat,type="l",auto.key = TRUE)
@@ -85,6 +85,7 @@ bothDat$meanSpread = meanSpread
 bothDat$sdSpread = sdSpread
 bothDat$upper = bothDat$meanSpread+sigma*bothDat$sdSpread
 bothDat$lower = bothDat$meanSpread-sigma*bothDat$sdSpread
+
 xyplot(spread + meanSpread + upper+lower~start_datetime,bothDat,type = "l",
        auto.key = T,main= "mean reverting portfolio (log prices)",
        panel = function(...) {
@@ -92,10 +93,10 @@ xyplot(spread + meanSpread + upper+lower~start_datetime,bothDat,type = "l",
          panel.xyplot(...)
        })
 
-
 plot1 = xyplot(close.x~start_datetime,bothDat,type="l", auto.key = TRUE, main = "double axis plot of OP vs ETH futures")
 plot2 = xyplot(close.y~start_datetime,bothDat,type="l",auto.key = TRUE)
 doubleYScale(plot1, plot2)
+
 bothDat$meanSpread = meanSpread
 bothDat$sdSpread = sdSpread
 bothDat$upper = bothDat$meanSpread+sigma*bothDat$sdSpread

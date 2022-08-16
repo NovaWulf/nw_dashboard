@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_08_15_195948) do
+ActiveRecord::Schema.define(version: 2022_08_16_184945) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -23,7 +23,7 @@ ActiveRecord::Schema.define(version: 2022_08_15_195948) do
     t.integer "version", null: false
     t.string "name"
     t.string "basket", default: "OP_ETH"
-    t.index ["version", "sequence_number"], name: "index_backtest_models_on_version_and_sequence_number", unique: true
+    t.index ["version", "sequence_number", "basket"], name: "index_backtest_models_on_version_and_sequence_number_and_basket", unique: true
   end
 
   create_table "candles", force: :cascade do |t|

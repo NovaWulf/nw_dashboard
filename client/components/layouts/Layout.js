@@ -166,16 +166,28 @@ export default function Layout({ children }) {
           </ListItem>
         </Link>
         <ListSubheader>Signals</ListSubheader>
-        <Link href="/arbitrage">
+        <Link href="/op_eth">
           <ListItem
             button
-            selected={router.pathname == '/arbitrage'}
-            key="Arbitrage"
+            selected={router.pathname == '/op_eth'}
+            key="OPETHArbitrage"
           >
             <ListItemIcon>
               <EthereumIcon />
             </ListItemIcon>
-            <ListItemText primary="Arbitrage" />
+            <ListItemText primary="OP-ETH" />
+          </ListItem>
+        </Link>
+        <Link href="/uni_eth">
+          <ListItem
+            button
+            selected={router.pathname == '/uni_eth'}
+            key="UNIETHArbitrage"
+          >
+            <ListItemIcon>
+              <EthereumIcon />
+            </ListItemIcon>
+            <ListItemText primary="UNI-ETH" />
           </ListItem>
         </Link>
       </List>

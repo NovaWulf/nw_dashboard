@@ -5,14 +5,14 @@ import ClientOnly from 'components/ClientOnly';
 import Layout from 'components/layouts/Layout';
 import ArbitrageCharts from 'components/protocols/ArbitrageCharts';
 
-const Arbitrage = () => {
+const UNIETHArbitrage = () => {
   return (
     <Layout>
       <ClientOnly>
-        <ArbitrageCharts basket={"OP_ETH"} />
+        <ArbitrageCharts basket={"UNI_ETH"} />
       </ClientOnly>
     </Layout>
   );
 };
 
-export default withPageAuthRequired(Arbitrage);
+export default withPageAuthRequired(UNIETHArbitrage);

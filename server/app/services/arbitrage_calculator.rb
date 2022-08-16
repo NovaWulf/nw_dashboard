@@ -8,11 +8,9 @@ class ArbitrageCalculator < BaseService
   end
 
   def run
-    puts "version = #{version} and basket='#{basket}'"
     most_recent_backtest_model = BacktestModel.where("version = #{version} and basket='#{basket}'").oldest_sequence_number_first.last
     Rails.logger.info "running arb calculator on sequence number #{most_recent_backtest_model&.sequence_number}"
     most_recent_model_id = most_recent_backtest_model&.model_id
-    puts "most recent model id: #{most_recent_model_id}"
     @most_recent_model = CointegrationModel.where("uuid='#{most_recent_model_id}'").last
     det_type = most_recent_model&.ecdet
     log_prices = most_recent_model&.log_prices
@@ -38,6 +36,7 @@ class ArbitrageCalculator < BaseService
 
     first_timestamps = asset_names.map { |a| Candle.where("pair = '#{a}'").oldest_first.first&.starttime }
     start_time = last_timestamp ? last_timestamp + res : first_in_sample_timestamp
+    puts "start time in arb signal: #{start_time}, last timestamp: #{last_timestamp}"
     flat_records = PriceMerger.run(asset_names, start_time).value
     starttimes = flat_records[0]
     prices = flat_records[1]
