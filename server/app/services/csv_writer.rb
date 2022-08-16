@@ -2,7 +2,7 @@ class CsvWriter < BaseService
   attr_reader :table, :assets
 
   DEFAULT_CSV_TABLE = 'both'
-  def initialize(table: DEFAULT_CSV_TABLE, assets: %w[eth-usd uni-usd])
+  def initialize(assets:, table: DEFAULT_CSV_TABLE)
     @table = table
     @assets = assets
   end
@@ -13,6 +13,7 @@ class CsvWriter < BaseService
     if table == 'both' || table == 'candles'
       # add timestamp here
       file = "#{Rails.root}/public/data.csv"
+      # file = "#{Rails.root}/public/data_#{Time.now.to_i}.csv"
       Rails.logger.info "writing csv to #{file}"
       CSV.open(file, 'w') do |writer|
         table = Candle.where("pair in #{asset_string}")

@@ -10,28 +10,28 @@ class ModelUpdate < BaseService
   def initialize(basket:)
     @r = RAdapter.new
     @basket = basket
+    puts "basket: #{basket}"
+
     @asset_names = []
     if basket == 'OP_ETH'
       @asset_names = %w[eth-usd op-usd]
     elsif basket == 'UNI_ETH'
       @asset_names = %w[eth-usd uni-usd]
     else
-      Rails.logger.info "not one of the registered baskets... can't create asset list"
-      raise e
+      raise "not one of the registered baskets... can't create asset list"
     end
   end
 
   def seed
-    r_count = BacktestModel.where("version = #{MODEL_VERSION} and basket = #{basket} and sequence_number= 0").count
+    r_count = BacktestModel.where("version = #{MODEL_VERSION} and basket = '#{basket}' and sequence_number= 0").count
     if r_count == 0
-      CsvWriter.run(table: candles)
+      CsvWriter.run(table: 'candles', assets: asset_names)
       return_vals = r.cointegration_analysis(asset_names: asset_names, start_time_string: MODEL_STARTDATES[0], end_time_string: MODEL_ENDDATES[0],
                                              ecdet_param: "'trend'")
       first_model = return_vals[0]
       Rails.logger.info "return val of seed model: #{return_vals}"
       Rails.logger.info "MODEL ID: #{first_model}"
       Rails.logger.info "no model detected for version #{MODEL_VERSION} seq 0... creating new seed model"
-
       BacktestModel.create(
         version: MODEL_VERSION,
         model_id: first_model,
@@ -40,7 +40,7 @@ class ModelUpdate < BaseService
         basket: basket
       )
     else
-      model_detected = BacktestModel.where("version = #{MODEL_VERSION} and sequence_number= 0").last&.model_id
+      model_detected = BacktestModel.where("version = #{MODEL_VERSION} and basket='#{basket}' and sequence_number= 0").last&.model_id
       Rails.logger.info "model #{model_detected} detected for sequence_number= 0... skipping creation of new seed model"
     end
   end

@@ -17,13 +17,13 @@ import DashboardItem from 'components/DashboardItem';
 import TimeAxisHighRes from 'components/TimeAxisHighRes';
 import CsvDownloadLink from 'components/CsvDownloadLink';
 
-export default function ArbitrageBacktestChart({seqNumber}) {
+export default function ArbitrageBacktestChart({seqNumber,version,basket}) {
 
-  console.log("seqNumber in backtest: "+seqNumber)
-
+  console.log("seqNumber in backtest: "+seqNumber + "version: "  + version + ", basket: " + basket)
+  
   const QUERY = gql`
-  query ($seqNumber: Int){
-    cointegrationModelInfo(version:2,sequenceNumber:$seqNumber) {
+  query ($version: Int!, $seqNumber: Int!, $basket: String!){
+    cointegrationModelInfo(version:$version,sequenceNumber:$seqNumber,basket:$basket) {
       inSampleMean
       inSampleSd
       uuid
@@ -32,7 +32,7 @@ export default function ArbitrageBacktestChart({seqNumber}) {
       modelStarttime
     }
 
-    backtestModel(version: 2,sequenceNumber:$seqNumber) {
+    backtestModel(version: $version,sequenceNumber:$seqNumber,basket: $basket) {
       ts
       v
       is
@@ -41,7 +41,7 @@ export default function ArbitrageBacktestChart({seqNumber}) {
   `;
 
   const { data, loading, error } = useQuery(QUERY, {
-    variables: { seqNumber },
+    variables: { seqNumber,version, basket },
   });
 
   const { cointegrationModelInfo, backtestModel } = data || {};

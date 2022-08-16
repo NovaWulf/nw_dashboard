@@ -55,6 +55,10 @@ if (logPrices){
   bothDat$close.y=log(bothDat$close.y)
 } 
 
+plot1 = xyplot(close.x~start_datetime,bothDat,type="l", auto.key = TRUE, main = "double axis plot of OP vs ETH futures")
+plot2 = xyplot(close.y~start_datetime,bothDat,type="l",auto.key = TRUE)
+doubleYScale(plot1, plot2)
+
 dataMat = as.matrix(bothDat[,c("close.x","close.y")])
 spec = "transitory"
 type = "trace"
@@ -73,7 +77,7 @@ if (ecdet == "none")
 if (ecdet == "trend")
  spread = vecs[1,1]*bothDat$close.x + vecs[2,1]*bothDat$close.y+vecs[3,1]*seq(1,nrow(dataMat))
 
-sigma = 3
+sigma = 1
 meanSpread= mean(spread)
 sdSpread = sd(spread)
 

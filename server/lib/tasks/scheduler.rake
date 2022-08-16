@@ -67,11 +67,11 @@ task update_arb_signal: :environment do
   end
   Rails.logger.info 'writing candle data to CSV...'
   puts 'writing candle data to CSV...'
-  mu = ModelUpdate.new(basket: 'UNI-ETH')
+  mu = ModelUpdate.new(basket: 'OP_ETH')
   mu.seed
-  ArbitrageCalculator.run(version: MODEL_VERSION, silent: true)
+  ArbitrageCalculator.run(version: 2, silent: true, basket: 'OP_ETH')
   Rails.logger.info 'arbitrage calculator complete for seed model'
-  Backtester.run(version: MODEL_VERSION)
+  Backtester.run(version: 2, basket: 'OP_ETH')
   Rails.logger.info 'backtester complete for seed model'
 end
 

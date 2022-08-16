@@ -1,5 +1,5 @@
 class ArbitrageCalculator < BaseService
-  attr_reader :version, :most_recent_model, :silent, :assets
+  attr_reader :version, :most_recent_model, :silent, :assets, :basket
 
   def initialize(version:, basket:, silent: false)
     @version = version
@@ -8,10 +8,11 @@ class ArbitrageCalculator < BaseService
   end
 
   def run
-    most_recent_backtest_model = BacktestModel.where("version = #{version} and basket=#{basket}").oldest_sequence_number_first.last
+    puts "version = #{version} and basket='#{basket}'"
+    most_recent_backtest_model = BacktestModel.where("version = #{version} and basket='#{basket}'").oldest_sequence_number_first.last
     Rails.logger.info "running arb calculator on sequence number #{most_recent_backtest_model&.sequence_number}"
-
     most_recent_model_id = most_recent_backtest_model&.model_id
+    puts "most recent model id: #{most_recent_model_id}"
     @most_recent_model = CointegrationModel.where("uuid='#{most_recent_model_id}'").last
     det_type = most_recent_model&.ecdet
     log_prices = most_recent_model&.log_prices

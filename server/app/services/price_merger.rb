@@ -8,6 +8,8 @@ class PriceMerger < BaseService
   end
 
   def run
+    puts "asset names in price merger: #{asset_names}"
+
     if asset_names.length != 2
       Rails.logger.info "price processor currently only works with 2 assets. you are trying to merge #{asset_names.length} asset timeseries"
       return

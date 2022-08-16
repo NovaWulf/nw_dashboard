@@ -9,7 +9,7 @@ const Arbitrage = () => {
   return (
     <Layout>
       <ClientOnly>
-        <ArbitrageCharts />
+        <ArbitrageCharts basket={"OP_ETH"} />
       </ClientOnly>
     </Layout>
   );
