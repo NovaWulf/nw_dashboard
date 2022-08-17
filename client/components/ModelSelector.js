@@ -11,6 +11,7 @@ const getModelsQuery = gql`
 `;
 
 const ModelSelector = ({ model, handleChange, basket, version }) => {
+  console.log("model in selector: "+ model + ", bsket: "+basket +", version: " + version)
   const { loading, error, data } = useQuery(getModelsQuery, {
     variables: { version, basket },
   });
@@ -18,6 +19,9 @@ const ModelSelector = ({ model, handleChange, basket, version }) => {
   if (error) {
     console.log(error);
     return <p>Error in Query...</p>;
+  }
+  if (data){
+    console.log("data: "+JSON.stringify(data))
   }
   const maxSeqNum = data.backtestModelInfo[0].sequenceNumber;
   var modelSequence = [];

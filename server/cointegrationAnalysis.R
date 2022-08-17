@@ -143,7 +143,7 @@ returnVals[[2]] = valueString
 
 #print(queryString)
 
-assetNames = c("eth-usd","op-usd","det")
+assetNames = c(asset_names[1],asset_names[2],"det")
 assetWeights=c(vecs[1,1],vecs[2,1],vecs[3,1])
 
 colNamesString2 = "(uuid,timestamp,asset_name,weight)"

@@ -8,6 +8,7 @@ class ArbitrageCalculator < BaseService
   end
 
   def run
+    puts "running backtest with version = #{version} and basket='#{basket}'"
     most_recent_backtest_model = BacktestModel.where("version = #{version} and basket='#{basket}'").oldest_sequence_number_first.last
     Rails.logger.info "running arb calculator on sequence number #{most_recent_backtest_model&.sequence_number}"
     most_recent_model_id = most_recent_backtest_model&.model_id
@@ -20,6 +21,7 @@ class ArbitrageCalculator < BaseService
     assets = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}'").pluck(:weight, :asset_name)
     asset_weights = assets.map { |x| x[0] }
     asset_names = assets.map { |x| x[1] }
+    puts "asset names in arb calc: #{asset_names}"
     det_index = asset_names.index('det')
     det_weight = asset_weights[det_index]
     asset_weights.delete_at(det_index)
@@ -67,9 +69,10 @@ class ArbitrageCalculator < BaseService
                           asset_weights[i] * prices[i][time_step]
                         end
         if time_step < 10
-          puts "timestamp: #{start_times[time_step]}, asset weight: #{asset_weights[i]}, price: #{prices[i][time_step]}"
+          puts "timestamp: #{starttimes[time_step]}, asset weight: #{asset_weights[i]}, price: #{prices[i][time_step]}"
         end
       end
+      puts "signal: #{signal_value}" if time_step < 10
       running_total += signal_value
       # puts "running average: #{running_total / (time_step + 1)}"
 

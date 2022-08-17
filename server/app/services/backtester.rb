@@ -47,6 +47,7 @@ class Backtester < BaseService
     @asset_names.delete_at(det_index)
     @asset_weights.delete_at(det_index)
     @num_ownable_assets = @asset_names.length
+    puts "model id in backtest: #{model_id} count: #{ModeledSignal.where("model_id = '#{@model_id}'").count}"
     modeled_signal = ModeledSignal.where("model_id = '#{@model_id}'").oldest_first.pluck(:value, :starttime)
     @signal = modeled_signal.map { |x| x[0] }
     @starttimes = modeled_signal.map { |x| x[1] }

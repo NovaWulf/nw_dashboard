@@ -65,16 +65,13 @@ task update_arb_signal: :environment do
     puts "getting pair #{p}"
     Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
   end
-  Rails.logger.info 'writing candle data to CSV...'
-  puts 'writing candle data to CSV...'
-  mu = ModelUpdate.new(basket: 'OP_ETH')
-  mu.seed
-  ArbitrageCalculator.run(version: 2, silent: true, basket: 'OP_ETH')
-  Backtester.run(version: 2, basket: 'OP_ETH')
-  mu = ModelUpdate.new(basket: 'UNI_ETH')
-  mu.seed
-  ArbitrageCalculator.run(version: 2, silent: true, basket: 'UNI_ETH')
-  Backtester.run(version: 2, basket: 'UNI_ETH')
+  baskets = %w[UNI_ETH]
+  baskets.each do |b|
+    mu = ModelUpdate.new(basket: b)
+    mu.seed
+    ArbitrageCalculator.run(version: 2, silent: true, basket: b)
+    Backtester.run(version: 2, basket: b)
+  end
 end
 
 task try_update_models: :environment do
