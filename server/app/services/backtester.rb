@@ -50,7 +50,9 @@ class Backtester < BaseService
     modeled_signal = ModeledSignal.where("model_id = '#{@model_id}'").oldest_first.pluck(:value, :starttime)
     @signal = modeled_signal.map { |x| x[0] }
     @starttimes = modeled_signal.map { |x| x[1] }
+    puts "model start time: #{@model_starttime} first time: #{@starttimes[0]}"
     start_ind = @starttimes.index(@model_starttime)
+    puts "start ind: #{start_ind}"
     signal_starttime = @starttimes[start_ind]
     signal_endtime = @starttimes.last
     @signal = @signal[start_ind..(@signal.length - 1)]

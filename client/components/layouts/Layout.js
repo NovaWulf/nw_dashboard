@@ -166,10 +166,10 @@ export default function Layout({ children }) {
           </ListItem>
         </Link>
         <ListSubheader>Signals</ListSubheader>
-        <Link href="/op_eth">
+        <Link href="/op_eth_arbitrage">
           <ListItem
             button
-            selected={router.pathname == '/op_eth'}
+            selected={router.pathname == '/op_eth_arbitrage'}
             key="OPETHArbitrage"
           >
             <ListItemIcon>
@@ -178,10 +178,10 @@ export default function Layout({ children }) {
             <ListItemText primary="OP-ETH" />
           </ListItem>
         </Link>
-        <Link href="/uni_eth">
+        <Link href="/uni_eth_arbitrage">
           <ListItem
             button
-            selected={router.pathname == '/uni_eth'}
+            selected={router.pathname == '/uni_eth_arbitrage'}
             key="UNIETHArbitrage"
           >
             <ListItemIcon>

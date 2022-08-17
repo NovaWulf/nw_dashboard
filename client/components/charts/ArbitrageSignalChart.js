@@ -59,8 +59,11 @@ export default function ArbitrageSignalChart({seqNumber,version,basket}) {
     sd = cointegrationModelInfo[0].inSampleSd;
     isEndDate = cointegrationModelInfo[0].modelEndtime;
     isStartDate = cointegrationModelInfo[0].modelStarttime;
+    var total = 0
+    const arbLength = arbSignalModel.length
     updatedData = arbSignalModel.map(d => {
-      console.log('sd: ' + Math.floor(100 * (-SIGMA * sd)));
+      // console.log('value: ' + d.v + ", mean: " + mean);
+      total+=d.v
       return {
         ts: d.ts,
         v: Math.floor(100 * (d.v - mean)),
@@ -70,6 +73,7 @@ export default function ArbitrageSignalChart({seqNumber,version,basket}) {
         arbMean: Math.floor(0),
       };
     });
+    console.log("true mean: "+ total/arbLength)
   }
 
   const theme = useTheme();

@@ -41,7 +41,9 @@ class ArbitrageCalculator < BaseService
     starttimes = flat_records[0]
     prices = flat_records[1]
     interp_count = 0
+    running_total = 0
     for time_step in 0..(starttimes.length - 1)
+      puts "det_weight: #{time_step * det_weight}" if time_step < 10
       signal_value = if det_type == 'const'
                        det_weight
                      elsif det_type == 'trend'
@@ -64,11 +66,18 @@ class ArbitrageCalculator < BaseService
                         else
                           asset_weights[i] * prices[i][time_step]
                         end
+        if time_step < 10
+          puts "timestamp: #{start_times[time_step]}, asset weight: #{asset_weights[i]}, price: #{prices[i][time_step]}"
+        end
       end
+      running_total += signal_value
+      # puts "running average: #{running_total / (time_step + 1)}"
+
       in_sample_flag = starttimes[time_step] <= last_in_sample_timestamp
       m = ModeledSignal.create(starttime: starttimes[time_step], model_id: most_recent_model_id, resolution: res, value: signal_value,
                                in_sample: in_sample_flag)
     end
+    puts "total det added: #{total_det} + contribution to mean: #{total_det / starttimes.length}"
     Rails.logger.info "flat forward interpolated #{interp_count} values"
 
     email_notification(m) if !silent && m
