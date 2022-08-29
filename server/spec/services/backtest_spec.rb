@@ -21,13 +21,14 @@ RSpec.describe Backtester do
   # suppose we have a signal from 2 time steps ago,
   # and candles, model from 1 timestep ago
   before(:each) do
-    Candle.create(starttime: Time.now.to_i - 60,
+    t_minus_1 = Time.now.to_i - 60
+    Candle.create(starttime: t_minus_1,
                   pair: 'eth-usd',
                   exchange: 'Coinbase',
                   resolution: 60,
                   low: 1, high: 1, open: 1, close: 1, volume: 1)
 
-    Candle.create(starttime: Time.now.to_i - 60,
+    Candle.create(starttime: t_minus_1,
                   pair: 'op-usd',
                   exchange: 'Coinbase',
                   resolution: 60,
@@ -64,7 +65,7 @@ RSpec.describe Backtester do
       test_stat: 9,
       top_eig: 0.0008,
       resolution: 60,
-      model_starttime: 1_600_000_000,
+      model_starttime: t_minus_1,
       model_endtime: 1_700_000_000,
       in_sample_mean: 0,
       in_sample_sd: 3,
@@ -80,7 +81,7 @@ RSpec.describe Backtester do
     )
 
     ModeledSignal.create(
-      starttime: Time.now.to_i - 60,
+      starttime:t_minus_1,
       model_id: 'id1',
       resolution: 60,
       value: 10
@@ -117,7 +118,7 @@ RSpec.describe Backtester do
       test_stat: 9,
       top_eig: 0.0008,
       resolution: 60,
-      model_starttime: 1_600_000_000,
+      model_starttime: t_minus_1,
       model_endtime: 1_700_000_000,
       in_sample_mean: 0,
       in_sample_sd: 3,
@@ -133,7 +134,7 @@ RSpec.describe Backtester do
     )
 
     ModeledSignal.create(
-      starttime: Time.now.to_i - 60,
+      starttime: t_minus_1,
       model_id: 'id2',
       resolution: 60,
       value: 10
