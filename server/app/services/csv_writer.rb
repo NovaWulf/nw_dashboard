@@ -8,9 +8,9 @@ class CsvWriter < BaseService
   end
 
   def run
-    asset_string = "('" + assets.join("','") + "')"
-    puts "asset string: #{asset_string}"
     if table == 'both' || table == 'candles'
+      asset_string = "('" + assets.join("','") + "')"
+      puts "asset string: #{asset_string}"
       # add timestamp here
       file = "#{Rails.root}/public/data.csv"
       # file = "#{Rails.root}/public/data_#{Time.now.to_i}.csv"

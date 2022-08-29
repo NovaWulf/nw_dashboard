@@ -65,7 +65,7 @@ task update_arb_signal: :environment do
     puts "getting pair #{p}"
     Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
   end
-  baskets = %w[UNI_ETH]
+  baskets = %w[OP_ETH UNI_ETH]
   baskets.each do |b|
     mu = ModelUpdate.new(basket: b)
     mu.seed
@@ -75,16 +75,18 @@ task update_arb_signal: :environment do
 end
 
 task try_update_models: :environment do
-  if Time.now.sunday?
-    tracked_pairs = %w[eth-usd op-usd]
+  if Time.now.monday?
+    tracked_pairs = %w[eth-usd op-usd btc-usd uni-usd snx-usd]
     tracked_pairs.each do |p|
       Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
     end
     Rails.logger.info 'writing candle data to CSV...'
-    CsvWriter.run
-    mu = ModelUpdate.new(basket: 'OP_ETH')
-    mu.update_model(version: 2, max_weeks_back: 8, min_weeks_back: 3, interval_mins: 1440)
-    mu.update_jesse_model
+    baskets = %w[OP_ETH UNI_ETH]
+    baskets.each do |b|
+      mu = ModelUpdate.new(basket: b)
+      mu.update_model(version: 2, max_weeks_back: 8, min_weeks_back: 3, interval_mins: 1440)
+    end
+    JesseModelUpdate.run
   end
 end
 
@@ -94,7 +96,6 @@ task try_update_model_as_of: :environment do
     Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
   end
   Rails.logger.info 'writing candle data to CSV...'
-  CsvWriter.run(table: 'candles')
   mu = ModelUpdate.new(basket: 'OP_ETH')
   puts ENV['end']
   mu.update_model(version: 2, max_weeks_back: 8, min_weeks_back: 3, interval_mins: 1440, as_of_date: ENV['end'])
@@ -106,7 +107,10 @@ task add_model_with_dates: :environment do
     Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
   end
   Rails.logger.info 'writing candle data to CSV...'
-  CsvWriter.run(table: 'candles')
   mu = ModelUpdate.new(basket: 'OP_ETH')
   mu.add_model_with_dates(version: 2, start_time_string: ENV['start'], end_time_string: ENV['end'])
+end
+
+task jesse_model_update: :environment do
+  JesseModelUpdate.run
 end

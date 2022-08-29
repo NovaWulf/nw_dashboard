@@ -38,14 +38,13 @@ class ArbitrageCalculator < BaseService
 
     first_timestamps = asset_names.map { |a| Candle.where("pair = '#{a}'").oldest_first.first&.starttime }
     start_time = last_timestamp ? last_timestamp + res : first_in_sample_timestamp
-    puts "start time in arb signal: #{start_time}, last timestamp: #{last_timestamp}"
     flat_records = PriceMerger.run(asset_names, start_time).value
     starttimes = flat_records[0]
     prices = flat_records[1]
     interp_count = 0
     running_total = 0
     for time_step in 0..(starttimes.length - 1)
-      puts "det_weight: #{time_step * det_weight}" if time_step < 10
+      #puts "det_weight: #{time_step * det_weight}" if time_step < 10
       signal_value = if det_type == 'const'
                        det_weight
                      elsif det_type == 'trend'
@@ -68,11 +67,7 @@ class ArbitrageCalculator < BaseService
                         else
                           asset_weights[i] * prices[i][time_step]
                         end
-        if time_step < 10
-          puts "timestamp: #{starttimes[time_step]}, asset weight: #{asset_weights[i]}, price: #{prices[i][time_step]}"
-        end
       end
-      puts "signal: #{signal_value}" if time_step < 10
       running_total += signal_value
       # puts "running average: #{running_total / (time_step + 1)}"
 

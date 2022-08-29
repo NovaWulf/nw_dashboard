@@ -46,6 +46,7 @@ class ModelUpdate < BaseService
   end
 
   def update_model(version:, max_weeks_back:, min_weeks_back:, interval_mins:, as_of_date: nil)
+    CsvWriter.run(table: 'candles', assets: asset_names)
     as_of_time = DateTime.strptime(as_of_date, '%Y-%m-%d').to_i unless as_of_date.nil?
     ArbitrageCalculator.run(version: version, silent: true)
     Backtester.run(version: version)
@@ -88,7 +89,9 @@ class ModelUpdate < BaseService
   end
 
   def add_model_with_dates(version:, start_time_string:, end_time_string:)
+    CsvWriter.run(table: 'candles', assets: asset_names)
     @r = RAdapter.new
+    puts "asset names in add model with dates: #{asset_names}"
     return_vals = @r.cointegration_analysis(asset_names: asset_names, start_time_string: start_time_string, end_time_string: end_time_string,
                                             ecdet_param: "'const'")
 
@@ -107,9 +110,4 @@ class ModelUpdate < BaseService
     Rails.logger.info 'backtester complete'
   end
 
-  def update_jesse_model
-    @r = RAdapter.new
-    resulVals = @r.jesse_analysis
-    JesseCalculator.run
-  end
 end
