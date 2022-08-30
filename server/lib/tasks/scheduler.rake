@@ -90,22 +90,22 @@ task try_update_models: :environment do
 end
 
 task try_update_model_as_of: :environment do
-  tracked_pairs = %w[eth-usd op-usd]
+  tracked_pairs = %w[eth-usd op-usd btc-usd uni-usd snx-usd]
   tracked_pairs.each do |p|
     Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
   end
   Rails.logger.info 'writing candle data to CSV...'
-  mu = ModelUpdate.new(basket: 'OP_ETH')
+  mu = ModelUpdate.new(basket: ENV['basket'])
   mu.update_model(version: 2, max_weeks_back: 8, min_weeks_back: 3, interval_mins: 1440, as_of_date: ENV['end'])
 end
 
 task add_model_with_dates: :environment do
-  tracked_pairs = %w[eth-usd op-usd]
+  tracked_pairs = %w[eth-usd op-usd btc-usd uni-usd snx-usd]
   tracked_pairs.each do |p|
     Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
   end
   Rails.logger.info 'writing candle data to CSV...'
-  mu = ModelUpdate.new(basket: 'OP_ETH')
+  mu = ModelUpdate.new(basket: ENV['basket'])
   mu.add_model_with_dates(version: 2, start_time_string: ENV['start'], end_time_string: ENV['end'])
 end
 
