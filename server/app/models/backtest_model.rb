@@ -3,6 +3,7 @@
 # Table name: backtest_models
 #
 #  id              :bigint           not null, primary key
+#  basket          :string           default("OP_ETH")
 #  name            :string
 #  sequence_number :integer          not null
 #  version         :integer          not null
@@ -12,7 +13,7 @@
 #
 # Indexes
 #
-#  index_backtest_models_on_version_and_sequence_number  (version,sequence_number) UNIQUE
+#  index_backtest_models_on_version_and_sequence_number_and_basket  (version,sequence_number,basket) UNIQUE
 #
 class BacktestModel < ApplicationRecord
   scope :by_version, ->(v) { where(version: v) }

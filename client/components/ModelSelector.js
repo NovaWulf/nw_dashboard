@@ -2,16 +2,18 @@ import React from 'react';
 import { useQuery, gql } from '@apollo/client';
 import { Box, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 const getModelsQuery = gql`
-  query  {
-    backtestModelInfo(version: 2) {
+  query ($version: Int!, $basket: String!) {
+    backtestModelInfo(version: $version, basket:$basket) {
       version
       sequenceNumber
     }
   }
 `;
 
-const ModelSelector = ({ model, handleChange }) => {
-  const { loading, error, data } = useQuery(getModelsQuery);
+const ModelSelector = ({ seqNumber, handleChange, basket, version }) => {
+  const { loading, error, data } = useQuery(getModelsQuery, {
+    variables: { version, basket },
+  });
   if (loading) return <p>Loading Query...</p>;
   if (error) {
     console.log(error);
@@ -30,7 +32,7 @@ const ModelSelector = ({ model, handleChange }) => {
         <Select
           labelId="select-model-label"
           id="select-model-select"
-          value={model || 0}
+          value={seqNumber || 0}
           label="Model #"
           onChange={e => handleChange(e.target.value)}
         >

@@ -1,4 +1,4 @@
-RSpec.describe Backtest do
+RSpec.describe Backtester do
   subject { described_class }
   let(:op_candle_first) { Candle.by_pair('op-usd').first&.close }
   let(:eth_candle_first) { Candle.by_pair('eth-usd').first&.close }
@@ -21,13 +21,14 @@ RSpec.describe Backtest do
   # suppose we have a signal from 2 time steps ago,
   # and candles, model from 1 timestep ago
   before(:each) do
-    Candle.create(starttime: Time.now.to_i - 60,
+    t_minus_1 = Time.now.to_i - 60
+    Candle.create(starttime: t_minus_1,
                   pair: 'eth-usd',
                   exchange: 'Coinbase',
                   resolution: 60,
                   low: 1, high: 1, open: 1, close: 1, volume: 1)
 
-    Candle.create(starttime: Time.now.to_i - 60,
+    Candle.create(starttime: t_minus_1,
                   pair: 'op-usd',
                   exchange: 'Coinbase',
                   resolution: 60,
@@ -64,7 +65,7 @@ RSpec.describe Backtest do
       test_stat: 9,
       top_eig: 0.0008,
       resolution: 60,
-      model_starttime: 1_600_000_000,
+      model_starttime: t_minus_1,
       model_endtime: 1_700_000_000,
       in_sample_mean: 0,
       in_sample_sd: 3,
@@ -75,11 +76,12 @@ RSpec.describe Backtest do
       version: 0,
       model_id: 'id1',
       sequence_number: 0,
-      name: 'seed_model'
+      name: 'seed_model',
+      basket: 'OP_ETH'
     )
 
     ModeledSignal.create(
-      starttime: Time.now.to_i - 60,
+      starttime:t_minus_1,
       model_id: 'id1',
       resolution: 60,
       value: 10
@@ -116,7 +118,7 @@ RSpec.describe Backtest do
       test_stat: 9,
       top_eig: 0.0008,
       resolution: 60,
-      model_starttime: 1_600_000_000,
+      model_starttime: t_minus_1,
       model_endtime: 1_700_000_000,
       in_sample_mean: 0,
       in_sample_sd: 3,
@@ -127,11 +129,12 @@ RSpec.describe Backtest do
       version: 1,
       model_id: 'id2',
       sequence_number: 0,
-      name: 'seed_model'
+      name: 'seed_model',
+      basket: 'OP_ETH'
     )
 
     ModeledSignal.create(
-      starttime: Time.now.to_i - 60,
+      starttime: t_minus_1,
       model_id: 'id2',
       resolution: 60,
       value: 10
@@ -175,13 +178,17 @@ RSpec.describe Backtest do
   end
 
   it 'pnl calculation is accurate for price-level model' do
-    expect { subject.run(version: 0) }.to change { ModeledSignal.where("model_id = 'id1-b'").count }.by(1)
+    expect { subject.run(version: 0, basket: 'OP_ETH') }.to change {
+                                                              ModeledSignal.where("model_id = 'id1-b'").count
+                                                            }.by(1)
     m = ModeledSignal.last
     expect(m.value.round(2)).to eql pnl_expected.round(2)
   end
 
   it 'pnl calculation is accurate for log-price model' do
-    expect { subject.run(version: 1) }.to change { ModeledSignal.where("model_id = 'id2-b'").count }.by(1)
+    expect { subject.run(version: 1, basket: 'OP_ETH') }.to change {
+                                                              ModeledSignal.where("model_id = 'id2-b'").count
+                                                            }.by(1)
     m = ModeledSignal.last
     expect(m.value.round(1)).to eql pnl_expected_log.round(2)
   end

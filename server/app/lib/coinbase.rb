@@ -71,8 +71,6 @@ class Coinbase
         "#{path}?start=#{start_timestamp}&end=#{time_now}&granularity=#{resolution}", headers: generate_headers(path)
       )
       responses = responses.parsed_response
-
-      # puts responses
     end
     Rails.logger.info 'done with coinbase call'
     responses

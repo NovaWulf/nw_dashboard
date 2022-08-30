@@ -11,13 +11,14 @@ class RAdapter
     @R.pull return_val.to_s
   end
 
-  def cointegration_analysis(start_time_string:, end_time_string:, ecdet_param:)
-    Rails.logger.info "creating cointegration model with start time #{start_time_string},
+  def cointegration_analysis(asset_names:, start_time_string:, end_time_string:, ecdet_param:)
+    Rails.logger.info "creating cointegration model for pair #{asset_names} with start time #{start_time_string},
       end time #{end_time_string} ecdet_param #{ecdet_param}"
+    asset_string = "c('" + asset_names.join("','") + "')"
     @R.eval <<-EOF
         print(getwd())
         source("./cointegrationAnalysis.R")
-        returnVals = fitModel(#{start_time_string},#{end_time_string},ecdet_param = #{ecdet_param})
+        returnVals = fitModel(#{asset_string},#{start_time_string},#{end_time_string},ecdet_param = #{ecdet_param})
     EOF
     return_vals = @R.pull 'returnVals'
     Rails.logger.info "Return Vals from R: #{return_vals}"
@@ -33,7 +34,6 @@ class RAdapter
       Rails.logger.info 'cointegration model fields are not in the right order!'
       return
     end
-    puts "correct fields: #{correct_fields[0]}"
     model_count = CointegrationModel.where("uuid='#{cv[0]}'").count
     if model_count == 0
       CointegrationModel.create(
@@ -75,7 +75,6 @@ class RAdapter
       )
     end
     puts "returning model values: #{cv}"
-    puts "cv[9]: #{cv[9]} cv10: #{cv[10]}"
     cv
   end
 

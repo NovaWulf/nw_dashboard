@@ -1,29 +1,12 @@
-class Backtest < BaseService
-  @asset_names
-  @asset_weights
-  @cursor
-  @model_starttime
-  @model_endtime
-  @signal
-  @in_sample_mean
-  @multiplier
-  @positions
-  @prices
-  @num_obs
-  @num_ownable_assets
-  @targets
-  @orders
-  @starttimes
-  @model_id
-  @resolution
-  @log_prices
+class Backtester < BaseService
   MULTIPLIER = 2
   MAX_TRADE_SIZE_DOLLARS = 1000
-  attr_accessor :model_id, :resolution, :model_starttime, :model_endtime, :in_sample_mean, :in_sample_sd, :assets,
-                :asset_weights, :num_ownable_assets, :num_obs, :positions, :prices, :pnl, :targets, :version
+  attr_reader :model_id, :resolution, :model_starttime, :model_endtime, :in_sample_mean, :in_sample_sd, :assets,
+              :asset_weights, :num_ownable_assets, :num_obs, :positions, :prices, :pnl, :targets, :version, :basket, :cursor, :starttimes
 
-  def initialize(version:)
+  def initialize(version:, basket:)
     @version = version
+    @basket = basket
   end
 
   def run
@@ -44,8 +27,8 @@ class Backtest < BaseService
   private
 
   def load_model(version)
-    @model_id = BacktestModel.where("version=#{version}").oldest_sequence_number_first.last&.model_id
-    seq_num = BacktestModel.where("version=#{version}").oldest_sequence_number_first.last&.sequence_number
+    @model_id = BacktestModel.where("version=#{version} and basket = '#{basket}'").oldest_sequence_number_first.last&.model_id
+    seq_num = BacktestModel.where("version=#{version} and basket='#{basket}'").oldest_sequence_number_first.last&.sequence_number
     Rails.logger.info "backtesting model #{@model_id} with sequence number #{seq_num}"
     model = CointegrationModel.where("uuid = '#{@model_id}'").last
     @log_prices = model&.log_prices
@@ -58,14 +41,17 @@ class Backtest < BaseService
     assets = weights.pluck(:asset_name, :weight)
     @asset_names = assets.map { |x| x[0] }
     @asset_weights = assets.map { |x| x[1] }
-    @asset_names.delete('det')
-    Rails.logger.info "asset names class: #{@asset_names.class}"
+    det_index = @asset_names.index('det')
+    @asset_names.delete_at(det_index)
+    @asset_weights.delete_at(det_index)
     @num_ownable_assets = @asset_names.length
-    modeled_signal = ModeledSignal.where("model_id = '#{@model_id}'").oldest_first
-    @signal = modeled_signal.pluck(:value)
-    @starttimes = modeled_signal.pluck(:starttime)
-    signal_starttime = @starttimes[0]
+    modeled_signal = ModeledSignal.where("model_id = '#{@model_id}'").oldest_first.pluck(:value, :starttime)
+    @signal = modeled_signal.map { |x| x[0] }
+    @starttimes = modeled_signal.map { |x| x[1] }
+    start_ind = @starttimes.index(@model_starttime)
+    signal_starttime = @starttimes[start_ind]
     signal_endtime = @starttimes.last
+    @signal = @signal[start_ind..(@signal.length - 1)]
     @num_obs = @signal.length
     @pnl = Array.new(@num_obs)
     @targets = Array.new(@num_ownable_assets)
@@ -79,14 +65,15 @@ class Backtest < BaseService
   def target_positions
     # In price model, eigenvectors represent weight in shares,
     # whereas in log-price model, eigenvectors are in $
+    asset_weight_signs = @asset_weights.map { |a| a >= 0 ? 1 : -1 }
     if @log_prices
       @targets = (0..(@num_ownable_assets - 1)).map do |i|
         if signal_up(@cursor)
-          - @asset_weights[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
+          - asset_weight_signs[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
         elsif signal_down(@cursor)
-          @asset_weights[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
+          asset_weight_signs[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
         elsif @cursor > 0 && ((signal_up(@cursor) && signal_down(@cursor - 1)) || (signal_down(@cursor) && signal_up(@cursor - 1)))
-          @asset_weights[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
+          asset_weight_signs[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
         else
           @positions[i][@cursor]
         end

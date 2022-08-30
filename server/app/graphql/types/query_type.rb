@@ -10,29 +10,35 @@ module Types
 
     field :backtest_latest_model, [Types::ModeledSignalType], null: false do
       argument :version, Integer
+      argument :basket, String
     end
 
     field :backtest_model, [Types::ModeledSignalType], null: false do
       argument :version, Integer
       argument :sequence_number, Integer, required: false
+      argument :basket, String
     end
 
     field :backtest_model_info, [Types::BacktestModelType], null: false do
       argument :version, Integer
+      argument :basket, String
     end
 
     field :arb_signal_latest_model, [Types::ModeledSignalType], null: false do
       argument :version, Integer
+      argument :basket, String
     end
 
     field :arb_signal_model, [Types::ModeledSignalType], null: false do
       argument :version, Integer
       argument :sequence_number, Integer, required: false
+      argument :basket, String
     end
 
     field :cointegration_model_info, [Types::CointegrationModelType], null: false do
       argument :version, Integer
       argument :sequence_number, Integer, required: false
+      argument :basket, String
     end
 
     field :smart_contract_active_users, [Types::MetricType], null: false do
@@ -151,34 +157,28 @@ module Types
       Displayers::WeeklyValueDisplayer.run(token: 'btc', metric: 'jesse').value
     end
 
-    def cointegration_model_info(version:, sequence_number: nil)
-      if sequence_number
-        model = BacktestModel.where("version=#{version} and sequence_number=#{sequence_number}").oldest_sequence_number_first.last&.model_id
-      else
-        model = BacktestModel.where("version=#{version}").oldest_sequence_number_first.last&.model_id
-      end
-      puts "model in cointegration_model_info: #{model}"
-      [CointegrationModel.where("uuid = '#{model}'").first]
+    def cointegration_model_info(version:, basket:, sequence_number: nil)
+      Displayers::CointegrationModelDisplayer.run(version:version,basket:basket,sequence_number:sequence_number).value
     end
 
-    def backtest_model_info(version:)
-      [BacktestModel.where("version=#{version}").oldest_sequence_number_first.last]
+    def backtest_model_info(version:, basket:)
+      [BacktestModel.where("version=#{version} and basket = '#{basket}'").oldest_sequence_number_first.last]
     end
 
-    def arb_signal_latest_model(version:)
-      Displayers::HourlyValueDisplayer.run(version: version, sequence_number: nil).value
+    def arb_signal_latest_model(version:, basket:)
+      Displayers::HourlyValueDisplayer.run(version: version, basket: basket, sequence_number: nil).value
     end
 
-    def backtest_latest_model(version:)
-      Displayers::HourlyBacktestDisplayer.run(version: version, sequence_number: nil).value
+    def backtest_latest_model(version:, basket:)
+      Displayers::HourlyBacktestDisplayer.run(version: version, basket: basket, sequence_number: nil).value
     end
 
-    def arb_signal_model(version:, sequence_number: nil)
-      Displayers::HourlyValueDisplayer.run(version: version, sequence_number: sequence_number).value
+    def arb_signal_model(version:, basket:, sequence_number: nil)
+      Displayers::HourlyValueDisplayer.run(version: version, basket: basket, sequence_number: sequence_number).value
     end
 
-    def backtest_model(version:, sequence_number: nil)
-      Displayers::HourlyBacktestDisplayer.run(version: version, sequence_number: sequence_number).value
+    def backtest_model(version:, basket:, sequence_number: nil)
+      Displayers::HourlyBacktestDisplayer.run(version: version, basket: basket, sequence_number: sequence_number).value
     end
 
     def smart_contract_contracts(token:)
