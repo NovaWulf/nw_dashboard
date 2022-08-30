@@ -13,10 +13,11 @@ module Hedgeserv
       fetch_files
       trades_text = csv_transactions_text ? trade_parser.run(csv_text: csv_transactions_text).value : nil
       positions_text = csv_positions_text ? positions_parser.run(csv_text: csv_positions_text).value : nil
+      winners_text = csv_positions_text ? winners_parser.run(csv_text: csv_positions_text).value : nil
 
       return if trades_text.blank? && positions_text.blank?
 
-      email_notification(trades_text, positions_text)
+      email_notification(trades_text, positions_text, winners_text)
     end
 
     private
@@ -65,9 +66,9 @@ module Hedgeserv
       end
     end
 
-    def email_notification(trade_text, positions_text)
+    def email_notification(trade_text, positions_text, winners_text)
       NotificationMailer.with(subject: 'Daily Trades and P&L',
-                              trades: trade_text, positions: positions_text, run_date: run_date).daily_trades.deliver_now
+                              trades: trade_text, positions: positions_text, winners: winners_text, run_date: run_date).daily_trades.deliver_now
     end
 
     def trade_parser
@@ -76,6 +77,10 @@ module Hedgeserv
 
     def positions_parser
       PositionsParser
+    end
+
+    def winners_parser
+      WinnersParser
     end
   end
 end

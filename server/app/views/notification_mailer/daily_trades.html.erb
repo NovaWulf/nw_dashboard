@@ -84,6 +84,15 @@
 		</td>
   </tr>
 
+	<% if @winners.present? %>
+		<%= render "winner_partial", title: "Daily Winners", rows: @winners[:daily_winners] %>
+		<%= render "winner_partial", title: "Daily Losers", rows: @winners[:daily_losers] %>
+		<%= render "winner_partial", title: "MTD Winners", rows: @winners[:mtd_winners] %>
+		<%= render "winner_partial", title: "MTD Losers", rows: @winners[:mtd_losers] %>
+		<%= render "winner_partial", title: "YTD Winners", rows: @winners[:ytd_winners] %>
+		<%= render "winner_partial", title: "YTD Losers", rows: @winners[:ytd_losers] %>		
+	<% end %>
+
 	<tr>
 		<td class="content-block">
 			Thanks,<br/>NovaWulf Dashboard

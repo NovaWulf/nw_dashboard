@@ -1,0 +1,28 @@
+<tr>
+  <td class="content-block">
+    <h3><%= title %></h3>
+  </td>
+</tr>
+<tr>
+  <td class="content-block">
+    <table width="100%" cellpadding="0" cellspacing="0" >
+      
+      <% rows.map do |winner| %>
+        <tr>
+          <% winner.map do |cell| %>
+            <% 
+            td_class = "content-block"
+              negative = cell.starts_with?("(")
+              if negative
+                td_class = "content-block negative"				
+              end
+            %>
+            <td class="<%= td_class %>">
+              <%= cell %>
+            </td>
+          <% end %>
+        </tr>
+      <% end %>	
+    </table>
+  </td>
+</tr>
