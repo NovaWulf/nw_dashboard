@@ -74,7 +74,7 @@ task update_arb_signal: :environment do
 end
 
 task try_update_models: :environment do
-  if Time.now.monday?
+  if Time.now.sunday?
     tracked_pairs = %w[eth-usd op-usd btc-usd uni-usd snx-usd]
     tracked_pairs.each do |p|
       Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
