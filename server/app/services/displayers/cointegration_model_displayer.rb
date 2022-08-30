@@ -10,11 +10,10 @@ module Displayers
 
   def run
     if sequence_number
-      model = BacktestModel.where("version=#{version} and basket = '#{basket}' and sequence_number=#{sequence_number}").oldest_sequence_number_first.last&.model_id
+      model = BacktestModel.where(version: version, basket: basket, sequence_number:sequence_number).oldest_sequence_number_first.last&.model_id
     else
-      model = BacktestModel.where("version=#{version} and basket = '#{basket}'").oldest_sequence_number_first.last&.model_id
+      model = BacktestModel.where(version:version, basket: basket).oldest_sequence_number_first.last&.model_id
     end
-    puts "model: #{model}"
     [CointegrationModel.where("uuid = '#{model}'").first]
   end
 end

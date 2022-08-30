@@ -10,8 +10,6 @@ class ModelUpdate < BaseService
   def initialize(basket:)
     @r = RAdapter.new
     @basket = basket
-    puts "basket: #{basket}"
-
     @asset_names = []
     if basket == 'OP_ETH'
       @asset_names = %w[eth-usd op-usd]
@@ -50,7 +48,6 @@ class ModelUpdate < BaseService
     as_of_time = DateTime.strptime(as_of_date, '%Y-%m-%d').to_i unless as_of_date.nil?
     ArbitrageCalculator.run(version: version, silent: true)
     Backtester.run(version: version)
-    puts "as_of_time: #{as_of_time}"
     last_candle_time = as_of_time || Candle.oldest_first.last&.starttime
     sec_diff = SECS_PER_WEEK * (max_weeks_back - min_weeks_back)
     num_models = sec_diff / (60 * interval_mins) - 1
@@ -74,8 +71,6 @@ class ModelUpdate < BaseService
     best_model = CointegrationModel.where("uuid = '#{max_test_stat_id}'").last
     current_model = BacktestModel.where("version = #{version}").oldest_sequence_number_first.last
     if best_model&.test_stat > best_model&.cv_10_pct
-      puts 'best new model is statistically valid with p<=.1. Auto-updating backtest models'
-      puts coint_models[max_test_stat_index]
       BacktestModel.create(
         version: version,
         model_id: best_model&.uuid,
@@ -91,7 +86,6 @@ class ModelUpdate < BaseService
   def add_model_with_dates(version:, start_time_string:, end_time_string:)
     CsvWriter.run(table: 'candles', assets: asset_names)
     @r = RAdapter.new
-    puts "asset names in add model with dates: #{asset_names}"
     return_vals = @r.cointegration_analysis(asset_names: asset_names, start_time_string: start_time_string, end_time_string: end_time_string,
                                             ecdet_param: "'const'")
 

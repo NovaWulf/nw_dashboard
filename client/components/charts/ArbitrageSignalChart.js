@@ -53,7 +53,6 @@ export default function ArbitrageSignalChart({seqNumber,version,basket}) {
   let mean, sd, isEndDate,isStartDate, updatedData;
   if (data) {
     mean = cointegrationModelInfo[0].inSampleMean;
-    console.log("in sample mean: " + mean)
     sd = cointegrationModelInfo[0].inSampleSd;
     isEndDate = cointegrationModelInfo[0].modelEndtime;
     isStartDate = cointegrationModelInfo[0].modelStarttime;

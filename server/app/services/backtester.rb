@@ -30,8 +30,6 @@ class Backtester < BaseService
     @model_id = BacktestModel.where("version=#{version} and basket = '#{basket}'").oldest_sequence_number_first.last&.model_id
     seq_num = BacktestModel.where("version=#{version} and basket='#{basket}'").oldest_sequence_number_first.last&.sequence_number
     Rails.logger.info "backtesting model #{@model_id} with sequence number #{seq_num}"
-    puts "backtesting model #{@model_id} with sequence number #{seq_num}"
-
     model = CointegrationModel.where("uuid = '#{@model_id}'").last
     @log_prices = model&.log_prices
     @resolution = model.resolution
@@ -47,13 +45,10 @@ class Backtester < BaseService
     @asset_names.delete_at(det_index)
     @asset_weights.delete_at(det_index)
     @num_ownable_assets = @asset_names.length
-    puts "model id in backtest: #{model_id} count: #{ModeledSignal.where("model_id = '#{@model_id}'").count}"
     modeled_signal = ModeledSignal.where("model_id = '#{@model_id}'").oldest_first.pluck(:value, :starttime)
     @signal = modeled_signal.map { |x| x[0] }
     @starttimes = modeled_signal.map { |x| x[1] }
-    puts "model start time: #{@model_starttime} first time: #{@starttimes[0]}"
     start_ind = @starttimes.index(@model_starttime)
-    puts "start ind: #{start_ind}"
     signal_starttime = @starttimes[start_ind]
     signal_endtime = @starttimes.last
     @signal = @signal[start_ind..(@signal.length - 1)]

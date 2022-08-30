@@ -10,7 +10,6 @@ class CsvWriter < BaseService
   def run
     if table == 'both' || table == 'candles'
       asset_string = "('" + assets.join("','") + "')"
-      puts "asset string: #{asset_string}"
       # add timestamp here
       file = "#{Rails.root}/public/data.csv"
       # file = "#{Rails.root}/public/data_#{Time.now.to_i}.csv"
@@ -27,20 +26,17 @@ class CsvWriter < BaseService
     if table == 'both' || table == 'metrics'
       metric_file = "#{Rails.root}/public/metrics.csv"
       Rails.logger.info "writing csv to #{metric_file}"
-      puts "writing csv to #{metric_file}"
       start_date = Date.new(2017, 1, 1)
       CSV.open(metric_file, 'w') do |writer|
         (start_date..Date.today).each do |day|
-          s2f = Metric.by_token('btc').by_metric('s2f_ratio').by_day(day).all
-          0
-          hash_rate = Metric.by_token('btc').by_metric('hash_rate').by_day(day).all
-          0
-          active_addresses = Metric.by_token('btc').by_metric('active_addresses').by_day(day).all
-          0
-          google_trends = Metric.by_token('btc').by_metric('google_trends').by_day(day).all
-          0
-          btc_price = Metric.by_token('btc').by_metric('price').by_day(day).all
-          0
+          ActiveRecord::Base.logger.silence do
+            s2f = Metric.by_token('btc').by_metric('s2f_ratio').by_day(day).all
+            hash_rate = Metric.by_token('btc').by_metric('hash_rate').by_day(day).all
+            active_addresses = Metric.by_token('btc').by_metric('active_addresses').by_day(day).all
+            google_trends = Metric.by_token('btc').by_metric('google_trends').by_day(day).all
+            btc_price = Metric.by_token('btc').by_metric('price').by_day(day).all
+          end
+          
           writer << s2f.first.attributes.map { |a, _v| a }
 
           s2f.find_each do |s|

@@ -34,7 +34,6 @@ class RAdapter
       Rails.logger.info 'cointegration model fields are not in the right order!'
       return
     end
-    puts "correct fields: #{correct_fields[0]}"
     model_count = CointegrationModel.where("uuid='#{cv[0]}'").count
     if model_count == 0
       CointegrationModel.create(
@@ -76,7 +75,6 @@ class RAdapter
       )
     end
     puts "returning model values: #{cv}"
-    puts "cv[9]: #{cv[9]} cv10: #{cv[10]}"
     cv
   end
 

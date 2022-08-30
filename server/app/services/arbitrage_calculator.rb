@@ -1,5 +1,5 @@
 class ArbitrageCalculator < BaseService
-  attr_reader :version, :most_recent_model, :silent, :assets, :basket
+  attr_reader :version, :most_recent_model, :silent, :asset_names, :basket
 
   def initialize(version:, basket:, silent: false)
     @version = version
@@ -8,7 +8,6 @@ class ArbitrageCalculator < BaseService
   end
 
   def run
-    puts "running backtest with version = #{version} and basket='#{basket}'"
     most_recent_backtest_model = BacktestModel.where("version = #{version} and basket='#{basket}'").oldest_sequence_number_first.last
     Rails.logger.info "running arb calculator on sequence number #{most_recent_backtest_model&.sequence_number}"
     most_recent_model_id = most_recent_backtest_model&.model_id
@@ -20,8 +19,7 @@ class ArbitrageCalculator < BaseService
     first_in_sample_timestamp = most_recent_model&.model_starttime
     assets = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}'").pluck(:weight, :asset_name)
     asset_weights = assets.map { |x| x[0] }
-    asset_names = assets.map { |x| x[1] }
-    puts "asset names in arb calc: #{asset_names}"
+    @asset_names = assets.map { |x| x[1] }
     det_index = asset_names.index('det')
     det_weight = asset_weights[det_index]
     asset_weights.delete_at(det_index)
@@ -44,7 +42,6 @@ class ArbitrageCalculator < BaseService
     interp_count = 0
     running_total = 0
     for time_step in 0..(starttimes.length - 1)
-      #puts "det_weight: #{time_step * det_weight}" if time_step < 10
       signal_value = if det_type == 'const'
                        det_weight
                      elsif det_type == 'trend'
@@ -69,8 +66,6 @@ class ArbitrageCalculator < BaseService
                         end
       end
       running_total += signal_value
-      # puts "running average: #{running_total / (time_step + 1)}"
-
       in_sample_flag = starttimes[time_step] <= last_in_sample_timestamp
       m = ModeledSignal.create(starttime: starttimes[time_step], model_id: most_recent_model_id, resolution: res, value: signal_value,
                                in_sample: in_sample_flag)
@@ -90,10 +85,10 @@ class ArbitrageCalculator < BaseService
     lower = in_sample_mean - sigma * in_sample_sd
     if signal_value > upper
       NotificationMailer.with(subject: 'Statistical Arbitrage Indicator Alert',
-                              text: "#{basket} spread value (#{signal_value.round(2)}) is above the high band of Paul's indicator (#{upper.round(2)}). Recommend buying OP and shorting ETH").notification.deliver_now
+                              text: "#{basket} spread value (#{signal_value.round(2)}) is above the high band of Paul's indicator (#{upper.round(2)}). Recommend buying #{asset_names[1]} and shorting #{asset_names[0]}").notification.deliver_now
     elsif signal_value < lower
       NotificationMailer.with(subject: 'Statistical Arbitrage Indicator Alert',
-                              text: "#{basket} (#{signal_value.round(2)}) is below the low band of Paul's indicator (#{lower.round(2)}). Recommend buying ETH and shorting OP").notification.deliver_now
+                              text: "#{basket} (#{signal_value.round(2)}) is below the low band of Paul's indicator (#{lower.round(2)}). Recommend buying #{asset_names[0]} and shorting #{asset_names[1]}").notification.deliver_now
     end
   end
 end

@@ -62,7 +62,6 @@ end
 task update_arb_signal: :environment do
   tracked_pairs = %w[eth-usd op-usd btc-usd uni-usd snx-usd]
   tracked_pairs.each do |p|
-    puts "getting pair #{p}"
     Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
   end
   baskets = %w[OP_ETH UNI_ETH]
@@ -97,7 +96,6 @@ task try_update_model_as_of: :environment do
   end
   Rails.logger.info 'writing candle data to CSV...'
   mu = ModelUpdate.new(basket: 'OP_ETH')
-  puts ENV['end']
   mu.update_model(version: 2, max_weeks_back: 8, min_weeks_back: 3, interval_mins: 1440, as_of_date: ENV['end'])
 end
 
