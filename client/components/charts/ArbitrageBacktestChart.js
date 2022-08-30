@@ -18,8 +18,6 @@ import TimeAxisHighRes from 'components/TimeAxisHighRes';
 import CsvDownloadLink from 'components/CsvDownloadLink';
 
 export default function ArbitrageBacktestChart({seqNumber,version,basket}) {
-
-  console.log("seqNumber in backtest: "+seqNumber + "version: "  + version + ", basket: " + basket)
   
   const QUERY = gql`
   query ($version: Int!, $seqNumber: Int!, $basket: String!){

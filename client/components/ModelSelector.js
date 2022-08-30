@@ -10,8 +10,7 @@ const getModelsQuery = gql`
   }
 `;
 
-const ModelSelector = ({ model, handleChange, basket, version }) => {
-  console.log("model in selector: "+ model + ", bsket: "+basket +", version: " + version)
+const ModelSelector = ({ seqNumber, handleChange, basket, version }) => {
   const { loading, error, data } = useQuery(getModelsQuery, {
     variables: { version, basket },
   });
@@ -19,9 +18,6 @@ const ModelSelector = ({ model, handleChange, basket, version }) => {
   if (error) {
     console.log(error);
     return <p>Error in Query...</p>;
-  }
-  if (data){
-    console.log("data: "+JSON.stringify(data))
   }
   const maxSeqNum = data.backtestModelInfo[0].sequenceNumber;
   var modelSequence = [];
@@ -36,7 +32,7 @@ const ModelSelector = ({ model, handleChange, basket, version }) => {
         <Select
           labelId="select-model-label"
           id="select-model-select"
-          value={model || 0}
+          value={seqNumber || 0}
           label="Model #"
           onChange={e => handleChange(e.target.value)}
         >

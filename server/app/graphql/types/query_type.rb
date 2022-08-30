@@ -158,13 +158,7 @@ module Types
     end
 
     def cointegration_model_info(version:, basket:, sequence_number: nil)
-      if sequence_number
-        model = BacktestModel.where("version=#{version} and basket = '#{basket}' and sequence_number=#{sequence_number}").oldest_sequence_number_first.last&.model_id
-      else
-        model = BacktestModel.where("version=#{version} and basket = '#{basket}'").oldest_sequence_number_first.last&.model_id
-      end
-      puts "model in cointegration_model_info: #{model}"
-      [CointegrationModel.where("uuid = '#{model}'").first]
+      Displayers::CointegrationModelDisplayer.run(version:version,basket:basket,sequence_number:sequence_number).value
     end
 
     def backtest_model_info(version:, basket:)

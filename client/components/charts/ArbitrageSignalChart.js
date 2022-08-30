@@ -19,8 +19,6 @@ import TimeAxisHighRes from 'components/TimeAxisHighRes';
 import CsvDownloadLink from 'components/CsvDownloadLink';
 
 export default function ArbitrageSignalChart({seqNumber,version,basket}) {
-  console.log("seqNumber in signal chart: " + seqNumber)
-  // console.log("seqNumber in signal chart: " + JSON.stringify(seqNumber))
   const QUERY = gql`
   query ($version: Int!,$seqNumber: Int!,$basket:String!){
 
@@ -62,7 +60,6 @@ export default function ArbitrageSignalChart({seqNumber,version,basket}) {
     var total = 0
     const arbLength = arbSignalModel.length
     updatedData = arbSignalModel.map(d => {
-      // console.log('value: ' + d.v + ", mean: " + mean);
       total+=d.v
       return {
         ts: d.ts,
@@ -73,11 +70,9 @@ export default function ArbitrageSignalChart({seqNumber,version,basket}) {
         arbMean: Math.floor(0),
       };
     });
-    console.log("true mean: "+ total/arbLength)
   }
 
   const theme = useTheme();
-  console.log('mean: ' + mean + ', sd: ' + sd);
 
   return (
     <Grid item sx={{ display: 'flex' }} xs={12} md={12}>

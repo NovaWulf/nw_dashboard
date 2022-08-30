@@ -7,15 +7,15 @@ import ArbitrageBacktestChart from 'components/charts/ArbitrageBacktestChart';
 import ModelSelector from 'components/ModelSelector';
 
 export default function ArbitrageCharts({basket}) {
-  const [model, setModel] = React.useState(0);
+  const [seqNumber, setSeqNumber] = React.useState(0);
   const version = 2
   return (
     <Grid container spacing={3}>
       <Grid item>
-        <ModelSelector model={model} handleChange={setModel} basket={basket} version={version} />
+        <ModelSelector seqNumber={seqNumber} handleChange={setSeqNumber} basket={basket} version={version} />
       </Grid>
-      <ArbitrageSignalChart seqNumber={model} version={version} basket={basket} />
-      <ArbitrageBacktestChart seqNumber={model} version={version} basket ={basket} />
+      <ArbitrageSignalChart seqNumber={seqNumber} version={version} basket={basket} />
+      <ArbitrageBacktestChart seqNumber={seqNumber} version={version} basket ={basket} />
     </Grid>
   );
 }
