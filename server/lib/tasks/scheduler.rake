@@ -73,6 +73,17 @@ task update_arb_signal: :environment do
   end
 end
 
+task rerun_backtest: :environment do
+  model_to_replace = BacktestModel.where(model_id:ENV['model']).last
+  version = model_to_replace&.version
+  seq_num = model_to_replace&.sequence_number
+  basket = model_to_replace&.basket
+  puts "seq_num: #{seq_num}"
+  ModeledSignal.where("model_id like '%#{ENV['model']}%'").destroy_all
+  ArbitrageCalculator.run(version: version, silent: true, basket: basket,seq_num:seq_num)
+  Backtester.run(version: version, basket: basket, seq_num: seq_num)
+end
+
 task try_update_models: :environment do
   if Time.now.sunday?
     tracked_pairs = %w[eth-usd op-usd btc-usd uni-usd snx-usd]

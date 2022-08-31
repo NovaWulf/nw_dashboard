@@ -69,7 +69,7 @@ class ModelUpdate < BaseService
     max_test_stat_index = test_stats.index(max_test_stat)
     max_test_stat_id = uuids[max_test_stat_index]
     best_model = CointegrationModel.where("uuid = '#{max_test_stat_id}'").last
-    current_model = BacktestModel.where("version = #{version}").oldest_sequence_number_first.last
+    current_model = BacktestModel.where(version:version,basket:basket).oldest_sequence_number_first.last
     if best_model&.test_stat > best_model&.cv_10_pct
       BacktestModel.create(
         version: version,
@@ -90,7 +90,7 @@ class ModelUpdate < BaseService
                                             ecdet_param: "'const'")
 
     new_model_id = return_vals[0]
-    current_model = BacktestModel.where("version = #{version}").oldest_sequence_number_first.last
+    current_model = BacktestModel.where(version: version, basket:basket).oldest_sequence_number_first.last
     BacktestModel.create(
       version: version,
       model_id: new_model_id,

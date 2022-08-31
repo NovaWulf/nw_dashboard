@@ -29,7 +29,7 @@ class Backtester < BaseService
   private
 
   def load_model(version,seq_num)
-    if !sequence_number
+    if !seq_num
       @model_id = BacktestModel.where("version=#{version} and basket = '#{basket}'").oldest_sequence_number_first.last&.model_id
       @seq_num = BacktestModel.where("version=#{version} and basket='#{basket}'").oldest_sequence_number_first.last&.sequence_number
     else
@@ -55,7 +55,9 @@ class Backtester < BaseService
     modeled_signal = ModeledSignal.where("model_id = '#{@model_id}'").oldest_first.pluck(:value, :starttime)
     @signal = modeled_signal.map { |x| x[0] }
     @starttimes = modeled_signal.map { |x| x[1] }
+    puts "length of startimes: #{starttimes.length}"
     start_ind = @starttimes.index(@model_starttime)
+    puts "start ind: #{start_ind}"
     signal_starttime = @starttimes[start_ind]
     signal_endtime = @starttimes.last
     @signal = @signal[start_ind..(@signal.length - 1)]
