@@ -68,8 +68,8 @@ task update_arb_signal: :environment do
   baskets.each do |b|
     mu = ModelUpdate.new(basket: b)
     mu.seed
-    ArbitrageCalculator.run(version: 2, silent: true, basket: b)
-    Backtester.run(version: 2, basket: b)
+    ArbitrageCalculator.run(version: 2, silent: true, basket: b,seq_num:nil)
+    Backtester.run(version: 2, basket: b, seq_num:nil)
   end
 end
 

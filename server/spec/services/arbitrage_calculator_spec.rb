@@ -1,5 +1,5 @@
 RSpec.describe ArbitrageCalculator do
-  subject { described_class.run(version: 2, basket: 'OP_ETH') }
+  subject { described_class.run(version: 2, basket: 'OP_ETH',seq_num:nil) }
   let(:op_candle) { Candle.by_pair('op-usd').last&.close }
   let(:eth_candle) { Candle.by_pair('eth-usd').last&.close }
   let(:latest_model) { CointegrationModel.newest_first.first&.uuid }

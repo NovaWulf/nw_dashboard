@@ -178,7 +178,7 @@ RSpec.describe Backtester do
   end
 
   it 'pnl calculation is accurate for price-level model' do
-    expect { subject.run(version: 0, basket: 'OP_ETH') }.to change {
+    expect { subject.run(version: 0, basket: 'OP_ETH',seq_num:nil) }.to change {
                                                               ModeledSignal.where("model_id = 'id1-b'").count
                                                             }.by(1)
     m = ModeledSignal.last
@@ -186,7 +186,7 @@ RSpec.describe Backtester do
   end
 
   it 'pnl calculation is accurate for log-price model' do
-    expect { subject.run(version: 1, basket: 'OP_ETH') }.to change {
+    expect { subject.run(version: 1, basket: 'OP_ETH',seq_num:nil) }.to change {
                                                               ModeledSignal.where("model_id = 'id2-b'").count
                                                             }.by(1)
     m = ModeledSignal.last
