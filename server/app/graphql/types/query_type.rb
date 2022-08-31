@@ -19,6 +19,12 @@ module Types
       argument :basket, String
     end
 
+    field :backtest_positions, [[Types::ModeledSignalType]], null: false do
+      argument :version, Integer
+      argument :sequence_number, Integer, required: false
+      argument :basket, String
+    end
+
     field :backtest_model_info, [Types::BacktestModelType], null: false do
       argument :version, Integer
       argument :basket, String
@@ -179,6 +185,10 @@ module Types
 
     def backtest_model(version:, basket:, sequence_number: nil)
       Displayers::HourlyBacktestDisplayer.run(version: version, basket: basket, sequence_number: sequence_number).value
+    end
+
+    def backtest_positions(version:, basket:, sequence_number: nil)
+      Displayers::PositionsDisplayer.run(version: version, basket: basket, sequence_number: sequence_number).value
     end
 
     def smart_contract_contracts(token:)

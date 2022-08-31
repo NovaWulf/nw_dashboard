@@ -1,7 +1,7 @@
 class Backtester < BaseService
   MULTIPLIER = 2
-  MAX_TRADE_SIZE_DOLLARS = 1000
-  attr_reader :model_id, :resolution, :model_starttime, :model_endtime, :in_sample_mean, :in_sample_sd, :assets,
+  MAX_TRADE_SIZE_DOLLARS = 1000.0
+  attr_reader :model_id, :resolution, :model_starttime, :model_endtime, :in_sample_mean, :in_sample_sd, :assets, :signal_flag,
               :asset_weights, :num_ownable_assets, :num_obs, :positions, :prices, :pnl, :targets, :version, :basket, :cursor, :starttimes
 
   def initialize(version:, basket:)
@@ -11,6 +11,7 @@ class Backtester < BaseService
 
   def run
     @cursor = 0
+    @signal_flag =0
     load_model(version)
     set_initial_positions
     while true
@@ -65,16 +66,24 @@ class Backtester < BaseService
   def target_positions
     # In price model, eigenvectors represent weight in shares,
     # whereas in log-price model, eigenvectors are in $
-    asset_weight_signs = @asset_weights.map { |a| a >= 0 ? 1 : -1 }
+    asset_weight_signs = @asset_weights.map { |a| a >= 0 ? 1.0 : -1.0 }
+    
+    old_signal_flag = @signal_flag
     if @log_prices
       @targets = (0..(@num_ownable_assets - 1)).map do |i|
         if signal_up(@cursor)
+          @signal_flag = 1
           - asset_weight_signs[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
         elsif signal_down(@cursor)
+          @signal_flag = -1
           asset_weight_signs[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
-        elsif @cursor > 0 && ((signal_up(@cursor) && signal_down(@cursor - 1)) || (signal_down(@cursor) && signal_up(@cursor - 1)))
-          asset_weight_signs[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
+        elsif @cursor > 0 && ((signal_pos(@cursor) && old_signal_flag==-1) || (signal_neg(@cursor) && old_signal_flag==1))
+          puts "CROSSOVER! cursor: #{@cursor}. old signal flag: #{old_signal_flag} signal pos? #{signal_pos(@cursor)} signal neg? #{signal_neg(@cursor)}"
+          @signal_flag = 0
+          0
         else
+          #@positions[i][@cursor]*prices[i][@cursor]/prices[i][@cursor-1]
+          @signal_flag = old_signal_flag
           @positions[i][@cursor]
         end
       end
@@ -112,9 +121,22 @@ class Backtester < BaseService
 
   def calculate_pnl
     @pnl[@cursor] = 0
+    in_sample_flag = @starttimes[@cursor] <= @model_endtime
+
     for i in 0..(@num_ownable_assets - 1)
+      if @cursor % 1000 == 1
+        r_count = ModeledSignal.where("model_id='#{@model_id}-#{@asset_names[i]}' and starttime=#{@starttimes[@cursor]}").count
+        if r_count == 0
+          ModeledSignal.create(
+            starttime: @starttimes[@cursor],
+            model_id: @model_id + '-' + @asset_names[i],
+            resolution: @resolution,
+            value: @targets[i] *  prices[i][@cursor-1] / MAX_TRADE_SIZE_DOLLARS,
+            in_sample: in_sample_flag
+          )
+        end
+      end
       @pnl[@cursor] += @positions[i][@cursor] * (@prices[i][@cursor] - @prices[i][@cursor - 1])
-      in_sample_flag = @starttimes[@cursor] <= @model_endtime
     end
     @pnl[@cursor] /= MAX_TRADE_SIZE_DOLLARS # calculate profit as a percentage of capital required
     @pnl[@cursor] += @pnl[@cursor - 1]
@@ -139,6 +161,14 @@ class Backtester < BaseService
 
   def signal_up(index)
     @signal[index] > @in_sample_mean + @in_sample_sd * MULTIPLIER
+  end
+
+  def signal_pos(index)
+    @signal[index] > @in_sample_mean
+  end
+
+  def signal_neg(index)
+    @signal[index] < @in_sample_mean
   end
 
   def signal_down(index)

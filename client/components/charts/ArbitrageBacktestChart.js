@@ -22,9 +22,6 @@ export default function ArbitrageBacktestChart({seqNumber,version,basket}) {
   const QUERY = gql`
   query ($version: Int!, $seqNumber: Int!, $basket: String!){
     cointegrationModelInfo(version:$version,sequenceNumber:$seqNumber,basket:$basket) {
-      inSampleMean
-      inSampleSd
-      uuid
       id
       modelEndtime
       modelStarttime
