@@ -1,18 +1,19 @@
 class Backtester < BaseService
   MULTIPLIER = 2
   MAX_TRADE_SIZE_DOLLARS = 1000.0
-  attr_reader :model_id, :resolution, :model_starttime, :model_endtime, :in_sample_mean, :in_sample_sd, :assets, :signal_flag,
+  attr_reader :model_id, :resolution, :model_starttime, :model_endtime, :in_sample_mean, :in_sample_sd, :assets, :signal_flag, :seq_num,
               :asset_weights, :num_ownable_assets, :num_obs, :positions, :prices, :pnl, :targets, :version, :basket, :cursor, :starttimes
 
-  def initialize(version:, basket:)
+  def initialize(version:, basket:, seq_num:)
     @version = version
     @basket = basket
+    @seq_num = seq_num
   end
 
   def run
     @cursor = 0
     @signal_flag =0
-    load_model(version)
+    load_model(version,seq_num)
     set_initial_positions
     while true
       target_positions
@@ -27,9 +28,14 @@ class Backtester < BaseService
 
   private
 
-  def load_model(version)
-    @model_id = BacktestModel.where("version=#{version} and basket = '#{basket}'").oldest_sequence_number_first.last&.model_id
-    seq_num = BacktestModel.where("version=#{version} and basket='#{basket}'").oldest_sequence_number_first.last&.sequence_number
+  def load_model(version,seq_num)
+    if !sequence_number
+      @model_id = BacktestModel.where("version=#{version} and basket = '#{basket}'").oldest_sequence_number_first.last&.model_id
+      @seq_num = BacktestModel.where("version=#{version} and basket='#{basket}'").oldest_sequence_number_first.last&.sequence_number
+    else
+      @model_id = BacktestModel.where(version: version, basket: basket,sequence_number: seq_num).last&.model_id
+    end
+    
     Rails.logger.info "backtesting model #{@model_id} with sequence number #{seq_num}"
     model = CointegrationModel.where("uuid = '#{@model_id}'").last
     @log_prices = model&.log_prices
@@ -82,8 +88,7 @@ class Backtester < BaseService
           @signal_flag = 0
           0
         else
-          #@positions[i][@cursor]*prices[i][@cursor]/prices[i][@cursor-1]
-          @signal_flag = old_signal_flag
+          #@positions[i][@cursor]*prices[i][@cursor]/prices[i][@cursor-1] 
           @positions[i][@cursor]
         end
       end
