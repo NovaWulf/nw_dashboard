@@ -19,12 +19,12 @@ module Hedgeserv
 
         Rails.logger.info "Found #{rows.count} positions"
 
-        results[:daily_winners] = get_rows(rows, 7, 17, false)
-        results[:daily_losers] = get_rows(rows, 7, 17, true)
-        results[:mtd_winners] = get_rows(rows, 8, 18, false)
-        results[:mtd_losers] = get_rows(rows, 8, 18, true)
-        results[:ytd_winners] = get_rows(rows, 9, 19, false)
-        results[:ytd_losers] = get_rows(rows, 9, 19, true)
+        results[:daily_winners] = get_rows(rows, 7, 14, false)
+        results[:daily_losers] = get_rows(rows, 7, 14, true)
+        results[:mtd_winners] = get_rows(rows, 8, 15, false)
+        results[:mtd_losers] = get_rows(rows, 8, 15, true)
+        results[:ytd_winners] = get_rows(rows, 9, 16, false)
+        results[:ytd_losers] = get_rows(rows, 9, 16, true)
 
         results
       end

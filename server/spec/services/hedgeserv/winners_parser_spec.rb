@@ -14,7 +14,7 @@ RSpec.describe Hedgeserv::WinnersParser do
     it 'shows name, value and percent' do
       expect(result[:daily_winners][0][0]).to include 'MSTR'
       expect(result[:daily_winners][0][1]).to include '66,740'
-      expect(result[:daily_winners][0][1]).to include '0.57%'
+      expect(result[:daily_winners][0][1]).to include '7.05%'
     end
 
     it 'sorts' do
