@@ -23,7 +23,6 @@ module Displayers
 
     def run
       Rails.logger.info "version: #{version}, basket: #{basket}, sequence_number: #{sequence_number}, model: #{model}"
-      puts "version: #{version}, basket: #{basket}, sequence_number: #{sequence_number}, model: #{model}"
       asset_names = CointegrationModelWeight.where("uuid = '#{@model}'").order_by_id.pluck(:asset_name)
       asset_names.delete_at(asset_names.index('det'))
       returnArray = []
@@ -32,13 +31,7 @@ module Displayers
         thing = ModeledSignal.by_model(model+"-"+a).oldest_first.first&.value
         puts "count: #{thing}"
       end
-      counts = asset_names.map{|asset| ModeledSignal.by_model(model+"-"+asset).count}
-      puts "counts: #{counts}"
-      returnThing = asset_names.map{|asset| ModeledSignal.by_model(model+"-"+asset).oldest_first}
-      puts "length of asset names: #{returnThing.length}"
-      puts "length of asset names[0]: #{returnThing[0].length} "
-      puts "length of asset_names[1]: #{returnThing[1].length}"
-      return returnThing
+      asset_names.map{|asset| ModeledSignal.by_model(model+"-"+asset).oldest_first}
     end
   end
 end

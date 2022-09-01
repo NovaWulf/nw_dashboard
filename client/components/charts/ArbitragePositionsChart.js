@@ -28,8 +28,8 @@ export default function ArbitragePositionsChart({seqNumber,version,basket}) {
     }
     cointegrationModelWeights(version:$version,sequenceNumber:$seqNumber,basket:$basket) {
       id
-      asset_name
       weight
+      assetName
     }
     backtestPositions(version: $version,sequenceNumber:$seqNumber,basket: $basket) {
       ts
@@ -43,7 +43,7 @@ export default function ArbitragePositionsChart({seqNumber,version,basket}) {
     variables: { seqNumber,version, basket },
   });
 
-  const { cointegrationModelInfo, backtestPositions } = data || {};
+  const { cointegrationModelInfo, backtestPositions,cointegrationModelWeights } = data || {};
 
   if (error) {
     console.error(error);
@@ -52,7 +52,11 @@ export default function ArbitragePositionsChart({seqNumber,version,basket}) {
   const theme = useTheme();
 
   let assets = [];
+  let assetNames
   if (data) {
+    assetNames = cointegrationModelWeights.map(d => d.assetName)
+    const index = assetNames.indexOf("det");
+    assetNames.splice(index, 1); 
 
     for (let i = 0; i < backtestPositions[0].length; i++) {
       assets.push({
@@ -98,7 +102,7 @@ export default function ArbitragePositionsChart({seqNumber,version,basket}) {
               <Line
                 type="monotone"
                 dataKey="v1"
-                name="asset 1 position"
+                name={assetNames[0]}
                 stroke="blue"
                 yAxisId="pnl"
                 dot={false}
@@ -106,7 +110,7 @@ export default function ArbitragePositionsChart({seqNumber,version,basket}) {
               <Line
                 type="monotone"
                 dataKey="v2"
-                name="asset 2 position"
+                name={assetNames[1]}
                 stroke={"orange"}
                 yAxisId="pnl"
                 dot={false}

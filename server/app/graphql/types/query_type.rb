@@ -46,6 +46,11 @@ module Types
       argument :sequence_number, Integer, required: false
       argument :basket, String
     end
+    field :cointegration_model_weights, [Types::CointegrationModelWeightType], null: false do
+      argument :version, Integer
+      argument :sequence_number, Integer, required: false
+      argument :basket, String
+    end
 
     field :smart_contract_active_users, [Types::MetricType], null: false do
       argument :token, String
