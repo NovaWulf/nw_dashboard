@@ -15,7 +15,7 @@ module Hedgeserv
         rows.shift # skip the summary
         results = {}
 
-        rows.reject { |r| r[2].include?('Fee') } # ignore fees
+        rows.reject! { |r| r[2].include?('Fee') } # ignore fees
 
         Rails.logger.info "Found #{rows.count} positions"
 
