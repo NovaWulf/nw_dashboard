@@ -7,6 +7,8 @@ library(latticeExtra)
 
 fitModel = function(asset_names,startTimeString,endTimeString,ecdet_param="const",logPrices=TRUE){
 
+print("asset names: ")
+print(asset_names)
 ecdet = ecdet_param
 asset_names = asset_names[order(asset_names)]
 print("does file ./public/data.csv exist in r?")

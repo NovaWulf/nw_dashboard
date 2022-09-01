@@ -190,6 +190,42 @@ export default function Layout({ children }) {
             <ListItemText primary="UNI-ETH" />
           </ListItem>
         </Link>
+        <Link href="/btc_eth_arbitrage">
+          <ListItem
+            button
+            selected={router.pathname == '/btc_eth_arbitrage'}
+            key="BTCETHArbitrage"
+          >
+            <ListItemIcon>
+              <EthereumIcon />
+            </ListItemIcon>
+            <ListItemText primary="BTC-ETH" />
+          </ListItem>
+        </Link>
+        <Link href="/snx_eth_arbitrage">
+          <ListItem
+            button
+            selected={router.pathname == '/snx_eth_arbitrage'}
+            key="SNXETHArbitrage"
+          >
+            <ListItemIcon>
+              <EthereumIcon />
+            </ListItemIcon>
+            <ListItemText primary="SNX-ETH" />
+          </ListItem>
+        </Link>
+        <Link href="/cvx_crv_arbitrage">
+          <ListItem
+            button
+            selected={router.pathname == '/cvx_crv_arbitrage'}
+            key="CVXCRVETHArbitrage"
+          >
+            <ListItemIcon>
+              <EthereumIcon />
+            </ListItemIcon>
+            <ListItemText primary="CVX-CRV" />
+          </ListItem>
+        </Link>
       </List>
     </div>
   );

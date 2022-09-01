@@ -77,15 +77,18 @@ class Backtester < BaseService
     old_signal_flag = @signal_flag
     if @log_prices
       @targets = (0..(@num_ownable_assets - 1)).map do |i|
-        if signal_up(@cursor)
+        if signal_up(@cursor) && old_signal_flag ==0
           @signal_flag = 1
           - asset_weight_signs[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
-        elsif signal_down(@cursor)
+          email_notification("up")
+        elsif signal_down(@cursor) &&  old_signal_flag==0
           @signal_flag = -1
           asset_weight_signs[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
+          email_notification("down")
         elsif @cursor > 0 && ((signal_pos(@cursor) && old_signal_flag==-1) || (signal_neg(@cursor) && old_signal_flag==1))
           puts "CROSSOVER! cursor: #{@cursor}. old signal flag: #{old_signal_flag} signal pos? #{signal_pos(@cursor)} signal neg? #{signal_neg(@cursor)}"
           @signal_flag = 0
+          email_notification("zero")
           0
         else
           #@positions[i][@cursor]*prices[i][@cursor]/prices[i][@cursor-1] 
@@ -181,5 +184,20 @@ class Backtester < BaseService
 
   def signal_down(index)
     @signal[index] < @in_sample_mean - @in_sample_sd * MULTIPLIER
+  end
+
+  def email_notification(type)
+    upper =  @in_sample_mean + @in_sample_sd * MULTIPLIER
+    lower =  @in_sample_mean - @in_sample_sd * MULTIPLIER
+    if type=="up"
+      NotificationMailer.with(subject: "Statistical Arbitrage Indicator Alert for pair #{@basket}",
+        text: "#{basket} spread value (#{@signal[@cursor].round(2)}) crossed above the high band of Paul's indicator (#{upper.round(2)}) while position is currently at 0. Recommend buying #{asset_names[1]} and shorting #{asset_names[0]}. To see the chart, check out dashboard.novawulf.io/#{basket.downcase}-arbitrage").notification.deliver_now
+    elsif type =="down"
+      NotificationMailer.with(subject: "Statistical Arbitrage Indicator Alert for pair #{@basket}",
+        text: "#{basket} spread value (#{@signal[@cursor].round(2)}) crossed above the high band of Paul's indicator (#{lower.round(2)}) while position is currently at 0. Recommend buying #{asset_names[1]} and shorting #{asset_names[0]}. To see the chart, check out dashboard.novawulf.io/#{basket.downcase}-arbitrage").notification.deliver_now  
+    elsif type =="zero"
+      NotificationMailer.with(subject: "Statistical Arbitrage Indicator Alert for pair #{@basket}",
+        text: "#{basket} spread value (#{@signal[@cursor].round(2)}) crossed the mean value of Paul's indicator (#{lower.round(2)}) while we currently have a position. Recommend closing out positions of #{asset_names[1]} and #{asset_names[0]}. To see the chart, check out dashboard.novawulf.io/#{basket.downcase}-arbitrage").notification.deliver_now  
+    end
   end
 end

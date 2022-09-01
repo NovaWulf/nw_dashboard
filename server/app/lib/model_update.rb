@@ -10,9 +10,7 @@ class ModelUpdate < BaseService
   def initialize(basket:)
     @r = RAdapter.new
     @basket = basket
-    
-    debugger
-    
+        
     @asset_names = []
     if basket == 'OP_ETH'
       @asset_names = %w[eth-usd op-usd]
@@ -21,9 +19,15 @@ class ModelUpdate < BaseService
     elsif basket == 'BTC_ETH'
       @asset_names = %w[eth-usd btc-usd]
     elsif basket == 'SNX_ETH'
-      @asset_names = %w[eth_usd snx-usd]
+      @asset_names = %w[eth-usd snx-usd]
     elsif basket == 'SNX_UNI'
       @asset_names = %w[snx-usd uni-usd]
+    elsif basket == 'CRV_ETH'
+      @asset_names = %w[eth-usd crv-usd]
+    elsif basket == 'CVX_ETH'
+      @asset_names = %w[eth-usd cvx-usd]
+    elsif basket == 'CVX_CRV'
+      @asset_names = %w[cvx-usd crv-usd]
     else
       raise "not one of the registered baskets... can't create asset list"
     end

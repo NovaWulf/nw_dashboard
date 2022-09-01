@@ -64,7 +64,7 @@ task update_arb_signal: :environment do
   tracked_pairs.each do |p|
     Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
   end
-  baskets = %w[OP_ETH UNI_ETH BTC_ETH SNX_ETH SNX_UNI]
+  baskets = %w[OP_ETH UNI_ETH BTC_ETH SNX_ETH]
   baskets.each do |b|
     mu = ModelUpdate.new(basket: b)
     mu.seed
