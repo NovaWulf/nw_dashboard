@@ -146,16 +146,19 @@ class Backtester < BaseService
     @pnl[@cursor] /= MAX_TRADE_SIZE_DOLLARS # calculate profit as a percentage of capital required
     @pnl[@cursor] += @pnl[@cursor - 1]
 
-    r_count = ModeledSignal.where("model_id='#{@model_id}-b' and starttime=#{@starttimes[@cursor]}").count
-    if r_count == 0
-      ModeledSignal.create(
-        starttime: @starttimes[@cursor],
-        model_id: @model_id + '-b',
-        resolution: @resolution,
-        value: @pnl[@cursor],
-        in_sample: in_sample_flag
-      )
+    if @cursor % 100==1
+      r_count = ModeledSignal.where("model_id='#{@model_id}-b' and starttime=#{@starttimes[@cursor]}").count
+      if r_count == 0
+        ModeledSignal.create(
+          starttime: @starttimes[@cursor],
+          model_id: @model_id + '-b',
+          resolution: @resolution,
+          value: @pnl[@cursor],
+          in_sample: in_sample_flag
+        )
+      end
     end
+    
   end
 
   def set_initial_positions
