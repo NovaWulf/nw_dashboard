@@ -15,5 +15,6 @@
 class CointegrationModelWeight < ApplicationRecord
     #belongs_to :cointegration_model
     scope :by_asset, ->(p) { where(asset_name: p) }
+    scope :order_by_id, -> { order(id: :asc) }
     #scope :by_model, ->(uuid) { joins(:cointegration_model).where(cointegration_models: {uuid: uuid})}
 end

@@ -24,7 +24,7 @@ module Displayers
     def run
       Rails.logger.info "version: #{version}, basket: #{basket}, sequence_number: #{sequence_number}, model: #{model}"
       puts "version: #{version}, basket: #{basket}, sequence_number: #{sequence_number}, model: #{model}"
-      asset_names = CointegrationModelWeight.where("uuid = '#{@model}'").pluck(:asset_name)
+      asset_names = CointegrationModelWeight.where("uuid = '#{@model}'").order_by_id.pluck(:asset_name)
       asset_names.delete_at(asset_names.index('det'))
       returnArray = []
       for a in asset_names do

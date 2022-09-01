@@ -64,7 +64,7 @@ task update_arb_signal: :environment do
   tracked_pairs.each do |p|
     Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
   end
-  baskets = %w[OP_ETH UNI_ETH]
+  baskets = %w[OP_ETH UNI_ETH BTC_ETH SNX_ETH SNX_UNI]
   baskets.each do |b|
     mu = ModelUpdate.new(basket: b)
     mu.seed
@@ -91,10 +91,10 @@ task try_update_models: :environment do
       Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
     end
     Rails.logger.info 'writing candle data to CSV...'
-    baskets = %w[OP_ETH UNI_ETH]
+    baskets = %w[OP_ETH UNI_ETH BTC_ETH SNX_ETH SNX_UNI]
     baskets.each do |b|
       mu = ModelUpdate.new(basket: b)
-      mu.update_model(version: 2, max_weeks_back: 8, min_weeks_back: 3, interval_mins: 1440)
+      mu.update_model(version: 2, max_weeks_back: 10, min_weeks_back: 5, interval_mins: 1440)
     end
     JesseModelUpdate.run
   end

@@ -15,23 +15,17 @@ class ArbitrageCalculator < BaseService
     else     
       most_recent_backtest_model = BacktestModel.where(version: version, basket: basket, sequence_number:@seq_num).last
     end
-    puts "running arb calculator on sequence number #{most_recent_backtest_model&.sequence_number}"
-
     Rails.logger.info "running arb calculator on sequence number #{most_recent_backtest_model&.sequence_number}"
     most_recent_model_id = most_recent_backtest_model&.model_id
-    puts "model_id: #{most_recent_model_id}" 
     @most_recent_model = CointegrationModel.where("uuid='#{most_recent_model_id}'").last
     det_type = most_recent_model&.ecdet
     log_prices = most_recent_model&.log_prices
     res = most_recent_model&.resolution
     last_in_sample_timestamp = most_recent_model&.model_endtime
     first_in_sample_timestamp = most_recent_model&.model_starttime
-    puts "asset count: #{CointegrationModelWeight.where("uuid = '#{most_recent_model_id}'").count}"
-    assets = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}'").pluck(:weight, :asset_name)
+    assets = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}'").order_by_id.pluck(:weight, :asset_name)
     asset_weights = assets.map { |x| x[0] }
-    puts "asset weights: #{asset_weights}"
     @asset_names = assets.map { |x| x[1] }
-    puts "asset names: #{@asset_names}"
     det_index = asset_names.index('det')
     det_weight = asset_weights[det_index]
     asset_weights.delete_at(det_index)

@@ -26,7 +26,11 @@ export default function ArbitragePositionsChart({seqNumber,version,basket}) {
       modelEndtime
       modelStarttime
     }
-
+    cointegrationModelWeights(version:$version,sequenceNumber:$seqNumber,basket:$basket) {
+      id
+      asset_name
+      weight
+    }
     backtestPositions(version: $version,sequenceNumber:$seqNumber,basket: $basket) {
       ts
       v
@@ -103,7 +107,7 @@ export default function ArbitragePositionsChart({seqNumber,version,basket}) {
                 type="monotone"
                 dataKey="v2"
                 name="asset 2 position"
-                stroke={theme.palette.secondary.secondary}
+                stroke={"orange"}
                 yAxisId="pnl"
                 dot={false}
               />

@@ -44,7 +44,7 @@ class Backtester < BaseService
     @model_endtime = model.model_endtime
     @in_sample_sd = model.in_sample_sd
     @in_sample_mean = model.in_sample_mean
-    weights = CointegrationModelWeight.where("uuid = '#{@model_id}'")
+    weights = CointegrationModelWeight.where("uuid = '#{@model_id}'").order_by_id
     assets = weights.pluck(:asset_name, :weight)
     @asset_names = assets.map { |x| x[0] }
     @asset_weights = assets.map { |x| x[1] }
@@ -55,9 +55,7 @@ class Backtester < BaseService
     modeled_signal = ModeledSignal.where("model_id = '#{@model_id}'").oldest_first.pluck(:value, :starttime)
     @signal = modeled_signal.map { |x| x[0] }
     @starttimes = modeled_signal.map { |x| x[1] }
-    puts "length of startimes: #{starttimes.length}"
     start_ind = @starttimes.index(@model_starttime)
-    puts "start ind: #{start_ind}"
     signal_starttime = @starttimes[start_ind]
     signal_endtime = @starttimes.last
     @signal = @signal[start_ind..(@signal.length - 1)]

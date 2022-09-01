@@ -167,6 +167,10 @@ module Types
       Displayers::CointegrationModelDisplayer.run(version:version,basket:basket,sequence_number:sequence_number).value
     end
 
+    def cointegration_model_weights(version:, basket:, sequence_number: nil)
+      Displayers::CointegrationModelWeightDisplayer.run(version:version,basket:basket,sequence_number:sequence_number).value
+    end
+
     def backtest_model_info(version:, basket:)
       [BacktestModel.where("version=#{version} and basket = '#{basket}'").oldest_sequence_number_first.last]
     end

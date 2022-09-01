@@ -10,11 +10,20 @@ class ModelUpdate < BaseService
   def initialize(basket:)
     @r = RAdapter.new
     @basket = basket
+    
+    debugger
+    
     @asset_names = []
     if basket == 'OP_ETH'
       @asset_names = %w[eth-usd op-usd]
     elsif basket == 'UNI_ETH'
       @asset_names = %w[eth-usd uni-usd]
+    elsif basket == 'BTC_ETH'
+      @asset_names = %w[eth-usd btc-usd]
+    elsif basket == 'SNX_ETH'
+      @asset_names = %w[eth_usd snx-usd]
+    elsif basket == 'SNX_UNI'
+      @asset_names = %w[snx-usd uni-usd]
     else
       raise "not one of the registered baskets... can't create asset list"
     end
@@ -25,7 +34,7 @@ class ModelUpdate < BaseService
     if r_count == 0
       CsvWriter.run(table: 'candles', assets: asset_names)
       return_vals = r.cointegration_analysis(asset_names: asset_names, start_time_string: MODEL_STARTDATES[0], end_time_string: MODEL_ENDDATES[0],
-                                             ecdet_param: "'trend'")
+                                             ecdet_param: "'const'")
       first_model = return_vals[0]
       Rails.logger.info "return val of seed model: #{return_vals}"
       Rails.logger.info "MODEL ID: #{first_model}"

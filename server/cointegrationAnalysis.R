@@ -5,7 +5,7 @@ library(digest)
 library(lattice)
 library(latticeExtra)
 
-fitModel = function(asset_names,startTimeString,endTimeString,ecdet_param="trend",logPrices=TRUE){
+fitModel = function(asset_names,startTimeString,endTimeString,ecdet_param="const",logPrices=TRUE){
 
 ecdet = ecdet_param
 asset_names = asset_names[order(asset_names)]
