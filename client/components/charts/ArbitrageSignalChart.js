@@ -79,7 +79,7 @@ export default function ArbitrageSignalChart({seqNumber,version,basket}) {
         <Skeleton variant="rectangular" />
       ) : (
         <DashboardItem
-          title="OP-ETH Arbitrage Indicator"
+          title={`${basket} Arbitrage Indicator`}
           helpText="Arbitrage Indicator looks at the value of the mean reverting portfolio of assets"
           downloadButton={
             <CsvDownloadLink data={updatedData} title="Arbitrage Indicator" />
