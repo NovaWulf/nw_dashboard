@@ -7,9 +7,36 @@ import ArbitrageBacktestChart from 'components/charts/ArbitrageBacktestChart';
 import ArbitragePositionsChart from 'components/charts/ArbitragePositionsChart';
 import ModelSelector from 'components/ModelSelector';
 
+const getModelsQuery = gql`
+query ($version: Int!, $basket: String!) {
+  backtestModelInfo(version: $version, basket:$basket) {
+    version
+    sequenceNumber
+  }
+}
+`;
 export default function ArbitrageCharts({basket}) {
-  const [seqNumber, setSeqNumber] = React.useState(0);
   const version = 2
+
+  const [seqNumber, setSeqNumber] = React.useState(0);
+
+  const { loading, error, data } = useQuery(getModelsQuery, {
+    variables: { version, basket },
+  });
+
+  React.useEffect(() => {
+    if(data) {
+      setSeqNumber(data.backtestModelInfo[0].sequenceNumber);
+    }
+  }, [data])
+
+  if (loading) return <p>Loading Query...</p>;
+  if (error) {
+    console.log(error);
+    return <p>Error in Query...</p>;
+  }
+
+  
   return (
     <Grid container spacing={3}>
       <Grid item>

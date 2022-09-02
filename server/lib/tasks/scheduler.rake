@@ -60,11 +60,11 @@ task hedgeserv_email: :environment do
 end
 
 task update_arb_signal: :environment do
-  tracked_pairs = %w[eth-usd op-usd btc-usd uni-usd snx-usd]
+  tracked_pairs = %w[eth-usd op-usd btc-usd uni-usd snx-usd crv-usd cvx-usd]
   tracked_pairs.each do |p|
     Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
   end
-  baskets = %w[OP_ETH UNI_ETH BTC_ETH SNX_ETH]
+  baskets = %w[OP_ETH UNI_ETH BTC_ETH SNX_ETH CVX_CRV]
   baskets.each do |b|
     mu = ModelUpdate.new(basket: b)
     mu.seed
