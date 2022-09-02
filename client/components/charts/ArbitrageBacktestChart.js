@@ -18,7 +18,6 @@ import TimeAxisHighRes from 'components/TimeAxisHighRes';
 import CsvDownloadLink from 'components/CsvDownloadLink';
 
 export default function ArbitrageBacktestChart({seqNumber,version,basket}) {
-  
   const QUERY = gql`
   query ($version: Int!, $seqNumber: Int!, $basket: String!){
     cointegrationModelInfo(version:$version,sequenceNumber:$seqNumber,basket:$basket) {
@@ -52,11 +51,10 @@ export default function ArbitrageBacktestChart({seqNumber,version,basket}) {
     updatedData = backtestModel.map(d => {
       return {
         ts: d.ts,
-        v: Math.floor(100 * d.v),
+        v: Math.floor(10000 * d.v)/100,
         is: d.is,
       };
     });
-
   }
 
   return (

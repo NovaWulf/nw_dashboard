@@ -12,8 +12,8 @@ class Backtester < BaseService
 
   def run
     @cursor = 0
-    @signal_flag =0
-    load_model(version,seq_num)
+    @signal_flag = 0
+    load_model(version, seq_num)
     set_initial_positions
     while true
       target_positions
@@ -28,14 +28,14 @@ class Backtester < BaseService
 
   private
 
-  def load_model(version,seq_num)
+  def load_model(version, seq_num)
     if !seq_num
       @model_id = BacktestModel.where("version=#{version} and basket = '#{basket}'").oldest_sequence_number_first.last&.model_id
       @seq_num = BacktestModel.where("version=#{version} and basket='#{basket}'").oldest_sequence_number_first.last&.sequence_number
     else
-      @model_id = BacktestModel.where(version: version, basket: basket,sequence_number: seq_num).last&.model_id
+      @model_id = BacktestModel.where(version: version, basket: basket, sequence_number: seq_num).last&.model_id
     end
-    
+
     Rails.logger.info "backtesting model #{@model_id} with sequence number #{seq_num}"
     model = CointegrationModel.where("uuid = '#{@model_id}'").last
     @log_prices = model&.log_prices
@@ -73,24 +73,24 @@ class Backtester < BaseService
     # In price model, eigenvectors represent weight in shares,
     # whereas in log-price model, eigenvectors are in $
     asset_weight_signs = @asset_weights.map { |a| a >= 0 ? 1.0 : -1.0 }
-    
+
     old_signal_flag = @signal_flag
     if @log_prices
       @targets = (0..(@num_ownable_assets - 1)).map do |i|
-        if signal_up(@cursor) && old_signal_flag ==0
-          email_notification("up")
+        if signal_up(@cursor) && old_signal_flag == 0
+          email_notification('up')
           @signal_flag = 1
           - asset_weight_signs[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
-        elsif signal_down(@cursor) &&  old_signal_flag==0
-          email_notification("down")
+        elsif signal_down(@cursor) &&  old_signal_flag == 0
+          email_notification('down')
           @signal_flag = -1
           asset_weight_signs[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
-        elsif @cursor > 0 && ((signal_pos(@cursor) && old_signal_flag==-1) || (signal_neg(@cursor) && old_signal_flag==1))
-          email_notification("zero")
+        elsif @cursor > 0 && ((signal_pos(@cursor) && old_signal_flag == -1) || (signal_neg(@cursor) && old_signal_flag == 1))
+          email_notification('zero')
           @signal_flag = 0
           0
         else
-          #@positions[i][@cursor]*prices[i][@cursor]/prices[i][@cursor-1] 
+          # @positions[i][@cursor]*prices[i][@cursor]/prices[i][@cursor-1]
           @positions[i][@cursor]
         end
       end
@@ -138,7 +138,7 @@ class Backtester < BaseService
             starttime: @starttimes[@cursor],
             model_id: @model_id + '-' + @asset_names[i],
             resolution: @resolution,
-            value: @targets[i] *  prices[i][@cursor-1] / MAX_TRADE_SIZE_DOLLARS,
+            value: @targets[i] * prices[i][@cursor - 1] / MAX_TRADE_SIZE_DOLLARS,
             in_sample: in_sample_flag
           )
         end
@@ -148,7 +148,7 @@ class Backtester < BaseService
     @pnl[@cursor] /= MAX_TRADE_SIZE_DOLLARS # calculate profit as a percentage of capital required
     @pnl[@cursor] += @pnl[@cursor - 1]
 
-    if @cursor % 100==1
+    if @cursor % 100 == 1
       r_count = ModeledSignal.where("model_id='#{@model_id}-b' and starttime=#{@starttimes[@cursor]}").count
       if r_count == 0
         ModeledSignal.create(
@@ -160,7 +160,6 @@ class Backtester < BaseService
         )
       end
     end
-    
   end
 
   def set_initial_positions
@@ -188,15 +187,15 @@ class Backtester < BaseService
   def email_notification(type)
     upper =  @in_sample_mean + @in_sample_sd * MULTIPLIER
     lower =  @in_sample_mean - @in_sample_sd * MULTIPLIER
-    if type=="up"
+    if type == 'up'
       NotificationMailer.with(subject: "Statistical Arbitrage Indicator Alert for pair #{@basket}",
-        text: "#{basket} spread value (#{@signal[@cursor].round(2)}) crossed above the high band of Paul's indicator (#{upper.round(2)}) while position is currently at 0. Recommend buying #{@asset_names[1]} and shorting #{@asset_names[0]}. To see the chart, check out dashboard.novawulf.io/#{basket.downcase}-arbitrage").notification.deliver_now
-    elsif type =="down"
+                              text: "#{basket} spread value (#{@signal[@cursor].round(2)}) crossed above the high band of Paul's indicator (#{upper.round(2)}) while position is currently at 0. Recommend buying #{@asset_names[1]} and shorting #{@asset_names[0]}. To see the chart, check out dashboard.novawulf.io/#{basket.downcase}-arbitrage").notification.deliver_now
+    elsif type == 'down'
       NotificationMailer.with(subject: "Statistical Arbitrage Indicator Alert for pair #{@basket}",
-        text: "#{basket} spread value (#{@signal[@cursor].round(2)}) crossed above the high band of Paul's indicator (#{lower.round(2)}) while position is currently at 0. Recommend buying #{@asset_names[1]} and shorting #{@asset_names[0]}. To see the chart, check out dashboard.novawulf.io/#{basket.downcase}-arbitrage").notification.deliver_now  
-    elsif type =="zero"
+                              text: "#{basket} spread value (#{@signal[@cursor].round(2)}) crossed above the high band of Paul's indicator (#{lower.round(2)}) while position is currently at 0. Recommend buying #{@asset_names[1]} and shorting #{@asset_names[0]}. To see the chart, check out dashboard.novawulf.io/#{basket.downcase}-arbitrage").notification.deliver_now
+    elsif type == 'zero'
       NotificationMailer.with(subject: "Statistical Arbitrage Indicator Alert for pair #{@basket}",
-        text: "#{basket} spread value (#{@signal[@cursor].round(2)}) crossed the mean value of Paul's indicator (#{lower.round(2)}) while we currently have a position. Recommend closing out positions of #{asset_names[1]} and #{asset_names[0]}. To see the chart, check out dashboard.novawulf.io/#{basket.downcase}-arbitrage").notification.deliver_now  
+                              text: "#{basket} spread value (#{@signal[@cursor].round(2)}) crossed the mean value of Paul's indicator (#{lower.round(2)}) while we currently have a position. Recommend closing out positions of #{@asset_names[1]} and #{@asset_names[0]}. To see the chart, check out dashboard.novawulf.io/#{basket.downcase}-arbitrage").notification.deliver_now
     end
   end
 end

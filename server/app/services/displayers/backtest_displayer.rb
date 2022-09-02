@@ -1,5 +1,5 @@
 module Displayers
-  class HourlyBacktestDisplayer < BaseService
+  class BacktestDisplayer < BaseService
     attr_reader :model, :version, :sequence_number, :basket
 
     def initialize(version:, basket:, sequence_number: nil)
@@ -23,7 +23,7 @@ module Displayers
 
     def run
       Rails.logger.info "basket: #{basket}, version: #{version}, sequence_number: #{sequence_number}, model: #{model}"
-      ModeledSignal.by_model(model + '-b').on_the_hour.oldest_first
+      ModeledSignal.by_model(model + '-b').oldest_first
     end
   end
 end

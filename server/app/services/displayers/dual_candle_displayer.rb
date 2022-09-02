@@ -1,31 +1,27 @@
 module Displayers
-  class PositionsDisplayer < BaseService
-    attr_reader :model, :version, :sequence_number, :basket
+  class DualCandleDisplayer < BaseService
+    attr_reader :basket, :version, :sequence_number, :asset_1, :asset_2
 
     def initialize(version:, basket:, sequence_number: nil)
-      @version = version
+      @basket = basket
       @sequence_number = sequence_number
       @basket = basket
       if version
         if sequence_number
-          Rails.logger.info "using #{sequence_number}-th model in sequence for v#{version} for displayer"
           model = BacktestModel.where("version=#{version} and basket = '#{basket}' and sequence_number=#{sequence_number}").last&.model_id
         else
-          Rails.logger.info "using most recent in model in sequence for v#{version} for displayer"
           model = BacktestModel.where("version=#{version} and basket = '#{basket}'").oldest_sequence_number_first.last&.model_id
         end
       else
-        Rails.logger.info 'using default model for displayer -- latest'
         model = BacktestModel.where("basket = '#{basket}'").oldest_version_first.last.oldest_sequence_number_first.last&.model_id
       end
       @model = model
     end
 
     def run
-      Rails.logger.info "version: #{version}, basket: #{basket}, sequence_number: #{sequence_number}, model: #{model}"
       asset_names = CointegrationModelWeight.where("uuid = '#{@model}'").order_by_id.pluck(:asset_name)
       asset_names.delete_at(asset_names.index('det'))
-      asset_names.map{|asset| ModeledSignal.by_model(model+"-"+asset).oldest_first}
+      asset_names.map { |asset| Candle.by_pair(asset).oldest_first.on_the_hour }
     end
   end
 end

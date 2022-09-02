@@ -5,6 +5,10 @@ import * as React from 'react';
 import ArbitrageSignalChart from 'components/charts/ArbitrageSignalChart';
 import ArbitrageBacktestChart from 'components/charts/ArbitrageBacktestChart';
 import ArbitragePositionsChart from 'components/charts/ArbitragePositionsChart';
+import PairChart from 'components/charts/PairChart';
+import RatioChart from 'components/charts/RatioChart';
+
+
 import ModelSelector from 'components/ModelSelector';
 
 const getModelsQuery = gql`
@@ -42,6 +46,8 @@ export default function ArbitrageCharts({basket}) {
       <Grid item>
         <ModelSelector seqNumber={seqNumber} handleChange={setSeqNumber} basket={basket} version={version} />
       </Grid>
+      <PairChart seqNumber={seqNumber} version={version} basket={basket} />
+      <RatioChart seqNumber={seqNumber} version={version} basket={basket} />
       <ArbitrageSignalChart seqNumber={seqNumber} version={version} basket={basket} />
       <ArbitrageBacktestChart seqNumber={seqNumber} version={version} basket ={basket} />
       <ArbitragePositionsChart seqNumber={seqNumber} version={version} basket ={basket} />

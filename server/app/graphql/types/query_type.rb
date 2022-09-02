@@ -13,6 +13,12 @@ module Types
       argument :basket, String
     end
 
+    field :dual_candle_charts, [[Types::CandleType]], null: false do
+      argument :version, Integer
+      argument :sequence_number, Integer, required: false
+      argument :basket, String
+    end
+
     field :backtest_model, [Types::ModeledSignalType], null: false do
       argument :version, Integer
       argument :sequence_number, Integer, required: false
@@ -168,12 +174,18 @@ module Types
       Displayers::WeeklyValueDisplayer.run(token: 'btc', metric: 'jesse').value
     end
 
+    def dual_candle_charts(version:, basket:, sequence_number: nil)
+      Displayers::DualCandleDisplayer.run(version: version, basket: basket, sequence_number: sequence_number).value
+    end
+
     def cointegration_model_info(version:, basket:, sequence_number: nil)
-      Displayers::CointegrationModelDisplayer.run(version:version,basket:basket,sequence_number:sequence_number).value
+      Displayers::CointegrationModelDisplayer.run(version: version, basket: basket,
+                                                  sequence_number: sequence_number).value
     end
 
     def cointegration_model_weights(version:, basket:, sequence_number: nil)
-      Displayers::CointegrationModelWeightDisplayer.run(version:version,basket:basket,sequence_number:sequence_number).value
+      Displayers::CointegrationModelWeightDisplayer.run(version: version, basket: basket,
+                                                        sequence_number: sequence_number).value
     end
 
     def backtest_model_info(version:, basket:)
@@ -185,7 +197,7 @@ module Types
     end
 
     def backtest_latest_model(version:, basket:)
-      Displayers::HourlyBacktestDisplayer.run(version: version, basket: basket, sequence_number: nil).value
+      Displayers::BacktestDisplayer.run(version: version, basket: basket, sequence_number: nil).value
     end
 
     def arb_signal_model(version:, basket:, sequence_number: nil)
@@ -193,7 +205,7 @@ module Types
     end
 
     def backtest_model(version:, basket:, sequence_number: nil)
-      Displayers::HourlyBacktestDisplayer.run(version: version, basket: basket, sequence_number: sequence_number).value
+      Displayers::BacktestDisplayer.run(version: version, basket: basket, sequence_number: sequence_number).value
     end
 
     def backtest_positions(version:, basket:, sequence_number: nil)
