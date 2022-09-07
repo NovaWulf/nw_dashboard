@@ -77,5 +77,24 @@ class ArbitrageCalculator < BaseService
                                in_sample: in_sample_flag)
     end
     Rails.logger.info "flat forward interpolated #{interp_count} values"
+    if 
+    email_notification(m) if !silent && m
+  end
+
+  def email_notification(arb_signal, sigma = 1)
+    in_sample_mean = most_recent_model&.in_sample_mean
+    in_sample_sd = most_recent_model&.in_sample_sd
+    return unless arb_signal && most_recent_model
+
+    signal_value = arb_signal.value
+    upper = in_sample_mean + sigma * in_sample_sd
+    lower = in_sample_mean - sigma * in_sample_sd
+    if signal_value > upper
+      NotificationMailer.with(subject: 'Statistical Arbitrage Indicator Alert',
+                              text: "OP-ETH spread value (#{signal_value.round(2)}) is above the high band of Paul's indicator (#{upper.round(2)}). Recommend buying OP and shorting ETH").notification.deliver_now
+    elsif signal_value < lower
+      NotificationMailer.with(subject: 'Statistical Arbitrage Indicator Alert',
+                              text: "OP-ETH (#{signal_value.round(2)}) is below the low band of Paul's indicator (#{lower.round(2)}). Recommend buying ETH and shorting OP").notification.deliver_now
+    end
   end
 end
