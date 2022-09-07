@@ -1,13 +1,15 @@
 class Backtester < BaseService
-  MULTIPLIER = 2
+  MULTIPLIER = 1
   MAX_TRADE_SIZE_DOLLARS = 1000.0
   attr_reader :model_id, :resolution, :model_starttime, :model_endtime, :in_sample_mean, :in_sample_sd, :assets, :signal_flag, :seq_num,
-              :asset_weights, :num_ownable_assets, :num_obs, :positions, :prices, :pnl, :targets, :version, :basket, :cursor, :starttimes
+              :asset_weights, :num_ownable_assets, :num_obs, :positions, :prices, :pnl, :targets, :version, :basket, :cursor, :starttimes,
+              :notifications
 
   def initialize(version:, basket:, seq_num:)
     @version = version
     @basket = basket
     @seq_num = seq_num
+    @notifications = []
   end
 
   def run
@@ -24,6 +26,7 @@ class Backtester < BaseService
       execute_trades
       calculate_pnl
     end
+    email_notification
   end
 
   private
@@ -55,6 +58,7 @@ class Backtester < BaseService
     modeled_signal = ModeledSignal.where("model_id = '#{@model_id}'").oldest_first.pluck(:value, :starttime)
     @signal = modeled_signal.map { |x| x[0] }
     @starttimes = modeled_signal.map { |x| x[1] }
+    puts "model starttime: #{@model_starttime} first starttime: #{@starttimes.first}"
     start_ind = @starttimes.index(@model_starttime)
     signal_starttime = @starttimes[start_ind]
     signal_endtime = @starttimes.last
@@ -76,24 +80,35 @@ class Backtester < BaseService
 
     old_signal_flag = @signal_flag
     if @log_prices
-      @targets = (0..(@num_ownable_assets - 1)).map do |i|
-        if signal_up(@cursor) && old_signal_flag == 0
-          email_notification('up')
-          @signal_flag = 1
-          - asset_weight_signs[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
-        elsif signal_down(@cursor) &&  old_signal_flag == 0
-          email_notification('down')
-          @signal_flag = -1
-          asset_weight_signs[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
-        elsif @cursor > 0 && ((signal_pos(@cursor) && old_signal_flag == -1) || (signal_neg(@cursor) && old_signal_flag == 1))
-          email_notification('zero')
-          @signal_flag = 0
+      if signal_up(@cursor) && old_signal_flag == 0
+        @signal_flag = 1
+        @targets = (0..(@num_ownable_assets - 1)).map do |i|
+          #- asset_weight_signs[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
+          - asset_weights[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
+        end
+        notifications << BacktestNotification.new(type: 'up', basket: @basket, timestamp: @starttimes[@cursor], signal_val: @signal[@cursor], assets: @asset_names,
+                                                  new_positions: @targets, sd: @in_sample_sd, mean: @in_sample_mean, multiplier: MULTIPLIER)
+      elsif signal_down(@cursor) &&  old_signal_flag == 0
+        @signal_flag = -1
+        @targets = (0..(@num_ownable_assets - 1)).map do |i|
+          # asset_weight_signs[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
+          asset_weights[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
+        end
+        notifications << BacktestNotification.new(type: 'down', basket: @basket, timestamp: @starttimes[@cursor], signal_val: @signal[@cursor], assets: @asset_names,
+                                                  new_positions: @targets, sd: @in_sample_sd, mean: @in_sample_mean, multiplier: MULTIPLIER)
+      elsif @cursor > 0 && ((signal_pos(@cursor) && old_signal_flag == -1) || (signal_neg(@cursor) && old_signal_flag == 1))
+        @signal_flag = 0
+        @targets = (0..(@num_ownable_assets - 1)).map do |_i|
           0
-        else
-          # @positions[i][@cursor]*prices[i][@cursor]/prices[i][@cursor-1]
+        end
+        notifications << BacktestNotification.new(type: 'zero', basket: @basket, timestamp: @starttimes[@cursor], signal_val: @signal[@cursor], assets: @asset_names,
+                                                  new_positions: @targets, sd: @in_sample_sd, mean: @in_sample_mean, multiplier: MULTIPLIER)
+      else
+        @targets = (0..(@num_ownable_assets - 1)).map do |i|
           @positions[i][@cursor]
         end
       end
+
     else
       n_shares_first_asset = MAX_TRADE_SIZE_DOLLARS / prices[0][@cursor]
       multiplier = n_shares_first_asset / @asset_weights[0]
@@ -184,18 +199,11 @@ class Backtester < BaseService
     @signal[index] < @in_sample_mean - @in_sample_sd * MULTIPLIER
   end
 
-  def email_notification(type)
-    upper =  @in_sample_mean + @in_sample_sd * MULTIPLIER
-    lower =  @in_sample_mean - @in_sample_sd * MULTIPLIER
-    if type == 'up'
-      NotificationMailer.with(subject: "Statistical Arbitrage Indicator Alert for pair #{@basket}",
-                              text: "#{basket} spread value (#{@signal[@cursor].round(2)}) crossed above the high band of Paul's indicator (#{upper.round(2)}) while position is currently at 0. Recommend buying #{@asset_names[1]} and shorting #{@asset_names[0]}. To see the chart, check out dashboard.novawulf.io/#{basket.downcase}-arbitrage").notification.deliver_now
-    elsif type == 'down'
-      NotificationMailer.with(subject: "Statistical Arbitrage Indicator Alert for pair #{@basket}",
-                              text: "#{basket} spread value (#{@signal[@cursor].round(2)}) crossed above the high band of Paul's indicator (#{lower.round(2)}) while position is currently at 0. Recommend buying #{@asset_names[1]} and shorting #{@asset_names[0]}. To see the chart, check out dashboard.novawulf.io/#{basket.downcase}-arbitrage").notification.deliver_now
-    elsif type == 'zero'
-      NotificationMailer.with(subject: "Statistical Arbitrage Indicator Alert for pair #{@basket}",
-                              text: "#{basket} spread value (#{@signal[@cursor].round(2)}) crossed the mean value of Paul's indicator (#{lower.round(2)}) while we currently have a position. Recommend closing out positions of #{@asset_names[1]} and #{@asset_names[0]}. To see the chart, check out dashboard.novawulf.io/#{basket.downcase}-arbitrage").notification.deliver_now
-    end
+  def email_notification
+    last_notif = @notifications[@notifications.length - 1]
+    notif_subject = last_notif.generate_subject
+    notif_text = last_notif.generate_text
+    Rails.logger.info "sending arb email with text: #{notif_text}"
+    NotificationMailer.with(subject: notif_subject, text: notif_text).notification.deliver_now
   end
 end

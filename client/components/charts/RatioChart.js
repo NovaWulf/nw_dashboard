@@ -71,7 +71,7 @@ export default function RatioChart({seqNumber,version,basket}) {
         <Skeleton variant="rectangular" />
       ) : (
         <DashboardItem
-          title={`${basket} Ratio Plot`}
+          title={`${assetNames[0]}/${assetNames[1]} Ratio Plot`}
           helpText="Ratio plot gives a reference for the prices of the underlying assets"
           downloadButton={
             <CsvDownloadLink data={assets} title="Asset Ratio Chart" />
@@ -97,7 +97,7 @@ export default function RatioChart({seqNumber,version,basket}) {
             <YAxis yAxisId={assetNames[0]} stroke={theme.palette.secondary.main} />
             <YAxis
               yAxisId={assetNames[1]}
-              orientation="right"
+              orientation="left"
               tickFormatter={nFormatter}
               stroke={theme.palette.primary.main}
             />

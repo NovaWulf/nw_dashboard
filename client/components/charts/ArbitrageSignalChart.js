@@ -30,7 +30,11 @@ export default function ArbitrageSignalChart({seqNumber,version,basket}) {
       modelEndtime
       modelStarttime
     }
-
+    cointegrationModelWeights(version:$version,sequenceNumber:$seqNumber,basket:$basket) {
+      id
+      weight
+      assetName
+    }
     arbSignalModel(version: $version,sequenceNumber:$seqNumber,basket:$basket) {
       ts
       v
@@ -42,16 +46,18 @@ export default function ArbitrageSignalChart({seqNumber,version,basket}) {
     variables: { seqNumber,version,basket},
   });
 
-  const { cointegrationModelInfo, arbSignalModel } = data || {};
+  const { cointegrationModelInfo, arbSignalModel, cointegrationModelWeights } = data || {};
 
   if (error) {
     console.error(error);
     return null;
   }
-  const SIGMA = 2;
+  const SIGMA = 1;
 
-  let mean, sd, isEndDate,isStartDate, updatedData;
+  let mean, sd, isEndDate,isStartDate, updatedData,assetNames,weights;
   if (data) {
+    assetNames = cointegrationModelWeights.map(d => d.assetName)
+    weights = cointegrationModelWeights.map(d => d.weight)
     mean = cointegrationModelInfo[0].inSampleMean;
     sd = cointegrationModelInfo[0].inSampleSd;
     isEndDate = cointegrationModelInfo[0].modelEndtime;
@@ -79,10 +85,10 @@ export default function ArbitrageSignalChart({seqNumber,version,basket}) {
         <Skeleton variant="rectangular" />
       ) : (
         <DashboardItem
-          title={`${basket} Arbitrage Indicator`}
+          title={`${basket} Arbitrage Indicator: ${Math.floor(100*weights[0])/100}*log(${assetNames[0]}) + ${Math.floor(100*weights[1])/100}*log(${assetNames[1]})`}
           helpText="Arbitrage Indicator looks at the value of the mean reverting portfolio of assets"
           downloadButton={
-            <CsvDownloadLink data={updatedData} title="Arbitrage Indicator" />
+            <CsvDownloadLink data={updatedData} title="Arbitrage Indicator:" />
           }
         >
           <ResponsiveContainer width="99%" height={300}>

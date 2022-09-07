@@ -214,16 +214,16 @@ export default function Layout({ children }) {
             <ListItemText primary="SNX-ETH" />
           </ListItem>
         </Link>
-        <Link href="/cvx_crv_arbitrage">
+        <Link href="/crv_eth_arbitrage">
           <ListItem
             button
-            selected={router.pathname == '/cvx_crv_arbitrage'}
-            key="CVXCRVETHArbitrage"
+            selected={router.pathname == '/crv_eth_arbitrage'}
+            key="CRVETHArbitrage"
           >
             <ListItemIcon>
               <EthereumIcon />
             </ListItemIcon>
-            <ListItemText primary="CVX-CRV" />
+            <ListItemText primary="CRV-ETH" />
           </ListItem>
         </Link>
       </List>
