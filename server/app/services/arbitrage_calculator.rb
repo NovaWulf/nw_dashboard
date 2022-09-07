@@ -77,7 +77,6 @@ class ArbitrageCalculator < BaseService
                                in_sample: in_sample_flag)
     end
     Rails.logger.info "flat forward interpolated #{interp_count} values"
-    if 
     email_notification(m) if !silent && m
   end
 
