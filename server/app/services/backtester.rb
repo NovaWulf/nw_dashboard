@@ -39,6 +39,7 @@ class Backtester < BaseService
       @model_id = BacktestModel.where(version: version, basket: basket, sequence_number: seq_num).last&.model_id
     end
 
+    BacktestTrades.where(model_id: @model_id).destroy_all
     Rails.logger.info "backtesting model #{@model_id} with sequence number #{seq_num}"
     model = CointegrationModel.where("uuid = '#{@model_id}'").last
     @log_prices = model&.log_prices
@@ -86,23 +87,26 @@ class Backtester < BaseService
           #- asset_weight_signs[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
           - asset_weights[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
         end
-        notifications << BacktestNotification.new(type: 'up', basket: @basket, timestamp: @starttimes[@cursor], signal_val: @signal[@cursor], assets: @asset_names,
-                                                  new_positions: @targets, sd: @in_sample_sd, mean: @in_sample_mean, multiplier: MULTIPLIER)
+        puts "signal up at timestamp #{starttimes[@cursor]} signal val: #{@signal[@cursor]}, mean: #{@in_sample_mean}, in_sample_sd: #{@in_sample_sd}"
+        BacktestTrades.create(model_id: @model_id, signal_flag: @signal_flag, prev_signal_flag: old_signal_flag,
+                              cursor: @cursor)
       elsif signal_down(@cursor) &&  old_signal_flag == 0
         @signal_flag = -1
         @targets = (0..(@num_ownable_assets - 1)).map do |i|
           # asset_weight_signs[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
           asset_weights[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
         end
-        notifications << BacktestNotification.new(type: 'down', basket: @basket, timestamp: @starttimes[@cursor], signal_val: @signal[@cursor], assets: @asset_names,
-                                                  new_positions: @targets, sd: @in_sample_sd, mean: @in_sample_mean, multiplier: MULTIPLIER)
+        puts "signal down at timestamp #{starttimes[@cursor]}. signal val: #{@signal[@cursor]}, mean: #{@in_sample_mean}, in_sample_sd: #{@in_sample_sd}"
+        BacktestTrades.create(model_id: @model_id, signal_flag: @signal_flag, prev_signal_flag: old_signal_flag,
+                              cursor: @cursor)
       elsif @cursor > 0 && ((signal_pos(@cursor) && old_signal_flag == -1) || (signal_neg(@cursor) && old_signal_flag == 1))
         @signal_flag = 0
         @targets = (0..(@num_ownable_assets - 1)).map do |_i|
           0
         end
-        notifications << BacktestNotification.new(type: 'zero', basket: @basket, timestamp: @starttimes[@cursor], signal_val: @signal[@cursor], assets: @asset_names,
-                                                  new_positions: @targets, sd: @in_sample_sd, mean: @in_sample_mean, multiplier: MULTIPLIER)
+        puts "signal flat at timestamp #{starttimes[@cursor]}. signal val: #{@signal[@cursor]}, mean: #{@in_sample_mean}, in_sample_sd: #{@in_sample_sd}"
+        BacktestTrades.create(model_id: @model_id, signal_flag: @signal_flag, prev_signal_flag: old_signal_flag,
+                              cursor: @cursor)
       else
         @targets = (0..(@num_ownable_assets - 1)).map do |i|
           @positions[i][@cursor]
@@ -200,10 +204,29 @@ class Backtester < BaseService
   end
 
   def email_notification
-    last_notif = @notifications[@notifications.length - 1]
-    notif_subject = last_notif.generate_subject
-    notif_text = last_notif.generate_text
-    Rails.logger.info "sending arb email with text: #{notif_text}"
-    NotificationMailer.with(subject: notif_subject, text: notif_text).notification.deliver_now
+    trades = BacktestTrades.where(model_id: @model_id).oldest_first
+    last_email_cursor = trades.where(email_sent: true).last&.cursor || 0
+    most_recent_trade = trades.where("cursor>#{last_email_cursor}").last
+
+    # only send email if trade should have happened within the past day
+    if most_recent_trade && @starttimes[most_recent_trade&.cursor] > (Date.today - 45).to_time.to_i
+      last_notif = get_notif_from_trade(most_recent_trade)
+      notif_subject = last_notif.generate_subject
+      notif_text = last_notif.generate_text
+      Rails.logger.info "sending arb email with text: #{notif_text}"
+      puts "sending arb email with text: #{notif_text}"
+
+      NotificationMailer.with(subject: notif_subject, text: notif_text).notification.deliver_now
+      most_recent_trade.update(email_time: Time.now.to_i, email_sent: true)
+    end
+  end
+
+  def get_notif_from_trade(trade)
+    backtest_model = BacktestModel.where(model_id: trade&.model_id)
+    old_positions = (0..(@num_ownable_assets - 1)).map do |i|
+      positions[i][trade&.cursor]
+    end
+    BacktestNotification.new(signal_flag: trade&.signal_flag, basket: @basket, timestamp: @starttimes[trade&.cursor], signal_val: @signal[trade&.cursor], assets: @asset_names,
+                             old_positions: old_positions, new_positions: @targets, sd: @in_sample_sd, mean: @in_sample_mean, multiplier: MULTIPLIER)
   end
 end
