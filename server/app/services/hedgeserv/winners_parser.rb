@@ -44,8 +44,8 @@ module Hedgeserv
     end
 
     def pnl(row, col)
-      ActionController::Base.helpers.number_to_currency(row[col], precision: 0, format: '%u%n',
-                                                                  negative_format: '(%u%n)')
+      ActionController::Base.helpers.number_to_currency((row[col]).to_i / 1000, precision: 0, format: '%n',
+                                                                                negative_format: '(%n)')
     end
 
     def ror(row, col)
