@@ -63,10 +63,8 @@ export default function ArbitrageSignalChart({seqNumber,version,basket}) {
     sd = cointegrationModelInfo[0].inSampleSd;
     isEndDate = cointegrationModelInfo[0].modelEndtime;
     isStartDate = cointegrationModelInfo[0].modelStarttime;
-    var total = 0
     const arbLength = arbSignalModel.length
     updatedData = arbSignalModel.map(d => {
-      total+=d.v
       return {
         ts: d.ts,
         v: Math.floor(100 * (d.v - mean)),

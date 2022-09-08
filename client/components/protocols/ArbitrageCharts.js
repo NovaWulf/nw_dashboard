@@ -50,7 +50,6 @@ export default function ArbitrageCharts({basket}) {
       <RatioChart seqNumber={seqNumber} version={version} basket={basket} />
       <ArbitrageSignalChart seqNumber={seqNumber} version={version} basket={basket} />
       <ArbitragePositionsChart seqNumber={seqNumber} version={version} basket ={basket} />
-      <ArbitrageBacktestChart seqNumber={seqNumber} version={version} basket ={basket} />
     </Grid>
   );
 }
