@@ -14,7 +14,7 @@ import {
 import { Skeleton } from '@mui/material';
 import Grid from '@mui/material/Grid';
 
-import { dateFormatter, nFormatter } from 'lib/formatters';
+import { dateTimeFormatter, nFormatter } from 'lib/formatters';
 import DashboardItem from 'components/DashboardItem';
 import TimeAxisHighRes from 'components/TimeAxisHighRes';
 import CsvDownloadLink from 'components/CsvDownloadLink';
@@ -110,7 +110,7 @@ export default function PairChart({seqNumber,version,basket}) {
               tickFormatter={nFormatter}
               stroke={theme.palette.primary.main}
             />
-            <Tooltip labelFormatter={dateFormatter} />
+            <Tooltip labelFormatter={dateTimeFormatter} />
             <Legend />
           </ComposedChart>
           </ResponsiveContainer>

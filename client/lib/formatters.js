@@ -45,6 +45,10 @@ export function dateFormatter(time) {
   return dayjs(time * 1000).format('MM/DD/YY');
 }
 
+export function dateTimeFormatter(time){
+  return dayjs(time * 1000).format('MM/DD/YY HH:mm:ss')
+}
+
 export function percentFormatter(x) {
   return `${x}%`;
 }

@@ -12,7 +12,7 @@ import {
 } from 'recharts';
 import { Skeleton } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import { dateFormatter, percentFormatter } from 'lib/formatters';
+import { dateTimeFormatter, percentFormatter } from 'lib/formatters';
 import DashboardItem from 'components/DashboardItem';
 import TimeAxisHighRes from 'components/TimeAxisHighRes';
 import CsvDownloadLink from 'components/CsvDownloadLink';
@@ -108,7 +108,7 @@ export default function ArbitrageBacktestChart({seqNumber,version,basket}) {
                 domain={[-200, 200]}
               />
 
-              <Tooltip labelFormatter={dateFormatter} />
+              <Tooltip labelFormatter={dateTimeFormatter} />
               <Legend />
             </LineChart>
           </ResponsiveContainer>

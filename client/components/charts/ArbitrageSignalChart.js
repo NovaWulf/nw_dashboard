@@ -13,7 +13,7 @@ import {
 import { Skeleton } from '@mui/material';
 import Grid from '@mui/material/Grid';
 
-import { dateFormatter, percentFormatter } from 'lib/formatters';
+import { dateTimeFormatter, percentFormatter } from 'lib/formatters';
 import DashboardItem from 'components/DashboardItem';
 import TimeAxisHighRes from 'components/TimeAxisHighRes';
 import CsvDownloadLink from 'components/CsvDownloadLink';
@@ -154,7 +154,7 @@ export default function ArbitrageSignalChart({seqNumber,version,basket}) {
                 domain={[-30, 30]}
               />
 
-              <Tooltip labelFormatter={dateFormatter} />
+              <Tooltip labelFormatter={dateTimeFormatter} />
               <Legend />
             </LineChart>
           </ResponsiveContainer>
