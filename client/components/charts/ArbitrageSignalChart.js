@@ -56,7 +56,6 @@ export default function ArbitrageSignalChart({seqNumber,version,basket}) {
 
   let mean, sd, isEndDate,isStartDate, updatedData,assetNames,weights;
   if (data) {
-    console.log("arbSignalModel: " + JSON.stringify(arbSignalModel))
     assetNames = cointegrationModelWeights.map(d => d.assetName)
     weights = cointegrationModelWeights.map(d => d.weight)
     mean = cointegrationModelInfo[0].inSampleMean;

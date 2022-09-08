@@ -49,7 +49,6 @@ export default function ArbitrageBacktestChart({seqNumber,version,basket}) {
   
   let updatedData;
   if (data) {
-    console.log("backtestModel: " + JSON.stringify(backtestModel))
     updatedData = backtestModel.map(d => {
       return {
         ts: d.ts,

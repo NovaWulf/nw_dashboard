@@ -57,8 +57,6 @@ class Backtester < BaseService
     @num_ownable_assets = @asset_names.length
     modeled_signal = ModeledSignal.where("model_id = '#{@model_id}'").oldest_first.pluck(:value, :starttime)
     @signal = modeled_signal.map { |x| x[0] }
-    puts "modeled signal count: #{ModeledSignal.count}"
-    puts "signal length: #{@signal.length}"
     @starttimes = modeled_signal.map { |x| x[1] }
     start_ind = @starttimes.index(@model_starttime)
     signal_starttime = @starttimes[start_ind]
@@ -80,30 +78,25 @@ class Backtester < BaseService
     asset_weight_signs = @asset_weights.map { |a| a >= 0 ? 1.0 : -1.0 }
 
     old_signal_flag = @signal_flag
-    puts "signal val: #{@signal[@cursor]}"
     if @log_prices
       if signal_up(@cursor) && old_signal_flag == 0
-        puts 'signal up'
         @signal_flag = 1
         @targets = (0..(@num_ownable_assets - 1)).map do |i|
           #- asset_weight_signs[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
           - asset_weights[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
         end
       elsif signal_down(@cursor) &&  old_signal_flag == 0
-        puts 'signal down'
         @signal_flag = -1
         @targets = (0..(@num_ownable_assets - 1)).map do |i|
           # asset_weight_signs[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
           asset_weights[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
         end
       elsif @cursor > 0 && ((signal_pos(@cursor) && old_signal_flag == -1) || (signal_neg(@cursor) && old_signal_flag == 1))
-        puts 'signal crossed 0'
         @signal_flag = 0
         @targets = (0..(@num_ownable_assets - 1)).map do |_i|
           0
         end
       else
-        puts 'nothing triggered'
         @targets = (0..(@num_ownable_assets - 1)).map do |i|
           @positions[i][@cursor]
         end
