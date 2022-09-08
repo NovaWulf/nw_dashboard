@@ -19,9 +19,10 @@ module Displayers
     end
 
     def run
+      starttime = @model&.model_starttime
       asset_names = CointegrationModelWeight.where("uuid = '#{@model}'").order_by_id.pluck(:asset_name)
       asset_names.delete_at(asset_names.index('det'))
-      asset_names.map { |asset| Candle.by_pair(asset).oldest_first.on_the_hour }
+      asset_names.map { |asset| Candle.where(starttime: starttime).by_pair(asset).oldest_first.on_the_hour }
     end
   end
 end
