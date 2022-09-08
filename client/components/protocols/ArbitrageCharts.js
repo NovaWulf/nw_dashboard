@@ -46,8 +46,6 @@ export default function ArbitrageCharts({basket}) {
       <Grid item>
         <ModelSelector seqNumber={seqNumber} handleChange={setSeqNumber} basket={basket} version={version} />
       </Grid>
-      <PairChart seqNumber={seqNumber} version={version} basket={basket} />
-      <RatioChart seqNumber={seqNumber} version={version} basket={basket} />
       <ArbitrageSignalChart seqNumber={seqNumber} version={version} basket={basket} />
       <ArbitragePositionsChart seqNumber={seqNumber} version={version} basket ={basket} />
     </Grid>
