@@ -40,7 +40,6 @@ RSpec.describe ArbitrageCalculator do
       asset_name: 'op-usd',
       weight: -1
     )
-
     CointegrationModelWeight.create(
       uuid: 'id1',
       timestamp: 1_800_000_000,
@@ -70,6 +69,7 @@ RSpec.describe ArbitrageCalculator do
       in_sample_mean: 0,
       in_sample_sd: 100
     )
+
     BacktestModel.create(
       version: 2,
       model_id: 'id1',

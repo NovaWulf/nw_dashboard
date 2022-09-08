@@ -24,7 +24,6 @@ const ModelSelector = ({ seqNumber, handleChange, basket, version }) => {
   for (let i = 0; i <= maxSeqNum; i++) {
     modelSequence.push(i);
   }
-  console.log('maxSeqNum: ' + maxSeqNum);
   return (
     <Box sx={{ width: 120 }}>
       <FormControl fullWidth>

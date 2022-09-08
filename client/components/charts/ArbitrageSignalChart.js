@@ -29,6 +29,8 @@ export default function ArbitrageSignalChart({seqNumber,version,basket}) {
       id
       modelEndtime
       modelStarttime
+      testStat
+      cv1Pct
     }
     cointegrationModelWeights(version:$version,sequenceNumber:$seqNumber,basket:$basket) {
       id
@@ -54,7 +56,7 @@ export default function ArbitrageSignalChart({seqNumber,version,basket}) {
   }
   const SIGMA = 1;
 
-  let mean, sd, isEndDate,isStartDate, updatedData,assetNames,weights;
+  let mean, sd, isEndDate,isStartDate, updatedData,assetNames,weights, tStat,cVal;
   if (data) {
     assetNames = cointegrationModelWeights.map(d => d.assetName)
     weights = cointegrationModelWeights.map(d => d.weight)
@@ -62,16 +64,16 @@ export default function ArbitrageSignalChart({seqNumber,version,basket}) {
     sd = cointegrationModelInfo[0].inSampleSd;
     isEndDate = cointegrationModelInfo[0].modelEndtime;
     isStartDate = cointegrationModelInfo[0].modelStarttime;
-    var total = 0
+    tStat = cointegrationModelInfo[0].testStat
+    cVal = cointegrationModelInfo[0].cv1Pct
     const arbLength = arbSignalModel.length
     updatedData = arbSignalModel.map(d => {
-      total+=d.v
       return {
         ts: d.ts,
-        v: Math.floor(100 * (d.v - mean)),
+        v: Math.floor(100*100 * (d.v - mean))/100,
         // is: d.is,
-        arbLow: Math.floor(100 * (-SIGMA * sd)),
-        arbHigh: Math.floor(100 * (SIGMA * sd)),
+        arbLow: Math.floor(100*100 * (-SIGMA * sd))/100,
+        arbHigh: Math.floor(100*100 * (SIGMA * sd))/100,
         arbMean: Math.floor(0),
       };
     });
@@ -85,7 +87,7 @@ export default function ArbitrageSignalChart({seqNumber,version,basket}) {
         <Skeleton variant="rectangular" />
       ) : (
         <DashboardItem
-          title={`${basket} Arbitrage Indicator: ${Math.floor(100*weights[0])/100}*log(${assetNames[0]}) + ${Math.floor(100*weights[1])/100}*log(${assetNames[1]})`}
+          title={`${basket} Arbitrage Indicator: ${Math.floor(100*weights[0])/100}*log(${assetNames[0].split("-")[0]}) + ${Math.floor(100*weights[1])/100}*log(${assetNames[1].split("-")[0]}) -- Quality: ${Math.floor(100*tStat/cVal)/100}`}
           helpText="Arbitrage Indicator looks at the value of the mean reverting portfolio of assets"
           downloadButton={
             <CsvDownloadLink data={updatedData} title="Arbitrage Indicator:" />

@@ -93,8 +93,6 @@ export default function RatioChart({seqNumber,version,basket}) {
             
             <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
             {TimeAxisHighRes()}
-
-            <YAxis yAxisId={assetNames[0]} stroke={theme.palette.secondary.main} />
             <YAxis
               yAxisId={assetNames[1]}
               orientation="left"

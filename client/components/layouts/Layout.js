@@ -165,7 +165,7 @@ export default function Layout({ children }) {
             <ListItemText primary="Synthetix" />
           </ListItem>
         </Link>
-        <ListSubheader>Signals</ListSubheader>
+        <ListSubheader>Mean-Reverting Signals</ListSubheader>
         <Link href="/op_eth_arbitrage">
           <ListItem
             button

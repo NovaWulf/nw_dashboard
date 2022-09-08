@@ -17,7 +17,6 @@ RSpec.describe Backtester do
   let(:pnl_expected_log) do
     - (op_weight / op_candle_first) * (op_candle_second - op_candle_first) - (eth_weight / eth_candle_first) * (eth_candle_second - eth_candle_first)
   end
-
   # suppose we have a signal from 2 time steps ago,
   # and candles, model from 1 timestep ago
   before(:each) do
@@ -40,7 +39,6 @@ RSpec.describe Backtester do
       asset_name: 'eth-usd',
       weight: 1
     )
-
     CointegrationModelWeight.create(
       uuid: 'id1',
       timestamp: 1_800_000_000,
@@ -53,7 +51,6 @@ RSpec.describe Backtester do
       asset_name: 'det',
       weight: 0
     )
-
     CointegrationModel.create(
       uuid: 'id1',
       timestamp: 1_800_000_000,
@@ -71,7 +68,6 @@ RSpec.describe Backtester do
       in_sample_sd: 3,
       log_prices: false
     )
-
     BacktestModel.create(
       version: 0,
       model_id: 'id1',
@@ -79,21 +75,18 @@ RSpec.describe Backtester do
       name: 'seed_model',
       basket: 'OP_ETH'
     )
-
     ModeledSignal.create(
-      starttime:t_minus_1,
+      starttime: t_minus_1,
       model_id: 'id1',
       resolution: 60,
-      value: 10
+      value: 5
     )
-
     CointegrationModelWeight.create(
       uuid: 'id2',
       timestamp: 1_800_000_000,
       asset_name: 'eth-usd',
       weight: 1
     )
-
     CointegrationModelWeight.create(
       uuid: 'id2',
       timestamp: 1_800_000_000,
@@ -137,7 +130,7 @@ RSpec.describe Backtester do
       starttime: t_minus_1,
       model_id: 'id2',
       resolution: 60,
-      value: 10
+      value: 5
     )
 
     # NOTE: that the signal is high, meaning we should be
@@ -148,48 +141,93 @@ RSpec.describe Backtester do
     # If ETH goes to 0, this position is now worth 1000 more than before.
     # so the total profit is $1500, or 1.5x, under the log-price model
 
+    # NOTE: the value of this signal doesn't matter
+    # it just needs to exist because the backtester using
+    # the signal to calculate the number of observations
     Candle.create(starttime: Time.now.to_i,
                   pair: 'op-usd',
                   exchange: 'Coinbase',
                   resolution: 60,
                   low: 3, high: 3, open: 3, close: 3, volume: 3)
-
     Candle.create(starttime: Time.now.to_i,
                   pair: 'eth-usd',
                   exchange: 'Coinbase',
                   resolution: 60,
                   low: 0, high: 0, open: 0, close: 0, volume: 0)
-
-    # NOTE: the value of this signal doesn't matter
-    # it just needs to exist because the backtester using
-    # the signal to calculate the number of observations
     ModeledSignal.create(
       starttime: Time.now.to_i,
       model_id: 'id1',
       resolution: 60,
-      value: 3
+      value: 4
     )
     ModeledSignal.create(
       starttime: Time.now.to_i,
       model_id: 'id2',
       resolution: 60,
-      value: 3
+      value: 4
     )
   end
 
-  it 'pnl calculation is accurate for price-level model' do
-    expect { subject.run(version: 0, basket: 'OP_ETH',seq_num:nil) }.to change {
-                                                              ModeledSignal.where("model_id = 'id1-b'").count
-                                                            }.by(1)
+  it 'pnl calculation is accurate for price-level model, does not send email when price remains high' do
+    expect { subject.run(version: 0, basket: 'OP_ETH', seq_num: nil) }.to change {
+                                                                            ModeledSignal.where("model_id = 'id1-b'").count
+                                                                          }.by(1)
     m = ModeledSignal.last
     expect(m.value.round(2)).to eql pnl_expected.round(2)
   end
 
   it 'pnl calculation is accurate for log-price model' do
-    expect { subject.run(version: 1, basket: 'OP_ETH',seq_num:nil) }.to change {
-                                                              ModeledSignal.where("model_id = 'id2-b'").count
-                                                            }.by(1)
+    expect { subject.run(version: 1, basket: 'OP_ETH', seq_num: nil) }.to change {
+                                                                            ModeledSignal.where("model_id = 'id2-b'").count
+                                                                          }.by(1)
     m = ModeledSignal.last
     expect(m.value.round(1)).to eql pnl_expected_log.round(2)
+  end
+
+  it 'does not send subsequent email when signal stays high' do
+    puts "count 2a: #{ModeledSignal.count}"
+    ModeledSignal.create(
+      starttime: Time.now.to_i + 60,
+      model_id: 'id2',
+      resolution: 60,
+      value: 2
+    )
+    Candle.create(starttime: Time.now.to_i + 60,
+                  pair: 'op-usd',
+                  exchange: 'Coinbase',
+                  resolution: 60,
+                  low: 3, high: 3, open: 3, close: 3, volume: 3)
+    Candle.create(starttime: Time.now.to_i + 60,
+                  pair: 'eth-usd',
+                  exchange: 'Coinbase',
+                  resolution: 60,
+                  low: 0, high: 0, open: 0, close: 0, volume: 0)
+
+    expect { subject.run(version: 1, basket: 'OP_ETH', seq_num: nil) }.to change {
+      ActionMailer::Base.deliveries.count
+    }.by(0)
+  end
+
+  it 'does send subsequent email when signal crosses 0' do
+    ModeledSignal.create(
+      starttime: Time.now.to_i + 60,
+      model_id: 'id2',
+      resolution: 60,
+      value: -4
+    )
+    Candle.create(starttime: Time.now.to_i + 60,
+                  pair: 'op-usd',
+                  exchange: 'Coinbase',
+                  resolution: 60,
+                  low: 3, high: 3, open: 3, close: 3, volume: 3)
+    Candle.create(starttime: Time.now.to_i + 60,
+                  pair: 'eth-usd',
+                  exchange: 'Coinbase',
+                  resolution: 60,
+                  low: 0, high: 0, open: 0, close: 0, volume: 0)
+
+    expect { subject.run(version: 1, basket: 'OP_ETH', seq_num: nil) }.to change {
+      ActionMailer::Base.deliveries.count
+    }.by(1)
   end
 end

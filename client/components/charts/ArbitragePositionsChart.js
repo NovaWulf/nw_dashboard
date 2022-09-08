@@ -57,7 +57,6 @@ export default function ArbitragePositionsChart({seqNumber,version,basket}) {
     assetNames = cointegrationModelWeights.map(d => d.assetName)
     const index = assetNames.indexOf("det");
     assetNames.splice(index, 1); 
-
     for (let i = 0; i < backtestPositions[0].length; i++) {
       assets.push({
         ts: backtestPositions[0][i].ts,
