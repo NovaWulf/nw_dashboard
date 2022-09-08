@@ -40,14 +40,16 @@ export default function ArbitrageBacktestChart({seqNumber,version,basket}) {
 
   const { cointegrationModelInfo, backtestModel } = data || {};
 
+
   if (error) {
     console.error(error);
     return null;
   }
   const theme = useTheme();
-
+  
   let updatedData;
   if (data) {
+    console.log("backtestModel: " + JSON.stringify(backtestModel))
     updatedData = backtestModel.map(d => {
       return {
         ts: d.ts,
