@@ -25,21 +25,24 @@ module Hedgeserv
                          format_cell(@total_mtd_pnl, @total_mtd_ror),
                          format_cell(@total_ytd_pnl, @total_ytd_ror)]]
 
-        rows.reject! { |r| r[2].include?('Fee') } # ignore fees
+        rows.reject! { |r| r[2].include?('Fee') || r[12] == 'Cash' } # ignore fees and cash
+
+        @total_market_value = sum_pnl(rows, 6)
 
         Rails.logger.info "Found #{rows.count} positions"
 
-        rows.group_by { |r| r[12] }.each do |strategy, positions|
-          next if strategy == 'Cash' # skip cash
-
+        rows.group_by { |r| r[12].try(:titleize) }.each do |strategy, positions|
           daily_pnl = sum_pnl(positions, 7)
           daily_cont = (daily_pnl / @total_daily_pnl) * @total_daily_ror
           mtd_pnl = sum_pnl(positions, 8)
           mtd_cont = (mtd_pnl / @total_mtd_pnl) * @total_mtd_ror
           ytd_pnl = sum_pnl(positions, 9)
           ytd_cont = (ytd_pnl / @total_ytd_pnl) * @total_ytd_ror
+
+          market_value = sum_pnl(positions, 6)
+
           str = !strategy || strategy.strip.blank? ? '[Untagged Strategy]' : strategy
-          translations << [str, format_cell(daily_pnl, daily_cont),
+          translations << ["#{str} - #{format_percent(100.0 * (market_value.to_f / @total_market_value.to_f))}", format_cell(daily_pnl, daily_cont),
                            format_cell(mtd_pnl, mtd_cont),
                            format_cell(ytd_pnl, ytd_cont)]
         end
