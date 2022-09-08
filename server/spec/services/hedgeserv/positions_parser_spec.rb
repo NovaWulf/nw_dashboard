@@ -13,7 +13,7 @@ RSpec.describe Hedgeserv::PositionsParser do
     it 'shows total' do
       expect(result[0][0]).to include 'Total'
       expect(result[0][3]).to include '(2,816)'
-      expect(result[0][3]).to include '-8.78%'
+      expect(result[0][3]).to include '-8.8%'
     end
 
     it 'groups data' do

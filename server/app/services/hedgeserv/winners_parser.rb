@@ -49,7 +49,7 @@ module Hedgeserv
     end
 
     def ror(row, col)
-      ActionController::Base.helpers.number_to_percentage(row[col].to_f * 100.0, precision: 2)
+      ActionController::Base.helpers.number_to_percentage(row[col].to_f * 100.0, precision: 1)
     end
   end
 end
