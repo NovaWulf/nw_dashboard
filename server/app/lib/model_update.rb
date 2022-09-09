@@ -80,7 +80,7 @@ class ModelUpdate < BaseService
       det_index = asset_names.index('det')
       asset_weights.delete_at(det_index)
       max_factor = [(asset_weights[0] / asset_weights[1]).abs, (asset_weights[1] / asset_weights[0]).abs].max
-      coint_models.append(coint_model) if max_factor < 5
+      coint_models.append(coint_model) if max_factor < 3.5
 
       # coint_models.append(@r.cointegration_analysis(start_time_string: start_time, end_time_string: last_candle_time,
       #                                             ecdet_param: "'trend'"))
