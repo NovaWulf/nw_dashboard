@@ -30,7 +30,7 @@ class ArbitrageCalculator < BaseService
     det_weight = asset_weights[det_index]
     asset_weights.delete_at(det_index)
     asset_names.delete('det')
-    last_timestamp = ModeledSignal.by_model(most_recent_model_id).last&.starttime
+    last_timestamp = ModeledSignal.by_model(most_recent_model_id).oldest_first.last&.starttime
     return if last_timestamp && last_timestamp > Time.now.to_i - res
 
     last_prices = [nil, nil]

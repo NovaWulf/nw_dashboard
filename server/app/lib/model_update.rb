@@ -4,7 +4,7 @@ class ModelUpdate < BaseService
   @r
   SECS_PER_WEEK = 604_800
   SECS_PER_HOUR = 3600
-  MODEL_VERSION = 2
+  MODEL_VERSION = 3
   MODEL_STARTDATES = ["'2022-06-13'", "'2022-06-11'", "'2022-07-12'"]
   MODEL_ENDDATES = ["'2022-07-12'", "'2022-07-27'", "'2022-08-08'"]
   def initialize(basket:)
@@ -103,7 +103,7 @@ class ModelUpdate < BaseService
         name: "auto-update #{current_model&.sequence_number + 1}",
         basket: basket
       )
-      ArbitrageCalculator.run(version: version, basket: basket, seq_num: nil,silent:true)
+      ArbitrageCalculator.run(version: version, basket: basket, seq_num: nil, silent: true)
       Backtester.run(version: version, basket: basket, seq_num: nil)
     else
       Rails.logger.info "did not find new model #{max_test_stat_id} with satisfactory test stat: #{best_model&.test_stat} and weight ratio <5:1"

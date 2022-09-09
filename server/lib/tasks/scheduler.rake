@@ -64,12 +64,12 @@ task update_arb_signal: :environment do
   tracked_pairs.each do |p|
     Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
   end
-  baskets = %w[OP_ETH UNI_ETH BTC_ETH SNX_ETH CRV_ETH]
+  baskets = %w[OP_ETH]
   baskets.each do |b|
     mu = ModelUpdate.new(basket: b)
     mu.seed
-    ArbitrageCalculator.run(version: 2, silent: true, basket: b, seq_num: nil)
-    Backtester.run(version: 2, basket: b, seq_num: nil)
+    ArbitrageCalculator.run(version: 3, silent: true, basket: b, seq_num: nil)
+    Backtester.run(version: 3, basket: b, seq_num: nil)
   end
 end
 
@@ -100,7 +100,7 @@ task try_update_models: :environment do
     baskets = %w[OP_ETH UNI_ETH BTC_ETH SNX_ETH CVX_CRV]
     baskets.each do |b|
       mu = ModelUpdate.new(basket: b)
-      mu.update_model(version: 2, max_weeks_back: 12, min_weeks_back: 5, interval_mins: 1440)
+      mu.update_model(version: 3, max_weeks_back: 12, min_weeks_back: 5, interval_mins: 1440)
     end
     JesseModelUpdate.run
   end
@@ -113,7 +113,7 @@ task try_update_model_as_of: :environment do
   end
   Rails.logger.info 'writing candle data to CSV...'
   mu = ModelUpdate.new(basket: ENV['basket'])
-  mu.update_model(version: 2, max_weeks_back: 12, min_weeks_back: 5, interval_mins: 1440, as_of_date: ENV['end'])
+  mu.update_model(version: 3, max_weeks_back: 12, min_weeks_back: 5, interval_mins: 1440, as_of_date: ENV['end'])
 end
 
 task add_model_with_dates: :environment do
@@ -123,7 +123,7 @@ task add_model_with_dates: :environment do
   end
   Rails.logger.info 'writing candle data to CSV...'
   mu = ModelUpdate.new(basket: ENV['basket'])
-  mu.add_model_with_dates(version: 2, start_time_string: ENV['start'], end_time_string: ENV['end'])
+  mu.add_model_with_dates(version: 3, start_time_string: ENV['start'], end_time_string: ENV['end'])
 end
 
 task jesse_model_update: :environment do

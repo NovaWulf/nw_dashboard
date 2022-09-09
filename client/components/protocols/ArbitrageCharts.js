@@ -20,7 +20,7 @@ query ($version: Int!, $basket: String!) {
 }
 `;
 export default function ArbitrageCharts({basket}) {
-  const version = 2
+  const version = 3
 
   const [seqNumber, setSeqNumber] = React.useState(0);
 
