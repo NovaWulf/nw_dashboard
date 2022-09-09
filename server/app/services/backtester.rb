@@ -102,6 +102,7 @@ class Backtester < BaseService
         end
       end
       if @signal_flag != old_signal_flag
+        puts "Trade Simulated. Signal flag: #{@signal_flag}"
         r_count = BacktestTrades.where(model_id: @model_id, cursor: @cursor).count
         if r_count == 0
           BacktestTrades.create(model_id: @model_id, signal_flag: @signal_flag, prev_signal_flag: old_signal_flag,
@@ -203,7 +204,7 @@ class Backtester < BaseService
     trades = BacktestTrades.where(model_id: @model_id).oldest_first
     last_email_cursor = trades.where(email_sent: true).last&.cursor || 0
     most_recent_trade = trades.where("cursor>#{last_email_cursor}").last
-    Rails.logger.info "last email was sent at timestep #{last_email_cursor}. Sending new trade notif at time step #{most_recent_trade&.email_time}"
+    Rails.logger.info "last email was sent at timestep #{last_email_cursor}. Sending new trade notif at time step #{most_recent_trade&.cursor}"
     # only send email if trade should have happened within the past day
     if most_recent_trade && @starttimes[most_recent_trade&.cursor] > @model_endtime
       last_notif = get_notif_from_trade(most_recent_trade)

@@ -63,7 +63,7 @@ RSpec.describe Backtester do
       top_eig: 0.0008,
       resolution: 60,
       model_starttime: t_minus_1,
-      model_endtime: 1_700_000_000,
+      model_endtime: 1_600_000_000,
       in_sample_mean: 0,
       in_sample_sd: 3,
       log_prices: false
@@ -112,7 +112,7 @@ RSpec.describe Backtester do
       top_eig: 0.0008,
       resolution: 60,
       model_starttime: t_minus_1,
-      model_endtime: 1_700_000_000,
+      model_endtime: 1_600_000_000,
       in_sample_mean: 0,
       in_sample_sd: 3,
       log_prices: true
@@ -185,13 +185,13 @@ RSpec.describe Backtester do
   end
 
   it 'does not send subsequent email when signal stays high' do
-    puts "count 2a: #{ModeledSignal.count}"
     ModeledSignal.create(
       starttime: Time.now.to_i + 60,
       model_id: 'id2',
       resolution: 60,
       value: 2
     )
+
     Candle.create(starttime: Time.now.to_i + 60,
                   pair: 'op-usd',
                   exchange: 'Coinbase',
@@ -209,12 +209,15 @@ RSpec.describe Backtester do
   end
 
   it 'does send subsequent email when signal crosses 0' do
+    puts "count 2a: #{ModeledSignal.count}"
     ModeledSignal.create(
       starttime: Time.now.to_i + 60,
       model_id: 'id2',
       resolution: 60,
       value: -4
     )
+    puts "count 2b: #{ModeledSignal.count}"
+
     Candle.create(starttime: Time.now.to_i + 60,
                   pair: 'op-usd',
                   exchange: 'Coinbase',
