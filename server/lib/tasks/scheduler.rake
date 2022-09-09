@@ -100,7 +100,7 @@ task try_update_models: :environment do
     baskets = %w[OP_ETH UNI_ETH BTC_ETH SNX_ETH CVX_CRV]
     baskets.each do |b|
       mu = ModelUpdate.new(basket: b)
-      mu.update_model(version: 2, max_weeks_back: 10, min_weeks_back: 5, interval_mins: 1440)
+      mu.update_model(version: 2, max_weeks_back: 12, min_weeks_back: 5, interval_mins: 1440)
     end
     JesseModelUpdate.run
   end
@@ -113,7 +113,7 @@ task try_update_model_as_of: :environment do
   end
   Rails.logger.info 'writing candle data to CSV...'
   mu = ModelUpdate.new(basket: ENV['basket'])
-  mu.update_model(version: 2, max_weeks_back: 8, min_weeks_back: 3, interval_mins: 1440, as_of_date: ENV['end'])
+  mu.update_model(version: 2, max_weeks_back: 12, min_weeks_back: 5, interval_mins: 1440, as_of_date: ENV['end'])
 end
 
 task add_model_with_dates: :environment do
