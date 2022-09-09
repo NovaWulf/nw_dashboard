@@ -9,8 +9,8 @@ class BacktestNotification
     @new_positions = new_positions
     @old_positions = old_positions
     @timestamp = timestamp
-    @upper = sd * multiplier + mean
-    @lower = mean - sd * multiplier
+    @upper = sd * multiplier
+    @lower = - sd * multiplier
     @mean = mean
     @basket = basket
   end
