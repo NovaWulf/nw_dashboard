@@ -69,8 +69,19 @@ class ModelUpdate < BaseService
     coint_models = []
     for i in 0..num_models
       start_time += step_size
-      coint_models.append(@r.cointegration_analysis(asset_names: asset_names, start_time_string: start_time, end_time_string: last_candle_time,
-                                                    ecdet_param: "'const'"))
+      coint_model = @r.cointegration_analysis(asset_names: asset_names, start_time_string: start_time, end_time_string: last_candle_time,
+                                              ecdet_param: "'const'")
+      uuid = coint_model[0]
+      puts "uuid: #{uuid}"
+      model_weights = CointegrationModelWeight.where("uuid= '#{uuid}'").order_by_id.pluck(:weight,
+                                                                                          :asset_name)
+      asset_weights = model_weights.map { |x| x[0] }
+      asset_names = model_weights.map { |x| x[1] }
+      det_index = asset_names.index('det')
+      asset_weights.delete_at(det_index)
+      max_factor = [(asset_weights[0] / asset_weights[1]).abs, (asset_weights[1] / asset_weights[0]).abs].max
+      coint_models.append(coint_model) if max_factor < 5
+
       # coint_models.append(@r.cointegration_analysis(start_time_string: start_time, end_time_string: last_candle_time,
       #                                             ecdet_param: "'trend'"))
     end
@@ -84,6 +95,7 @@ class ModelUpdate < BaseService
     best_model = CointegrationModel.where("uuid = '#{max_test_stat_id}'").last
     current_model = BacktestModel.where(version: version, basket: basket).oldest_sequence_number_first.last
     if best_model&.test_stat > best_model&.cv_10_pct
+      Rails.logger.info "found new model #{max_test_stat_id} with satisfactory test stat: #{best_model&.test_stat} and weight ratio <5:1"
       BacktestModel.create(
         version: version,
         model_id: best_model&.uuid,
@@ -93,6 +105,8 @@ class ModelUpdate < BaseService
       )
       ArbitrageCalculator.run(version: version, basket: basket, seq_num: nil)
       Backtester.run(version: version, basket: basket, seq_num: nil)
+    else
+      Rails.logger.info "did not find new model #{max_test_stat_id} with satisfactory test stat: #{best_model&.test_stat} and weight ratio <5:1"
     end
   end
 

@@ -102,7 +102,6 @@ class Backtester < BaseService
         end
       end
       if @signal_flag != old_signal_flag
-        puts "Trade Simulated. Signal flag: #{@signal_flag}"
         r_count = BacktestTrades.where(model_id: @model_id, cursor: @cursor).count
         if r_count == 0
           BacktestTrades.create(model_id: @model_id, signal_flag: @signal_flag, prev_signal_flag: old_signal_flag,
