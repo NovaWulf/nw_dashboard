@@ -14,7 +14,7 @@ class Backtester < BaseService
 
   def run
     @cursor = 0
-    @signal_flag = 0
+    @signal_flag = nil
     load_model(version, seq_num)
     set_initial_positions
     while true
@@ -79,19 +79,21 @@ class Backtester < BaseService
 
     old_signal_flag = @signal_flag
     if @log_prices
-      if signal_up(@cursor) && old_signal_flag == 0
+      if signal_up(@cursor) && (old_signal_flag == 0 || !old_signal_flag)
         @signal_flag = 1
         @targets = (0..(@num_ownable_assets - 1)).map do |i|
           #- asset_weight_signs[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
           - asset_weights[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
         end
-      elsif signal_down(@cursor) &&  old_signal_flag == 0
+      elsif signal_down(@cursor) && (old_signal_flag == 0 || !old_signal_flag)
         @signal_flag = -1
         @targets = (0..(@num_ownable_assets - 1)).map do |i|
           # asset_weight_signs[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
           asset_weights[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
         end
-      elsif @cursor > 0 && ((signal_pos(@cursor) && old_signal_flag == -1) || (signal_neg(@cursor) && old_signal_flag == 1))
+      elsif @cursor > 0 &&
+            ((signal_pos(@cursor) && (old_signal_flag == -1 || !old_signal_flag)) ||
+             (signal_neg(@cursor) && (old_signal_flag == 1 || !old_signal_flag)))
         @signal_flag = 0
         @targets = (0..(@num_ownable_assets - 1)).map do |_i|
           0
@@ -101,14 +103,13 @@ class Backtester < BaseService
           @positions[i][@cursor]
         end
       end
-      if @signal_flag != old_signal_flag
+      if old_signal_flag && @signal_flag != old_signal_flag
         r_count = BacktestTrades.where(model_id: @model_id, cursor: @cursor).count
         if r_count == 0
           BacktestTrades.create(model_id: @model_id, signal_flag: @signal_flag, prev_signal_flag: old_signal_flag,
                                 cursor: @cursor, starttime: @starttimes[@cursor])
         end
       end
-
     else
       n_shares_first_asset = MAX_TRADE_SIZE_DOLLARS / prices[0][@cursor]
       multiplier = n_shares_first_asset / @asset_weights[0]
@@ -200,14 +201,13 @@ class Backtester < BaseService
   end
 
   def email_notification
-    previous_models = BacktestModel.where("basket= #{@basket} and version = #{@version} and sequence_number<=#{@seq_num}").pluck(:model_id)
-
+    previous_models = BacktestModel.where("basket= '#{@basket}' and version = #{@version} and sequence_number<=#{@seq_num}").pluck(:model_id)
     # get cursor
     last_email_starttime = previous_models.map do |m|
       trades = BacktestTrades.where(model_id: m).oldest_first
       last_email_time = trades.where(email_sent: true).last&.starttime || 0
     end.max
-
+    trades = BacktestTrades.where(model_id: @model_id).oldest_first
     most_recent_trade = trades.where("starttime>#{last_email_starttime}").last
     Rails.logger.info "last email was sent at timestep #{last_email_starttime}. Sending new trade notif at time step #{most_recent_trade&.starttime}"
     # only send email if trade should have happened within the past day
