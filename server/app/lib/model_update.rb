@@ -10,7 +10,7 @@ class ModelUpdate < BaseService
   def initialize(basket:)
     @r = RAdapter.new
     @basket = basket
-        
+
     @asset_names = []
     if basket == 'OP_ETH'
       @asset_names = %w[eth-usd op-usd]
@@ -59,8 +59,8 @@ class ModelUpdate < BaseService
   def update_model(version:, max_weeks_back:, min_weeks_back:, interval_mins:, as_of_date: nil)
     CsvWriter.run(table: 'candles', assets: asset_names)
     as_of_time = DateTime.strptime(as_of_date, '%Y-%m-%d').to_i unless as_of_date.nil?
-    ArbitrageCalculator.run(version: version, silent: true, seq_num:nil)
-    Backtester.run(version: version,seq_num:nil)
+    ArbitrageCalculator.run(version: version, silent: true, seq_num: nil, basket: @basket)
+    Backtester.run(version: version, seq_num: nil)
     last_candle_time = as_of_time || Candle.oldest_first.last&.starttime
     sec_diff = SECS_PER_WEEK * (max_weeks_back - min_weeks_back)
     num_models = sec_diff / (60 * interval_mins) - 1
@@ -82,7 +82,7 @@ class ModelUpdate < BaseService
     max_test_stat_index = test_stats.index(max_test_stat)
     max_test_stat_id = uuids[max_test_stat_index]
     best_model = CointegrationModel.where("uuid = '#{max_test_stat_id}'").last
-    current_model = BacktestModel.where(version:version,basket:basket).oldest_sequence_number_first.last
+    current_model = BacktestModel.where(version: version, basket: basket).oldest_sequence_number_first.last
     if best_model&.test_stat > best_model&.cv_10_pct
       BacktestModel.create(
         version: version,
@@ -91,8 +91,8 @@ class ModelUpdate < BaseService
         name: "auto-update #{current_model&.sequence_number + 1}",
         basket: basket
       )
-      ArbitrageCalculator.run(version: version, basket: basket,seq_num:nil)
-      Backtester.run(version: version, basket: basket,seq_num:nil)
+      ArbitrageCalculator.run(version: version, basket: basket, seq_num: nil)
+      Backtester.run(version: version, basket: basket, seq_num: nil)
     end
   end
 
@@ -103,7 +103,7 @@ class ModelUpdate < BaseService
                                             ecdet_param: "'const'")
 
     new_model_id = return_vals[0]
-    current_model = BacktestModel.where(version: version, basket:basket).oldest_sequence_number_first.last
+    current_model = BacktestModel.where(version: version, basket: basket).oldest_sequence_number_first.last
     BacktestModel.create(
       version: version,
       model_id: new_model_id,
@@ -111,10 +111,9 @@ class ModelUpdate < BaseService
       name: "manual update #{current_model&.sequence_number + 1}",
       basket: basket
     )
-    ArbitrageCalculator.run(version: version, silent: true, basket: basket,seq_num:nil)
+    ArbitrageCalculator.run(version: version, silent: true, basket: basket, seq_num: nil)
     Rails.logger.info 'arbitrage calculator complete'
-    Backtester.run(version: version, basket: basket,seq_num:nil)
+    Backtester.run(version: version, basket: basket, seq_num: nil)
     Rails.logger.info 'backtester complete'
   end
-
 end
