@@ -64,7 +64,7 @@ task update_arb_signal: :environment do
   tracked_pairs.each do |p|
     Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
   end
-  baskets = %w[OP_ETH]
+  baskets = %w[OP_ETH UNI_ETH BTC_ETH SNX_ETH CRV_ETH]
   baskets.each do |b|
     mu = ModelUpdate.new(basket: b)
     mu.seed
@@ -92,12 +92,12 @@ end
 
 task try_update_models: :environment do
   if Time.now.sunday?
-    tracked_pairs = %w[eth-usd op-usd btc-usd uni-usd snx-usd crv-usd cvx-usd]
+    tracked_pairs = %w[eth-usd op-usd btc-usd uni-usd snx-usd crv-usd]
     tracked_pairs.each do |p|
       Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
     end
     Rails.logger.info 'writing candle data to CSV...'
-    baskets = %w[OP_ETH UNI_ETH BTC_ETH SNX_ETH CVX_CRV]
+    baskets = %w[OP_ETH UNI_ETH BTC_ETH SNX_ETH CRV_ETH]
     baskets.each do |b|
       mu = ModelUpdate.new(basket: b)
       mu.update_model(version: 3, max_weeks_back: 12, min_weeks_back: 5, interval_mins: 1440)
@@ -107,7 +107,7 @@ task try_update_models: :environment do
 end
 
 task try_update_model_as_of: :environment do
-  tracked_pairs = %w[eth-usd op-usd btc-usd uni-usd snx-usd]
+  tracked_pairs = %w[eth-usd op-usd btc-usd uni-usd snx-usd crv-usd]
   tracked_pairs.each do |p|
     Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
   end
@@ -117,7 +117,7 @@ task try_update_model_as_of: :environment do
 end
 
 task add_model_with_dates: :environment do
-  tracked_pairs = %w[eth-usd op-usd btc-usd uni-usd snx-usd]
+  tracked_pairs = %w[eth-usd op-usd btc-usd uni-usd snx-usd crv-usd]
   tracked_pairs.each do |p|
     Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
   end
