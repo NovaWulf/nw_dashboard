@@ -103,7 +103,7 @@ class ModelUpdate < BaseService
         name: "auto-update #{current_model&.sequence_number + 1}",
         basket: basket
       )
-      ArbitrageCalculator.run(version: version, basket: basket, seq_num: nil)
+      ArbitrageCalculator.run(version: version, basket: basket, seq_num: nil,silent:true)
       Backtester.run(version: version, basket: basket, seq_num: nil)
     else
       Rails.logger.info "did not find new model #{max_test_stat_id} with satisfactory test stat: #{best_model&.test_stat} and weight ratio <5:1"
