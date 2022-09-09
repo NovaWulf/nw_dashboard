@@ -53,7 +53,9 @@ export default function PairChart({seqNumber,version,basket}) {
   if (data) {
     assetNames = cointegrationModelWeights.map(d => d.assetName)
     const index = assetNames.indexOf("det");
-    assetNames.splice(index, 1); 
+    assetNames.splice(index, 1);
+    console.log("assets: " + assetNames) 
+    console.log("dualCandleCharts[0].length: "+dualCandleCharts[0].length +", dualCandleCharts[2].length: "+dualCandleCharts[1].length)
     for (let i = 0; i < dualCandleCharts[0].length; i++) {
       assets.push({
         ts: dualCandleCharts[0][i].ts,
