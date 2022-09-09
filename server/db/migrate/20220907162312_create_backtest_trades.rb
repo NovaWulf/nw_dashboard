@@ -7,6 +7,7 @@ class CreateBacktestTrades < ActiveRecord::Migration[6.1]
       t.float :signal_flag, null: false
       t.float :prev_signal_flag, null: false
       t.integer :cursor, null: false
+      t.integer :starttime, null: false
       t.boolean :email_sent, null: false, default: false
     end
   end

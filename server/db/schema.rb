@@ -34,8 +34,8 @@ ActiveRecord::Schema.define(version: 2022_09_07_232023) do
     t.float "signal_flag", null: false
     t.float "prev_signal_flag", null: false
     t.integer "cursor", null: false
+    t.integer "starttime", null: false
     t.boolean "email_sent", default: false, null: false
-    t.index ["cursor", "model_id"], name: "index_backtest_trades_on_cursor_and_model_id", unique: true
   end
 
   create_table "candles", force: :cascade do |t|

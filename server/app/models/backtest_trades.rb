@@ -8,13 +8,10 @@
 #  email_time       :integer
 #  prev_signal_flag :float            not null
 #  signal_flag      :float            not null
+#  starttime        :integer          not null
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
 #  model_id         :string           not null
-#
-# Indexes
-#
-#  index_backtest_trades_on_cursor_and_model_id  (cursor,model_id) UNIQUE
 #
 
 class BacktestTrades < ApplicationRecord

@@ -105,7 +105,7 @@ class Backtester < BaseService
         r_count = BacktestTrades.where(model_id: @model_id, cursor: @cursor).count
         if r_count == 0
           BacktestTrades.create(model_id: @model_id, signal_flag: @signal_flag, prev_signal_flag: old_signal_flag,
-                                cursor: @cursor)
+                                cursor: @cursor, starttime: @starttimes[@cursor])
         end
       end
 
@@ -200,12 +200,18 @@ class Backtester < BaseService
   end
 
   def email_notification
-    trades = BacktestTrades.where(model_id: @model_id).oldest_first
-    last_email_cursor = trades.where(email_sent: true).last&.cursor || 0
-    most_recent_trade = trades.where("cursor>#{last_email_cursor}").last
-    Rails.logger.info "last email was sent at timestep #{last_email_cursor}. Sending new trade notif at time step #{most_recent_trade&.cursor}"
+    previous_models = BacktestModel.where("basket= #{@basket} and version = #{@version} and sequence_number<=#{@seq_num}").pluck(:model_id)
+
+    # get cursor
+    last_email_starttime = previous_models.map do |m|
+      trades = BacktestTrades.where(model_id: m).oldest_first
+      last_email_time = trades.where(email_sent: true).last&.starttime || 0
+    end.max
+
+    most_recent_trade = trades.where("starttime>#{last_email_starttime}").last
+    Rails.logger.info "last email was sent at timestep #{last_email_starttime}. Sending new trade notif at time step #{most_recent_trade&.starttime}"
     # only send email if trade should have happened within the past day
-    if most_recent_trade && @starttimes[most_recent_trade&.cursor] > @model_endtime
+    if most_recent_trade && most_recent_trade&.starttime > @model_endtime
       last_notif = get_notif_from_trade(most_recent_trade)
       notif_subject = last_notif.generate_subject
       notif_text = last_notif.generate_text
