@@ -60,7 +60,7 @@ class ModelUpdate < BaseService
     CsvWriter.run(table: 'candles', assets: asset_names)
     as_of_time = DateTime.strptime(as_of_date, '%Y-%m-%d').to_i unless as_of_date.nil?
     ArbitrageCalculator.run(version: version, silent: true, seq_num: nil, basket: @basket)
-    Backtester.run(version: version, seq_num: nil)
+    Backtester.run(version: version, seq_num: nil, basket: @basket)
     last_candle_time = as_of_time || Candle.oldest_first.last&.starttime
     sec_diff = SECS_PER_WEEK * (max_weeks_back - min_weeks_back)
     num_models = sec_diff / (60 * interval_mins) - 1
