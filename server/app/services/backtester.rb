@@ -211,9 +211,8 @@ class Backtester < BaseService
     most_recent_trade = trades.where("starttime>#{last_email_starttime}").last
     Rails.logger.info "last email was sent at timestep #{last_email_starttime}."
     # only send email if trade should have happened within the past day
-    if most_recent_trade && most_recent_trade&.starttime > @model_endtime
+    if most_recent_trade && most_recent_trade&.starttime > @model_endtime && most_recent_trade&.starttime > (Date.today - 5).to_time.to_i
       Rails.logger.info 'Sending new Email.'
-
       last_notif = get_notif_from_trade(most_recent_trade)
       notif_subject = last_notif.generate_subject
       notif_text = last_notif.generate_text
