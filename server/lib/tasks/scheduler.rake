@@ -106,6 +106,19 @@ task try_update_models: :environment do
   end
 end
 
+task try_update_models_as_of: :environment do
+  tracked_pairs = %w[eth-usd op-usd btc-usd uni-usd snx-usd crv-usd]
+  tracked_pairs.each do |p|
+    Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
+  end
+  Rails.logger.info 'writing candle data to CSV...'
+  baskets = %w[OP_ETH]
+  baskets.each do |b|
+    mu = ModelUpdate.new(basket: b)
+    mu.update_model(version: 3, max_weeks_back: 12, min_weeks_back: 5, interval_mins: 1440, as_of_date: ENV['end'])
+  end
+end
+
 task try_update_model_as_of: :environment do
   tracked_pairs = %w[eth-usd op-usd btc-usd uni-usd snx-usd crv-usd]
   tracked_pairs.each do |p|
