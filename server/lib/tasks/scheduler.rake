@@ -112,7 +112,7 @@ task try_update_models_as_of: :environment do
     Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
   end
   Rails.logger.info 'writing candle data to CSV...'
-  baskets = %w[OP_ETH]
+  baskets = %w[OP_ETH UNI_ETH BTC_ETH SNX_ETH CRV_ETH]
   baskets.each do |b|
     mu = ModelUpdate.new(basket: b)
     mu.update_model(version: 3, max_weeks_back: 12, min_weeks_back: 5, interval_mins: 1440, as_of_date: ENV['end'])
