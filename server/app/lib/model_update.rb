@@ -94,8 +94,8 @@ class ModelUpdate < BaseService
     max_test_stat_id = uuids[max_test_stat_index]
     best_model = CointegrationModel.where("uuid = '#{max_test_stat_id}'").last
     current_model = BacktestModel.where(version: version, basket: basket).oldest_sequence_number_first.last
-    if best_model&.test_stat > best_model&.cv_10_pct
-      Rails.logger.info "found new model #{max_test_stat_id} with satisfactory test stat: #{best_model&.test_stat} and weight ratio <5:1"
+    if best_model&.test_stat > best_model&.cv_1_pct
+      Rails.logger.info "found new model #{max_test_stat_id} with satisfactory test stat: #{best_model&.test_stat} and weight ratio <3.5:1"
       BacktestModel.create(
         version: version,
         model_id: best_model&.uuid,
@@ -106,7 +106,7 @@ class ModelUpdate < BaseService
       ArbitrageCalculator.run(version: version, basket: basket, seq_num: nil, silent: true)
       Backtester.run(version: version, basket: basket, seq_num: nil)
     else
-      Rails.logger.info "did not find new model #{max_test_stat_id} with satisfactory test stat: #{best_model&.test_stat} and weight ratio <5:1"
+      Rails.logger.info "did not find new model #{max_test_stat_id} with satisfactory test stat: #{best_model&.test_stat} and weight ratio <3.5:1"
     end
   end
 
