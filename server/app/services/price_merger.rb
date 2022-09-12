@@ -29,7 +29,7 @@ class PriceMerger < BaseService
     Rails.logger.info "number of records after merge (outer join): #{records_array.count}"
     starttimes = records_array.pluck('starttime')
 
-    return nil if starttimes[starttimes.length - 1] < start_time
+    return nil if start_time && starttimes[starttimes.length - 1] < start_time
 
     prices = asset_aliases.map { |a| records_array.pluck(a) }
 
