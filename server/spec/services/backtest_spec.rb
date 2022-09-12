@@ -21,6 +21,7 @@ RSpec.describe Backtester do
   # and candles, model from 1 timestep ago
   before(:each) do
     t_minus_1 = Time.now.to_i - 60
+    t_minus_10 = Time.now.to_i - 60
     Candle.create(starttime: t_minus_1,
                   pair: 'eth-usd',
                   exchange: 'Coinbase',
@@ -35,25 +36,25 @@ RSpec.describe Backtester do
 
     CointegrationModelWeight.create(
       uuid: 'id1',
-      timestamp: 1_800_000_000,
+      timestamp: t_minus_10,
       asset_name: 'eth-usd',
       weight: 1
     )
     CointegrationModelWeight.create(
       uuid: 'id1',
-      timestamp: 1_800_000_000,
+      timestamp: t_minus_10,
       asset_name: 'op-usd',
       weight: -1
     )
     CointegrationModelWeight.create(
       uuid: 'id1',
-      timestamp: 1_800_000_000,
+      timestamp: t_minus_10,
       asset_name: 'det',
       weight: 0
     )
     CointegrationModel.create(
       uuid: 'id1',
-      timestamp: 1_800_000_000,
+      timestamp: t_minus_10,
       ecdet: 'const',
       spec: 'transitory',
       cv_10_pct: 6,
@@ -62,8 +63,8 @@ RSpec.describe Backtester do
       test_stat: 9,
       top_eig: 0.0008,
       resolution: 60,
-      model_starttime: t_minus_1,
-      model_endtime: 1_600_000_000,
+      model_starttime: t_minus_10,
+      model_endtime: t_minus_1,
       in_sample_mean: 0,
       in_sample_sd: 3,
       log_prices: false
@@ -83,26 +84,26 @@ RSpec.describe Backtester do
     )
     CointegrationModelWeight.create(
       uuid: 'id2',
-      timestamp: 1_800_000_000,
+      timestamp: t_minus_10,
       asset_name: 'eth-usd',
       weight: 1
     )
     CointegrationModelWeight.create(
       uuid: 'id2',
-      timestamp: 1_800_000_000,
+      timestamp: t_minus_10,
       asset_name: 'op-usd',
       weight: -1
     )
     CointegrationModelWeight.create(
       uuid: 'id2',
-      timestamp: 1_800_000_000,
+      timestamp: t_minus_10,
       asset_name: 'det',
       weight: 0
     )
 
     CointegrationModel.create(
       uuid: 'id2',
-      timestamp: 1_800_000_000,
+      timestamp: t_minus_10,
       ecdet: 'const',
       spec: 'transitory',
       cv_10_pct: 6,
@@ -111,8 +112,8 @@ RSpec.describe Backtester do
       test_stat: 9,
       top_eig: 0.0008,
       resolution: 60,
-      model_starttime: t_minus_1,
-      model_endtime: 1_600_000_000,
+      model_starttime: t_minus_10,
+      model_endtime: t_minus_1,
       in_sample_mean: 0,
       in_sample_sd: 3,
       log_prices: true
