@@ -50,7 +50,7 @@ export default function RatioChart({seqNumber,version,basket}) {
   let assetNames
     
   if (data) {
-    console.log("dualCandleCharts[0].length: "+dualCandleCharts[0].length +", dualCandleCharts[2].length: "+dualCandleCharts[1].length)
+    console.log("dualCandleCharts[0].length: "+dualCandleCharts[0].length +", dualCandleCharts[1].length: "+dualCandleCharts[1].length)
 
     assetNames = cointegrationModelWeights.map(d => d.assetName)
     const index = assetNames.indexOf("det");

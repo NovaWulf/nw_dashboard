@@ -1,7 +1,7 @@
 class PriceMerger < BaseService
   attr_reader :asset_names, :start_time, :end_time
 
-  def initialize(asset_names, start_time = nil, end_time = nil)
+  def initialize(asset_names:, start_time: nil, end_time: nil)
     @asset_names = asset_names
     @start_time = start_time
     @end_time = end_time
@@ -24,9 +24,13 @@ class PriceMerger < BaseService
     where t1.pair='#{asset_names[0]}' or t2.pair='#{asset_names[1]}'
     order by t1.starttime asc
     "
+
     records_array = ActiveRecord::Base.connection.execute(sql)
     Rails.logger.info "number of records after merge (outer join): #{records_array.count}"
     starttimes = records_array.pluck('starttime')
+
+    return nil if starttimes[starttimes.length - 1] < start_time
+
     prices = asset_aliases.map { |a| records_array.pluck(a) }
 
     if end_time

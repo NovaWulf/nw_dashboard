@@ -69,7 +69,8 @@ class Backtester < BaseService
     @transactions = Array.new(@num_obs)
     @prices = Array.new(@num_ownable_assets) { Array.new(@num_obs) }
     @positions = Array.new(@num_ownable_assets) { Array.new(@num_obs) }
-    @prices =  PriceMerger.run(@asset_names, signal_starttime, signal_endtime).value[1]
+    @prices =  PriceMerger.run(asset_names: @asset_names, start_time: signal_starttime,
+                               end_time: signal_endtime).value[1]
   end
 
   def target_positions

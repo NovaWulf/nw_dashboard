@@ -31,6 +31,7 @@ class ArbitrageCalculator < BaseService
     asset_weights.delete_at(det_index)
     asset_names.delete('det')
     last_timestamp = ModeledSignal.by_model(most_recent_model_id).oldest_first.last&.starttime
+    Rails.logger.info "last timestamp for arb signal: #{last_timestamp}"
     return if last_timestamp && last_timestamp > Time.now.to_i - res
 
     last_prices = [nil, nil]
@@ -42,7 +43,11 @@ class ArbitrageCalculator < BaseService
 
     first_timestamps = asset_names.map { |a| Candle.where("pair = '#{a}'").oldest_first.first&.starttime }
     start_time = last_timestamp ? last_timestamp + res : first_in_sample_timestamp
-    flat_records = PriceMerger.run(asset_names, start_time).value
+    Rails.logger.info "start time in arb signal: #{start_time}"
+
+    flat_records = PriceMerger.run(asset_names: asset_names, start_time: start_time).value
+    return if flat_records.nil?
+
     starttimes = flat_records[0]
     prices = flat_records[1]
     interp_count = 0
