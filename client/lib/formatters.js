@@ -50,7 +50,7 @@ export function dateTimeFormatter(time){
 }
 
 export function percentFormatter(x) {
-  return `${x}%`;
+  return `${x.toFixed(0)}%`;
 }
 
 export function mergeTimestamps(array1, array2, key) {

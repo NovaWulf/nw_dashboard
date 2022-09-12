@@ -14,7 +14,7 @@ class PriceMerger < BaseService
     end
     asset_aliases = asset_names.map { |e| e.gsub('-', '_') }
     sql = "Select
-    t1.starttime as starttime,
+    coalesce(t1.starttime,t2.starttime) as starttime,
     t1.close as #{asset_aliases[0]},
     t2.close as #{asset_aliases[1]}
     from candles t1
@@ -22,13 +22,14 @@ class PriceMerger < BaseService
     on t1.starttime=t2.starttime
     and t1.pair='#{asset_names[0]}' and t2.pair='#{asset_names[1]}'
     where t1.pair='#{asset_names[0]}' or t2.pair='#{asset_names[1]}'
-    order by t1.starttime asc
+    order by coalesce(t1.starttime,t2.starttime) asc
     "
 
     records_array = ActiveRecord::Base.connection.execute(sql)
     Rails.logger.info "number of records after merge (outer join): #{records_array.count}"
     starttimes = records_array.pluck('starttime')
-
+    Rails.logger.info "length of starttimes: #{starttimes.length}"
+    Rails.logger.info "last start time: #{starttimes[starttimes.length - 1]}"
     return nil if start_time && starttimes[starttimes.length - 1] < start_time
 
     prices = asset_aliases.map { |a| records_array.pluck(a) }

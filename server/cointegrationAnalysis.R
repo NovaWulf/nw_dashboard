@@ -6,7 +6,7 @@ library(lattice)
 library(latticeExtra)
 
 fitModel = function(asset_names,startTimeString,endTimeString,ecdet_param="const",logPrices=TRUE){
-
+resolution = 60
 print("asset names: ")
 print(asset_names)
 ecdet = ecdet_param
@@ -24,7 +24,6 @@ if (class(startTimeString)=="character" && class(endTimeString)== "character"){
   endTime = as.numeric(strptime(endTimeString,"%Y-%m-%d",tz="UTC")) 
 }
 
-resolution = 60
 allDat = data.table(read.csv("./public/data.csv"))
 allDat$interpolated=as.logical(allDat$interpolated)
 print("counts of different pairs")
@@ -32,23 +31,26 @@ print(table(allDat$pair,useNA="always"))
 
 ethDat = allDat[starttime>startTime & 
                   starttime<endTime &
-                  resolution == resolution &
                   interpolated==FALSE &
                   pair == asset_names[1]
                   ]
 opDat =  allDat[starttime>startTime &
                   starttime<endTime &
-                  resolution == resolution &
                   interpolated==FALSE &
                   pair == asset_names[2]
                 ]
 
+rm(allDat)
 print(dim(ethDat))
 print(dim(opDat))
 bothDat = merge(ethDat,opDat,by = "starttime")
+rm(opDat)
+rm(ethDat)
 print(dim(bothDat))
 bothDat = bothDat[order(bothDat$starttime)]
 bothDat$start_datetime = as_datetime(bothDat$starttime)    
+
+gc()
 
 print(dim(bothDat))
 
@@ -57,9 +59,9 @@ if (logPrices){
   bothDat$close.y=log(bothDat$close.y)
 }
 
-plot1 = xyplot(close.x~start_datetime,bothDat,type="l", auto.key = TRUE, main = "double axis plot of OP vs ETH futures")
-plot2 = xyplot(close.y~start_datetime,bothDat,type="l",auto.key = TRUE)
-doubleYScale(plot1, plot2)
+#plot1 = xyplot(close.x~start_datetime,bothDat,type="l", auto.key = TRUE, main = "double axis plot of OP vs ETH futures")
+#plot2 = xyplot(close.y~start_datetime,bothDat,type="l",auto.key = TRUE)
+#doubleYScale(plot1, plot2)
 
 dataMat = as.matrix(bothDat[,c("close.x","close.y")])
 spec = "transitory"
@@ -67,6 +69,8 @@ type = "trace"
 jo=ca.jo(dataMat,type= type,spec=spec,ecdet = ecdet)
 print(summary(jo))
 
+rm(dataMat)
+gc()
 vecs = jo@V
 
 spread = NULL
