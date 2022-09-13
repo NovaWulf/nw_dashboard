@@ -80,11 +80,14 @@ task rerun_backtest: :environment do
   basket = model_to_replace&.basket
   puts "seq_num: #{seq_num}"
   if ENV['skip'] == 'y'
-    Rails.Logger.info 'deleting backtest and positions and recalculating. not deleting signal, skipping recalculation of it'
+    Rails.logger.info 'deleting backtest and positions and recalculating. not deleting signal, skipping recalculation of it'
     ModeledSignal.where("model_id like '%#{ENV['model']}-%'").delete_all
+    Rails.logger.info "number of records in modeled signal: #{ModeledSignal.where("model_id like '%#{ENV['model']}%'").count}"
+    Rails
   else
     Rails.logger.info 'deleting signal, backtest, and positions, and recalculating'
     ModeledSignal.where("model_id like '%#{ENV['model']}%'").delete_all
+    Rails.logger.info "number of records in modeled signal: #{ModeledSignal.where("model_id like '%#{ENV['model']}%'").count}"
     ArbitrageCalculator.run(version: version, silent: true, basket: basket, seq_num: seq_num)
   end
   Backtester.run(version: version, basket: basket, seq_num: seq_num)

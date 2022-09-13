@@ -78,6 +78,8 @@ class ArbitrageCalculator < BaseService
       end
       running_total += signal_value
       in_sample_flag = starttimes[time_step] <= last_in_sample_timestamp
+      r_count = ModeledSignal.where(starttime: starttimes[time_step], model_id: most_recent_model_id).count
+      debugger if r_count > 0
       m = ModeledSignal.create(starttime: starttimes[time_step], model_id: most_recent_model_id, resolution: res, value: signal_value,
                                in_sample: in_sample_flag)
     end
