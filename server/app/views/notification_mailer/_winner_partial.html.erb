@@ -9,18 +9,18 @@
       
       <% rows.map do |winner| %>
         <tr>
-          <% winner.map do |cell| %>
-            <% 
+          <td width="75%" class="content-block">
+            <%= winner[0] %>
+          </td>
+          <% 
             td_class = "content-block"
-              negative = cell.starts_with?("(")
-              if negative
-                td_class = "content-block negative"				
-              end
-            %>
-            <td class="<%= td_class %>">
-              <%= cell %>
-            </td>
-          <% end %>
+            negative = winner[1].starts_with?("(")
+            td_class += " negative" if negative
+          %>
+          <td class="<%= td_class %>">
+            <%= winner[1] %>
+          </td>
+
         </tr>
       <% end %>	
     </table>

@@ -55,7 +55,7 @@ module Hedgeserv
         cont_to_return = ActionController::Base.helpers.number_to_percentage(
           (pnl / @total_daily_pnl) * @total_daily_ror, precision: 1
         )
-        [name, "#{pnl} [#{cont_to_return}]"]
+        [name, "#{format_currency(pnl)} [#{cont_to_return}]"]
       end
     end
 
@@ -76,7 +76,7 @@ module Hedgeserv
         cont_to_return = ActionController::Base.helpers.number_to_percentage(
           (pnl / @total_mtd_pnl) * @total_mtd_ror, precision: 1
         )
-        [name, "#{pnl} [#{cont_to_return}]"]
+        [name, "#{format_currency(pnl)} [#{cont_to_return}]"]
       end
     end
 
@@ -97,8 +97,13 @@ module Hedgeserv
         cont_to_return = ActionController::Base.helpers.number_to_percentage(
           (pnl / @total_ytd_pnl) * @total_ytd_ror, precision: 1
         )
-        [name, "#{pnl} [#{cont_to_return}]"]
+        [name, "#{format_currency(pnl)} [#{cont_to_return}]"]
       end
+    end
+
+    def format_currency(value)
+      ActionController::Base.helpers.number_to_currency(value, precision: 0, format: '%n',
+                                                               negative_format: '(%n)')
     end
   end
 end
