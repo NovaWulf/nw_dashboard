@@ -15,11 +15,7 @@ class CsvWriter < BaseService
       # file = "#{Rails.root}/public/data_#{Time.now.to_i}.csv"
       Rails.logger.info "writing csv to #{file}"
       CSV.open(file, 'w') do |writer|
-<<<<<<< HEAD
         candles = Candle.where("pair in #{asset_string}").select(:id, :starttime, :interpolated, :close, :pair)
-=======
-        table = Candle.where("pair in #{asset_string}").select(:id, :starttime, :interpolated, :close, :pair)
->>>>>>> 30b2ade0264c6d964324d380fcfa1cb2fcb97c70
         0
         writer << candles.first.attributes.map { |a, _v| a }
         candles.find_each do |s|
