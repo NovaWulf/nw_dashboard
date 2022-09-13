@@ -13,28 +13,31 @@ import {
 import { Skeleton } from '@mui/material';
 import Grid from '@mui/material/Grid';
 
-import { dateFormatter, percentFormatter } from 'lib/formatters';
+import { dateTimeFormatter, percentFormatter } from 'lib/formatters';
 import DashboardItem from 'components/DashboardItem';
 import TimeAxisHighRes from 'components/TimeAxisHighRes';
 import CsvDownloadLink from 'components/CsvDownloadLink';
 
-export default function ArbitrageSignalChart({seqNumber}) {
-  console.log("seqNumber in signal chart: " + seqNumber)
-  const version = 2
-  // console.log("seqNumber in signal chart: " + JSON.stringify(seqNumber))
+export default function ArbitrageSignalChart({seqNumber,version,basket}) {
   const QUERY = gql`
-  query ($seqNumber: Int){
+  query ($version: Int!,$seqNumber: Int!,$basket:String!){
 
-    cointegrationModelInfo(version:2,sequenceNumber:$seqNumber) {
+    cointegrationModelInfo(version:$version,sequenceNumber:$seqNumber,basket:$basket) {
       inSampleMean
       inSampleSd
       uuid
       id
       modelEndtime
       modelStarttime
+      testStat
+      cv1Pct
     }
-
-    arbSignalModel(version: 2,sequenceNumber:$seqNumber) {
+    cointegrationModelWeights(version:$version,sequenceNumber:$seqNumber,basket:$basket) {
+      id
+      weight
+      assetName
+    }
+    arbSignalModel(version: $version,sequenceNumber:$seqNumber,basket:$basket) {
       ts
       v
       is
@@ -42,39 +45,41 @@ export default function ArbitrageSignalChart({seqNumber}) {
   }
   `;
   const { data, loading, error } = useQuery(QUERY, {
-    variables: { seqNumber },
+    variables: { seqNumber,version,basket},
   });
 
-  const { cointegrationModelInfo, arbSignalModel } = data || {};
+  const { cointegrationModelInfo, arbSignalModel, cointegrationModelWeights } = data || {};
 
   if (error) {
     console.error(error);
     return null;
   }
-  const SIGMA = 2;
+  const SIGMA = 1;
 
-  let mean, sd, isEndDate,isStartDate, updatedData;
+  let mean, sd, isEndDate,isStartDate, updatedData,assetNames,weights, tStat,cVal;
   if (data) {
+    assetNames = cointegrationModelWeights.map(d => d.assetName)
+    weights = cointegrationModelWeights.map(d => d.weight)
     mean = cointegrationModelInfo[0].inSampleMean;
-    console.log("in sample mean: " + mean)
     sd = cointegrationModelInfo[0].inSampleSd;
     isEndDate = cointegrationModelInfo[0].modelEndtime;
     isStartDate = cointegrationModelInfo[0].modelStarttime;
+    tStat = cointegrationModelInfo[0].testStat
+    cVal = cointegrationModelInfo[0].cv1Pct
+    const arbLength = arbSignalModel.length
     updatedData = arbSignalModel.map(d => {
-      console.log('sd: ' + Math.floor(100 * (-SIGMA * sd)));
       return {
         ts: d.ts,
-        v: Math.floor(100 * (d.v - mean)),
+        v: Math.floor(100*100 * (d.v - mean))/100,
         // is: d.is,
-        arbLow: Math.floor(100 * (-SIGMA * sd)),
-        arbHigh: Math.floor(100 * (SIGMA * sd)),
+        arbLow: Math.floor(100*100 * (-SIGMA * sd))/100,
+        arbHigh: Math.floor(100*100 * (SIGMA * sd))/100,
         arbMean: Math.floor(0),
       };
     });
   }
 
   const theme = useTheme();
-  console.log('mean: ' + mean + ', sd: ' + sd);
 
   return (
     <Grid item sx={{ display: 'flex' }} xs={12} md={12}>
@@ -82,10 +87,10 @@ export default function ArbitrageSignalChart({seqNumber}) {
         <Skeleton variant="rectangular" />
       ) : (
         <DashboardItem
-          title="OP-ETH Arbitrage Indicator"
+          title={`${basket} Arbitrage Indicator: ${Math.floor(100*weights[0])/100}*log(${assetNames[0].split("-")[0]}) + ${Math.floor(100*weights[1])/100}*log(${assetNames[1].split("-")[0]}) -- Quality: ${Math.floor(100*tStat/cVal)/100}`}
           helpText="Arbitrage Indicator looks at the value of the mean reverting portfolio of assets"
           downloadButton={
-            <CsvDownloadLink data={updatedData} title="Arbitrage Indicator" />
+            <CsvDownloadLink data={updatedData} title="Arbitrage Indicator:" />
           }
         >
           <ResponsiveContainer width="99%" height={300}>
@@ -149,7 +154,7 @@ export default function ArbitrageSignalChart({seqNumber}) {
                 domain={[-30, 30]}
               />
 
-              <Tooltip labelFormatter={dateFormatter} />
+              <Tooltip labelFormatter={dateTimeFormatter} />
               <Legend />
             </LineChart>
           </ResponsiveContainer>

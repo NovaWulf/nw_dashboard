@@ -1,6 +1,4 @@
 module Fetchers
-  require 'csv'
-
   class CoinbaseFetcher < BaseService
     attr_reader :resolution, :pair
 
@@ -17,7 +15,7 @@ module Fetchers
         return
       end
       start_timestamp = last_timestamp ? last_timestamp + resolution : nil
-      Rails.logger.info "start timestamp: " + start_timestamp.to_s
+      Rails.logger.info 'start timestamp: ' + start_timestamp.to_s
       response = coinbase_client.get_prices(pair: pair, start_time: start_timestamp, resolution: resolution)
       return if response.blank?
 

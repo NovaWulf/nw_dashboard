@@ -1,5 +1,5 @@
 module Displayers
-  class HourlyValueDisplayer < BaseService
+  class BacktestDisplayer < BaseService
     attr_reader :model, :version, :sequence_number, :basket
 
     def initialize(version:, basket:, sequence_number: nil)
@@ -16,14 +16,14 @@ module Displayers
         end
       else
         Rails.logger.info 'using default model for displayer -- latest'
-        model = BacktestModel.where("basket = '#{basket}'").oldest_version_first.last.oldest_sequence_number_first.last&.model_id
+        model = BacktestModel.where("basket='#{basket}'").oldest_version_first.oldest_sequence_number_first.last&.model_id
       end
       @model = model
     end
 
     def run
-      Rails.logger.info "version: #{version}, basket: #{basket}, sequence_number: #{sequence_number}, model: #{model}"
-      ModeledSignal.by_model(model).on_the_hour.oldest_first
+      Rails.logger.info "basket: #{basket}, version: #{version}, sequence_number: #{sequence_number}, model: #{model}"
+      ModeledSignal.by_model(model + '-b').oldest_first
     end
   end
 end

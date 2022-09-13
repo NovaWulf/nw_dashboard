@@ -1,5 +1,5 @@
 module Displayers
-  class HourlyValueDisplayer < BaseService
+  class PositionsDisplayer < BaseService
     attr_reader :model, :version, :sequence_number, :basket
 
     def initialize(version:, basket:, sequence_number: nil)
@@ -23,7 +23,9 @@ module Displayers
 
     def run
       Rails.logger.info "version: #{version}, basket: #{basket}, sequence_number: #{sequence_number}, model: #{model}"
-      ModeledSignal.by_model(model).on_the_hour.oldest_first
+      asset_names = CointegrationModelWeight.where("uuid = '#{@model}'").order_by_id.pluck(:asset_name)
+      asset_names.delete_at(asset_names.index('det'))
+      asset_names.map{|asset| ModeledSignal.by_model(model+"-"+asset).oldest_first}
     end
   end
 end

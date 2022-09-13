@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_08_11_161226) do
+ActiveRecord::Schema.define(version: 2022_09_07_232023) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -22,7 +22,20 @@ ActiveRecord::Schema.define(version: 2022_08_11_161226) do
     t.integer "sequence_number", null: false
     t.integer "version", null: false
     t.string "name"
-    t.index ["version", "sequence_number"], name: "index_backtest_models_on_version_and_sequence_number", unique: true
+    t.string "basket", default: "OP_ETH"
+    t.index ["version", "sequence_number", "basket"], name: "index_backtest_models_on_version_and_sequence_number_and_basket", unique: true
+  end
+
+  create_table "backtest_trades", force: :cascade do |t|
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.integer "email_time"
+    t.string "model_id", null: false
+    t.float "signal_flag", null: false
+    t.float "prev_signal_flag", null: false
+    t.integer "cursor", null: false
+    t.integer "starttime", null: false
+    t.boolean "email_sent", default: false, null: false
   end
 
   create_table "candles", force: :cascade do |t|

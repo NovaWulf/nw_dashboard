@@ -1,5 +1,5 @@
 RSpec.describe PriceMerger do
-  subject { described_class.run(%w[eth-usd op-usd]) }
+  subject { described_class.run(asset_names: %w[eth-usd op-usd]) }
   before do
     Candle.create(starttime: 10_000_000,
                   pair: 'eth-usd',

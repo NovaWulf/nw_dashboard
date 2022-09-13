@@ -165,17 +165,65 @@ export default function Layout({ children }) {
             <ListItemText primary="Synthetix" />
           </ListItem>
         </Link>
-        <ListSubheader>Signals</ListSubheader>
-        <Link href="/arbitrage">
+        <ListSubheader>Mean-Reverting Signals</ListSubheader>
+        <Link href="/op_eth_arbitrage">
           <ListItem
             button
-            selected={router.pathname == '/arbitrage'}
-            key="Arbitrage"
+            selected={router.pathname == '/op_eth_arbitrage'}
+            key="OPETHArbitrage"
           >
             <ListItemIcon>
               <EthereumIcon />
             </ListItemIcon>
-            <ListItemText primary="Arbitrage" />
+            <ListItemText primary="OP-ETH" />
+          </ListItem>
+        </Link>
+        <Link href="/uni_eth_arbitrage">
+          <ListItem
+            button
+            selected={router.pathname == '/uni_eth_arbitrage'}
+            key="UNIETHArbitrage"
+          >
+            <ListItemIcon>
+              <EthereumIcon />
+            </ListItemIcon>
+            <ListItemText primary="UNI-ETH" />
+          </ListItem>
+        </Link>
+        <Link href="/btc_eth_arbitrage">
+          <ListItem
+            button
+            selected={router.pathname == '/btc_eth_arbitrage'}
+            key="BTCETHArbitrage"
+          >
+            <ListItemIcon>
+              <EthereumIcon />
+            </ListItemIcon>
+            <ListItemText primary="BTC-ETH" />
+          </ListItem>
+        </Link>
+        <Link href="/snx_eth_arbitrage">
+          <ListItem
+            button
+            selected={router.pathname == '/snx_eth_arbitrage'}
+            key="SNXETHArbitrage"
+          >
+            <ListItemIcon>
+              <EthereumIcon />
+            </ListItemIcon>
+            <ListItemText primary="SNX-ETH" />
+          </ListItem>
+        </Link>
+        <Link href="/crv_eth_arbitrage">
+          <ListItem
+            button
+            selected={router.pathname == '/crv_eth_arbitrage'}
+            key="CRVETHArbitrage"
+          >
+            <ListItemIcon>
+              <EthereumIcon />
+            </ListItemIcon>
+            <ListItemText primary="CRV-ETH" />
           </ListItem>
         </Link>
       </List>

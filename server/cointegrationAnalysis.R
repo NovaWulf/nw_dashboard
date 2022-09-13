@@ -5,8 +5,12 @@ library(digest)
 library(lattice)
 library(latticeExtra)
 
-fitModel = function(startTimeString,endTimeString,ecdet_param="trend",logPrices=TRUE){
+fitModel = function(asset_names,startTimeString,endTimeString,ecdet_param="const",logPrices=TRUE){
+resolution = 60
+print("asset names: ")
+print(asset_names)
 ecdet = ecdet_param
+asset_names = asset_names[order(asset_names)]
 print("does file ./public/data.csv exist in r?")
 print(file.exists("./public/data.csv"))
 
@@ -14,12 +18,12 @@ startTime = startTimeString
 endTime = endTimeString
 print(startTimeString)
 print(endTimeString)
+
 if (class(startTimeString)=="character" && class(endTimeString)== "character"){
-  startTime = as.numeric(strptime(startTimeString, "%Y-%m-%d",tz="EST"))
-  endTime = as.numeric(strptime(endTimeString,"%Y-%m-%d",tz="EST")) 
+  startTime = as.numeric(strptime(startTimeString, "%Y-%m-%d",tz="UTC"))
+  endTime = as.numeric(strptime(endTimeString,"%Y-%m-%d",tz="UTC")) 
 }
 
-resolution = 60
 allDat = data.table(read.csv("./public/data.csv"))
 allDat$interpolated=as.logical(allDat$interpolated)
 print("counts of different pairs")
@@ -27,29 +31,37 @@ print(table(allDat$pair,useNA="always"))
 
 ethDat = allDat[starttime>startTime & 
                   starttime<endTime &
-                  resolution == resolution &
                   interpolated==FALSE &
-                  pair == "eth-usd" 
+                  pair == asset_names[1]
                   ]
 opDat =  allDat[starttime>startTime &
                   starttime<endTime &
-                  resolution == resolution &
                   interpolated==FALSE &
-                  pair == "op-usd"]
+                  pair == asset_names[2]
+                ]
 
+rm(allDat)
 print(dim(ethDat))
 print(dim(opDat))
 bothDat = merge(ethDat,opDat,by = "starttime")
+rm(opDat)
+rm(ethDat)
 print(dim(bothDat))
 bothDat = bothDat[order(bothDat$starttime)]
 bothDat$start_datetime = as_datetime(bothDat$starttime)    
+
+gc()
 
 print(dim(bothDat))
 
 if (logPrices){
   bothDat$close.x=log(bothDat$close.x)
   bothDat$close.y=log(bothDat$close.y)
-} 
+}
+
+#plot1 = xyplot(close.x~start_datetime,bothDat,type="l", auto.key = TRUE, main = "double axis plot of OP vs ETH futures")
+#plot2 = xyplot(close.y~start_datetime,bothDat,type="l",auto.key = TRUE)
+#doubleYScale(plot1, plot2)
 
 dataMat = as.matrix(bothDat[,c("close.x","close.y")])
 spec = "transitory"
@@ -57,6 +69,8 @@ type = "trace"
 jo=ca.jo(dataMat,type= type,spec=spec,ecdet = ecdet)
 print(summary(jo))
 
+rm(dataMat)
+gc()
 vecs = jo@V
 
 spread = NULL
@@ -69,7 +83,7 @@ if (ecdet == "none")
 if (ecdet == "trend")
  spread = vecs[1,1]*bothDat$close.x + vecs[2,1]*bothDat$close.y+vecs[3,1]*seq(1,nrow(dataMat))
 
-sigma = 3
+sigma = 1
 meanSpread= mean(spread)
 sdSpread = sd(spread)
 
@@ -77,6 +91,7 @@ bothDat$meanSpread = meanSpread
 bothDat$sdSpread = sdSpread
 bothDat$upper = bothDat$meanSpread+sigma*bothDat$sdSpread
 bothDat$lower = bothDat$meanSpread-sigma*bothDat$sdSpread
+
 xyplot(spread + meanSpread + upper+lower~start_datetime,bothDat,type = "l",
        auto.key = T,main= "mean reverting portfolio (log prices)",
        panel = function(...) {
@@ -84,10 +99,10 @@ xyplot(spread + meanSpread + upper+lower~start_datetime,bothDat,type = "l",
          panel.xyplot(...)
        })
 
-
 plot1 = xyplot(close.x~start_datetime,bothDat,type="l", auto.key = TRUE, main = "double axis plot of OP vs ETH futures")
 plot2 = xyplot(close.y~start_datetime,bothDat,type="l",auto.key = TRUE)
 doubleYScale(plot1, plot2)
+
 bothDat$meanSpread = meanSpread
 bothDat$sdSpread = sdSpread
 bothDat$upper = bothDat$meanSpread+sigma*bothDat$sdSpread
@@ -98,7 +113,8 @@ realStartDate = min(bothDat$start_datetime)
 realEndDate = max(bothDat$start_datetime)
 currentTime = round(as.numeric(as.POSIXct(Sys.time())))
 
-forDigest = c(ecdet,
+forDigest = c(asset_names,
+              ecdet,
               spec,
               resolution,
               realStartDate,
@@ -133,7 +149,7 @@ returnVals[[2]] = valueString
 
 #print(queryString)
 
-assetNames = c("eth-usd","op-usd","det")
+assetNames = c(asset_names[1],asset_names[2],"det")
 assetWeights=c(vecs[1,1],vecs[2,1],vecs[3,1])
 
 colNamesString2 = "(uuid,timestamp,asset_name,weight)"

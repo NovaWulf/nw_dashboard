@@ -1,2 +1,2 @@
-# nw_dashboard
+#nw_dashboard
 NovaWulf Dashboard

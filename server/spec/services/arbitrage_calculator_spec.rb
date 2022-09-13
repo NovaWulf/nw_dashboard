@@ -1,5 +1,5 @@
 RSpec.describe ArbitrageCalculator do
-  subject { described_class.run(version: 2) }
+  subject { described_class.run(version: 2, basket: 'OP_ETH', seq_num: nil) }
   let(:op_candle) { Candle.by_pair('op-usd').last&.close }
   let(:eth_candle) { Candle.by_pair('eth-usd').last&.close }
   let(:latest_model) { CointegrationModel.newest_first.first&.uuid }
@@ -40,7 +40,6 @@ RSpec.describe ArbitrageCalculator do
       asset_name: 'op-usd',
       weight: -1
     )
-
     CointegrationModelWeight.create(
       uuid: 'id1',
       timestamp: 1_800_000_000,
@@ -70,11 +69,13 @@ RSpec.describe ArbitrageCalculator do
       in_sample_mean: 0,
       in_sample_sd: 100
     )
+
     BacktestModel.create(
       version: 2,
       model_id: 'id1',
       sequence_number: 0,
-      name: 'seed_model'
+      name: 'seed_model',
+      basket: 'OP_ETH'
     )
 
     ModeledSignal.create(

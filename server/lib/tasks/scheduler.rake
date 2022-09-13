@@ -60,50 +60,98 @@ task hedgeserv_email: :environment do
 end
 
 task update_arb_signal: :environment do
-  tracked_pairs = %w[eth-usd op-usd]
+  tracked_pairs = %w[eth-usd op-usd btc-usd uni-usd snx-usd crv-usd]
   tracked_pairs.each do |p|
     Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
   end
-  Rails.logger.info 'writing candle data to CSV...'
-  puts 'writing candle data to CSV...'
-  CsvWriter.run
-  mu = ModelUpdate.new
-  mu.seed
+  baskets = %w[OP_ETH UNI_ETH BTC_ETH SNX_ETH CRV_ETH]
+  baskets.each do |b|
+    mu = ModelUpdate.new(basket: b)
+    mu.seed
+    ArbitrageCalculator.run(version: 3, silent: true, basket: b, seq_num: nil)
+    Backtester.run(version: 3, basket: b, seq_num: nil)
+  end
+end
+
+task rerun_backtest: :environment do
+  model_to_replace = BacktestModel.where(model_id: ENV['model']).last
+  version = model_to_replace&.version
+  seq_num = model_to_replace&.sequence_number
+  basket = model_to_replace&.basket
+  puts "seq_num: #{seq_num}"
+  if ENV['skip'] == 'y'
+    Rails.logger.info 'deleting backtest and positions and recalculating. not deleting signal, skipping recalculation of it'
+    ModeledSignal.where("model_id like '%#{ENV['model']}-%'").delete_all
+    Rails.logger.info "number of records in modeled signal: #{ModeledSignal.where("model_id like '%#{ENV['model']}%'").count}"
+    Rails
+  else
+    Rails.logger.info 'deleting signal, backtest, and positions, and recalculating'
+    ModeledSignal.where("model_id like '%#{ENV['model']}%'").delete_all
+    Rails.logger.info "number of records in modeled signal: #{ModeledSignal.where("model_id like '%#{ENV['model']}%'").count}"
+    ArbitrageCalculator.run(version: version, silent: true, basket: basket, seq_num: seq_num)
+  end
+  Backtester.run(version: version, basket: basket, seq_num: seq_num)
 end
 
 task try_update_models: :environment do
-  if Time.now.sunday?
-    tracked_pairs = %w[eth-usd op-usd]
+  if Time.now.tuesday?
+    tracked_pairs = %w[eth-usd op-usd btc-usd uni-usd snx-usd crv-usd]
     tracked_pairs.each do |p|
       Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
     end
     Rails.logger.info 'writing candle data to CSV...'
-    CsvWriter.run
-    mu = ModelUpdate.new
-    mu.update_model(version: 2, max_weeks_back: 8, min_weeks_back: 3, interval_mins: 1440)
-    mu.update_jesse_model
+    baskets = %w[OP_ETH UNI_ETH BTC_ETH SNX_ETH CRV_ETH]
+    baskets.each do |b|
+      mu = ModelUpdate.new(basket: b)
+      mu.update_model(version: 3, max_weeks_back: 12, min_weeks_back: 5, interval_mins: 1440)
+    end
+    JesseModelUpdate.run
+  end
+end
+
+task try_update_model: :environment do
+  tracked_pairs = %w[eth-usd op-usd btc-usd uni-usd snx-usd crv-usd]
+  tracked_pairs.each do |p|
+    Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
+  end
+  Rails.logger.info 'writing candle data to CSV...'
+  mu = ModelUpdate.new(basket: ENV['basket'])
+  mu.update_model(version: 3, max_weeks_back: 12, min_weeks_back: 5, interval_mins: 1440)
+end
+
+task try_update_models_as_of: :environment do
+  tracked_pairs = %w[eth-usd op-usd btc-usd uni-usd snx-usd crv-usd]
+  tracked_pairs.each do |p|
+    Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
+  end
+  Rails.logger.info 'writing candle data to CSV...'
+  baskets = %w[OP_ETH UNI_ETH BTC_ETH SNX_ETH CRV_ETH]
+  baskets.each do |b|
+    mu = ModelUpdate.new(basket: b)
+    mu.update_model(version: 3, max_weeks_back: 12, min_weeks_back: 5, interval_mins: 1440, as_of_date: ENV['end'])
   end
 end
 
 task try_update_model_as_of: :environment do
-  tracked_pairs = %w[eth-usd op-usd]
+  tracked_pairs = %w[eth-usd op-usd btc-usd uni-usd snx-usd crv-usd]
   tracked_pairs.each do |p|
     Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
   end
   Rails.logger.info 'writing candle data to CSV...'
-  CsvWriter.run(table: 'candles')
-  mu = ModelUpdate.new
-  puts ENV['as_of_date']
-  mu.update_model(version: 2, max_weeks_back: 8, min_weeks_back: 3, interval_mins: 1440, as_of_date: ENV['as_of_date'])
+  mu = ModelUpdate.new(basket: ENV['basket'])
+  mu.update_model(version: 3, max_weeks_back: 12, min_weeks_back: 5, interval_mins: 1440, as_of_date: ENV['end'])
 end
 
 task add_model_with_dates: :environment do
-  tracked_pairs = %w[eth-usd op-usd]
+  tracked_pairs = %w[eth-usd op-usd btc-usd uni-usd snx-usd crv-usd]
   tracked_pairs.each do |p|
     Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
   end
   Rails.logger.info 'writing candle data to CSV...'
-  CsvWriter.run(table: 'candles')
-  mu = ModelUpdate.new
-  mu.add_model_with_dates(version: 2, start_time_string: ENV['start'], end_time_string: ENV['end'])
+  mu = ModelUpdate.new(basket: ENV['basket'])
+  mu.add_model_with_dates(version: 3, start_time_string: ENV['start'], end_time_string: ENV['end'])
+end
+
+task jesse_model_update: :environment do
+  JesseModelUpdate.run
 end

@@ -45,7 +45,6 @@ class Coinbase
       responses = []
       new_start_time = time_now - 298 * resolution
       new_start_time = start_timestamp if new_start_time < start_timestamp
-
       responses.concat self.class.get(
         "#{path}?start=#{new_start_time}&end=#{time_now}&granularity=#{resolution}", headers: generate_headers(path)
       ).parsed_response
@@ -71,8 +70,6 @@ class Coinbase
         "#{path}?start=#{start_timestamp}&end=#{time_now}&granularity=#{resolution}", headers: generate_headers(path)
       )
       responses = responses.parsed_response
-
-      # puts responses
     end
     Rails.logger.info 'done with coinbase call'
     responses

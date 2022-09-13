@@ -12,12 +12,13 @@ import {
 } from 'recharts';
 import { Skeleton } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import { dateTimeFormatter, percentFormatter } from 'lib/formatters';
+import { dateTimeFormatter, nFormatter } from 'lib/formatters';
 import DashboardItem from 'components/DashboardItem';
 import TimeAxisHighRes from 'components/TimeAxisHighRes';
 import CsvDownloadLink from 'components/CsvDownloadLink';
 
-export default function ArbitrageBacktestChart({seqNumber,version,basket}) {
+export default function ArbitragePositionsChart({seqNumber,version,basket}) {
+  
   const QUERY = gql`
   query ($version: Int!, $seqNumber: Int!, $basket: String!){
     cointegrationModelInfo(version:$version,sequenceNumber:$seqNumber,basket:$basket) {
@@ -25,8 +26,12 @@ export default function ArbitrageBacktestChart({seqNumber,version,basket}) {
       modelEndtime
       modelStarttime
     }
-
-    backtestModel(version: $version,sequenceNumber:$seqNumber,basket: $basket) {
+    cointegrationModelWeights(version:$version,sequenceNumber:$seqNumber,basket:$basket) {
+      id
+      weight
+      assetName
+    }
+    backtestPositions(version: $version,sequenceNumber:$seqNumber,basket: $basket) {
       ts
       v
       is
@@ -38,24 +43,28 @@ export default function ArbitrageBacktestChart({seqNumber,version,basket}) {
     variables: { seqNumber,version, basket },
   });
 
-  const { cointegrationModelInfo, backtestModel } = data || {};
-
+  const { cointegrationModelInfo, backtestPositions,cointegrationModelWeights } = data || {};
 
   if (error) {
     console.error(error);
     return null;
   }
   const theme = useTheme();
-  
-  let updatedData;
+
+  let assets = [];
+  let assetNames
   if (data) {
-    updatedData = backtestModel.map(d => {
-      return {
-        ts: d.ts,
-        v: Math.floor(10000 * d.v)/100,
-        is: d.is,
-      };
-    });
+    assetNames = cointegrationModelWeights.map(d => d.assetName)
+    const index = assetNames.indexOf("det");
+    assetNames.splice(index, 1); 
+    for (let i = 0; i < backtestPositions[0].length; i++) {
+      assets.push({
+        ts: backtestPositions[0][i].ts,
+        is: backtestPositions[0][i].is,
+        v1: backtestPositions[0][i].v,
+        v2: backtestPositions[1][i].v,
+      })
+    }
   }
 
   return (
@@ -64,15 +73,15 @@ export default function ArbitrageBacktestChart({seqNumber,version,basket}) {
         <Skeleton variant="rectangular" />
       ) : (
         <DashboardItem
-          title="Arbitrage Backtester"
-          helpText="Arbitrage Backtester looks at the PnL of a given trading strategy over time"
+          title="Arbitrage Positions"
+          helpText="Arbitrage Positions looks at the positions of a given trading strategy over time"
           downloadButton={
-            <CsvDownloadLink data={updatedData} title="Arbitrage Backtester" />
+            <CsvDownloadLink data={assets} title="Arbitrage Positions" />
           }
         >
           <ResponsiveContainer width="99%" height={300}>
             <LineChart
-              data={updatedData}
+              data={assets}
               margin={{ top: 5, right: 15, bottom: 5, left: 0 }}
             >
               <ReferenceLine
@@ -91,9 +100,17 @@ export default function ArbitrageBacktestChart({seqNumber,version,basket}) {
               />
               <Line
                 type="monotone"
-                dataKey="v"
-                name="Profit and Loss"
-                stroke={theme.palette.secondary.secondary}
+                dataKey="v1"
+                name={assetNames[0]}
+                stroke="blue"
+                yAxisId="pnl"
+                dot={false}
+              />
+              <Line
+                type="monotone"
+                dataKey="v2"
+                name={assetNames[1]}
+                stroke={"orange"}
                 yAxisId="pnl"
                 dot={false}
               />
@@ -103,9 +120,9 @@ export default function ArbitrageBacktestChart({seqNumber,version,basket}) {
               <YAxis
                 yAxisId="pnl"
                 orientation="left"
-                tickFormatter={percentFormatter}
+                tickFormatter={nFormatter}
                 stroke={theme.palette.primary.main}
-                domain={[-200, 200]}
+                domain={[-2, 2]}
               />
 
               <Tooltip labelFormatter={dateTimeFormatter} />

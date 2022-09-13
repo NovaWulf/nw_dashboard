@@ -1,15 +1,21 @@
 class ArbitrageCalculator < BaseService
-  attr_reader :version, :most_recent_model, :silent
+  attr_reader :version, :most_recent_model, :silent, :asset_names, :basket, :seq_num
 
-  def initialize(version:, silent: false)
+  def initialize(version:, basket:, seq_num: nil, silent: false)
     @version = version
     @silent = silent
+    @basket = basket
+    @seq_num = seq_num
   end
 
   def run
-    most_recent_backtest_model = BacktestModel.where("version = #{version}").oldest_sequence_number_first.last
+    if !@seq_num
+      most_recent_backtest_model = BacktestModel.where("version = #{version} and basket='#{basket}'").oldest_sequence_number_first.last
+      @seq_num = most_recent_backtest_model&.sequence_number
+    else
+      most_recent_backtest_model = BacktestModel.where(version: version, basket: basket, sequence_number: @seq_num).last
+    end
     Rails.logger.info "running arb calculator on sequence number #{most_recent_backtest_model&.sequence_number}"
-
     most_recent_model_id = most_recent_backtest_model&.model_id
     @most_recent_model = CointegrationModel.where("uuid='#{most_recent_model_id}'").last
     det_type = most_recent_model&.ecdet
@@ -17,14 +23,15 @@ class ArbitrageCalculator < BaseService
     res = most_recent_model&.resolution
     last_in_sample_timestamp = most_recent_model&.model_endtime
     first_in_sample_timestamp = most_recent_model&.model_starttime
-    assets = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}'").pluck(:weight, :asset_name)
+    assets = CointegrationModelWeight.where("uuid = '#{most_recent_model_id}'").order_by_id.pluck(:weight, :asset_name)
     asset_weights = assets.map { |x| x[0] }
-    asset_names = assets.map { |x| x[1] }
+    @asset_names = assets.map { |x| x[1] }
     det_index = asset_names.index('det')
     det_weight = asset_weights[det_index]
     asset_weights.delete_at(det_index)
     asset_names.delete('det')
-    last_timestamp = ModeledSignal.by_model(most_recent_model_id).last&.starttime
+    last_timestamp = ModeledSignal.by_model(most_recent_model_id).oldest_first.last&.starttime
+    Rails.logger.info "last timestamp for arb signal: #{last_timestamp}"
     return if last_timestamp && last_timestamp > Time.now.to_i - res
 
     last_prices = [nil, nil]
@@ -36,10 +43,15 @@ class ArbitrageCalculator < BaseService
 
     first_timestamps = asset_names.map { |a| Candle.where("pair = '#{a}'").oldest_first.first&.starttime }
     start_time = last_timestamp ? last_timestamp + res : first_in_sample_timestamp
-    flat_records = PriceMerger.run(asset_names, start_time).value
+    Rails.logger.info "start time in arb signal: #{start_time}"
+
+    flat_records = PriceMerger.run(asset_names: asset_names, start_time: start_time).value
+    return if flat_records.nil?
+
     starttimes = flat_records[0]
     prices = flat_records[1]
     interp_count = 0
+    running_total = 0
     for time_step in 0..(starttimes.length - 1)
       signal_value = if det_type == 'const'
                        det_weight
@@ -64,12 +76,12 @@ class ArbitrageCalculator < BaseService
                           asset_weights[i] * prices[i][time_step]
                         end
       end
+      running_total += signal_value
       in_sample_flag = starttimes[time_step] <= last_in_sample_timestamp
       m = ModeledSignal.create(starttime: starttimes[time_step], model_id: most_recent_model_id, resolution: res, value: signal_value,
                                in_sample: in_sample_flag)
     end
     Rails.logger.info "flat forward interpolated #{interp_count} values"
-
     email_notification(m) if !silent && m
   end
 
