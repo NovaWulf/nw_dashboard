@@ -44,7 +44,6 @@ class CsvWriter < BaseService
           ActiveRecord::Base.logger.silence do
             btc_price = Metric.by_token('btc').by_metric('price').by_day(day).all
           end
-          debugger
           writer << s2f.first.attributes.map { |a, _v| a }
 
           s2f.find_each do |s|
