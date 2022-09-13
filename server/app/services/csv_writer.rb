@@ -31,11 +31,20 @@ class CsvWriter < BaseService
         (start_date..Date.today).each do |day|
           ActiveRecord::Base.logger.silence do
             s2f = Metric.by_token('btc').by_metric('s2f_ratio').by_day(day).all
+          end
+          ActiveRecord::Base.logger.silence do
             hash_rate = Metric.by_token('btc').by_metric('hash_rate').by_day(day).all
+          end
+          ActiveRecord::Base.logger.silence do
             active_addresses = Metric.by_token('btc').by_metric('active_addresses').by_day(day).all
+          end
+          ActiveRecord::Base.logger.silence do
             google_trends = Metric.by_token('btc').by_metric('google_trends').by_day(day).all
+          end
+          ActiveRecord::Base.logger.silence do
             btc_price = Metric.by_token('btc').by_metric('price').by_day(day).all
           end
+          debugger
           writer << s2f.first.attributes.map { |a, _v| a }
 
           s2f.find_each do |s|
