@@ -15,7 +15,7 @@ class CsvWriter < BaseService
       # file = "#{Rails.root}/public/data_#{Time.now.to_i}.csv"
       Rails.logger.info "writing csv to #{file}"
       CSV.open(file, 'w') do |writer|
-        table = Candle.where("pair in #{asset_string}")
+        table = Candle.where("pair in #{asset_string}").select(:id, :starttime, :interpolated, :close, :pair)
         0
         writer << table.first.attributes.map { |a, _v| a }
         table.find_each do |s|
@@ -36,7 +36,7 @@ class CsvWriter < BaseService
             google_trends = Metric.by_token('btc').by_metric('google_trends').by_day(day).all
             btc_price = Metric.by_token('btc').by_metric('price').by_day(day).all
           end
-          
+
           writer << s2f.first.attributes.map { |a, _v| a }
 
           s2f.find_each do |s|
