@@ -2,6 +2,16 @@ module Hedgeserv
   class PositionsParser < BaseService
     attr_reader :csv_text, :row
 
+    ISSUER_COL = 2
+    MARKET_VAL_COL = 5
+    DAILY_PNL_COL = 6
+    MTD_PNL_COL = 7
+    YTD_PNL_COL = 8
+    STRATEGY_COL = 11
+    DAILY_TOTAL_ROR_COL = 16
+    MTD_TOTAL_ROR_COL = 17
+    YTD_TOTAL_ROR_COL = 18
+
     def initialize(csv_text:)
       @csv_text = csv_text
     end
@@ -13,36 +23,37 @@ module Hedgeserv
         ['There are no positions reported.']
       else
         summary = rows.shift # skip the summary
-        @total_daily_pnl = summary[7].to_i / 1000.0
-        @total_mtd_pnl = summary[8].to_i / 1000.0
-        @total_ytd_pnl = summary[9].to_i / 1000.0
-        @total_daily_ror = summary[17].to_f * 100.0
-        @total_mtd_ror = summary[18].to_f * 100.0
-        @total_ytd_ror = summary[19].to_f * 100.0
+        @total_daily_pnl = summary[DAILY_PNL_COL].to_i / 1000.0
+        @total_mtd_pnl = summary[MTD_PNL_COL].to_i / 1000.0
+        @total_ytd_pnl = summary[YTD_PNL_COL].to_i / 1000.0
+        @total_daily_ror = summary[DAILY_TOTAL_ROR_COL].to_f * 100.0
+        @total_mtd_ror = summary[MTD_TOTAL_ROR_COL].to_f * 100.0
+        @total_ytd_ror = summary[YTD_TOTAL_ROR_COL].to_f * 100.0
 
         translations = [['Total',
                          format_cell(@total_daily_pnl, @total_daily_ror),
                          format_cell(@total_mtd_pnl, @total_mtd_ror),
                          format_cell(@total_ytd_pnl, @total_ytd_ror)]]
 
-        rows.reject! { |r| r[2].include?('Fee') || r[12] == 'Cash' } # ignore fees and cash
+        rows.reject! { |r| r[ISSUER_COL].include?('Fee') || r[ISSUER_COL] == 'Cash' } # ignore fees and cash
 
-        @total_market_value = sum_pnl(rows, 6)
+        @total_market_value = sum_pnl(rows, MARKET_VAL_COL)
 
         Rails.logger.info "Found #{rows.count} positions"
 
-        rows.group_by { |r| r[12].try(:titleize) }.each do |strategy, positions|
-          daily_pnl = sum_pnl(positions, 7)
+        rows.group_by { |r| r[STRATEGY_COL].try(:titleize) }.each do |strategy, positions|
+          daily_pnl = sum_pnl(positions, DAILY_PNL_COL)
           daily_cont = (daily_pnl / @total_daily_pnl) * @total_daily_ror
-          mtd_pnl = sum_pnl(positions, 8)
+          mtd_pnl = sum_pnl(positions, MTD_PNL_COL)
           mtd_cont = (mtd_pnl / @total_mtd_pnl) * @total_mtd_ror
-          ytd_pnl = sum_pnl(positions, 9)
+          ytd_pnl = sum_pnl(positions, YTD_PNL_COL)
           ytd_cont = (ytd_pnl / @total_ytd_pnl) * @total_ytd_ror
 
-          market_value = sum_pnl(positions, 6)
+          market_value = sum_pnl(positions, MARKET_VAL_COL)
 
           str = !strategy || strategy.strip.blank? ? '[Untagged Strategy]' : strategy
-          translations << ["#{str} - #{format_percent(100.0 * (market_value.to_f / @total_market_value.to_f))}", format_cell(daily_pnl, daily_cont),
+          translations << ["#{str} - #{format_percent(100.0 * (market_value / @total_market_value.to_f))}",
+                           format_cell(daily_pnl, daily_cont),
                            format_cell(mtd_pnl, mtd_cont),
                            format_cell(ytd_pnl, ytd_cont)]
         end
