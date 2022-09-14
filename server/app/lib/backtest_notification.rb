@@ -23,7 +23,7 @@ class BacktestNotification
     if @signal_flag == 1
       "#{@basket} spread crossed above the high band of Paul's indicator (#{@upper.round(2)}) at #{Time.at(@timestamp).to_datetime} while trading position was at 0. Recommend buying (MAX_TRADE_SIZE x) #{@new_positions[1].round(3)} of #{@assets[1]} and #{@new_positions[0].round(3)} of #{@assets[0]}. To see the chart, check out dashboard.novawulf.io/#{@basket.downcase}_arbitrage"
     elsif @signal_flag == -1
-      "#{@basket} spread crossed above the low band of Paul's indicator (#{@lower.round(2)})  at #{Time.at(@timestamp).to_datetime} while trading position was at 0. Recommend buying (MAX_TRADE_SIZE x) #{@new_positions[0].round(3)} #{@assets[0]} and #{@new_positions[1].round(3)} of #{@assets[1]}. To see the chart, check out dashboard.novawulf.io/#{@basket.downcase}_arbitrage"
+      "#{@basket} spread crossed below the low band of Paul's indicator (#{@lower.round(2)})  at #{Time.at(@timestamp).to_datetime} while trading position was at 0. Recommend buying (MAX_TRADE_SIZE x) #{@new_positions[0].round(3)} #{@assets[0]} and #{@new_positions[1].round(3)} of #{@assets[1]}. To see the chart, check out dashboard.novawulf.io/#{@basket.downcase}_arbitrage"
     elsif @signal_flag == 0
       "#{@basket} spread crossed over the mean value of Paul's indicator (#{@mean.round(2)})  at #{Time.at(@timestamp).to_datetime} while we had a net trading position. Recommend closing out positions of #{@assets[1]} and #{@assets[0]}. To see the chart, check out dashboard.novawulf.io/#{@basket.downcase}_arbitrage"
     end
