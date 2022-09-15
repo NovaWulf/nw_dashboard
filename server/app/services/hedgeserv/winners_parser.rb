@@ -3,13 +3,13 @@ module Hedgeserv
     attr_reader :csv_text, :row
 
     ISSUER_COL = 2
-    MARKET_VAL_COL = 5
-    DAILY_PNL_COL = 6
-    MTD_PNL_COL = 7
-    YTD_PNL_COL = 8
-    DAILY_TOTAL_ROR_COL = 16
-    MTD_TOTAL_ROR_COL = 17
-    YTD_TOTAL_ROR_COL = 18
+    MARKET_VAL_COL = 4
+    DAILY_PNL_COL = 5
+    MTD_PNL_COL = 6
+    YTD_PNL_COL = 7
+    DAILY_TOTAL_ROR_COL = 15
+    MTD_TOTAL_ROR_COL = 16
+    YTD_TOTAL_ROR_COL = 17
 
     NUM_WINNERS = 3
 
