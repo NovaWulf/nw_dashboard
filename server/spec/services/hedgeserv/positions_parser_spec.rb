@@ -13,16 +13,16 @@ RSpec.describe Hedgeserv::PositionsParser do
 
     it 'shows total' do
       expect(result[0][0]).to include 'Total'
-      expect(result[0][3]).to include '(4,763)'
-      expect(result[0][3]).to include '-13.0%'
+      expect(result[0][3]).to include '(4,810)'
+      expect(result[0][3]).to include '-13.4%'
     end
 
     it 'groups data' do
       expect(result[1][0]).to include 'Liquid Digital Assets'
-      expect(result[1][3]).to include '(109)'
+      expect(result[1][3]).to include '(110)'
 
       expect(result[2][0]).to include 'Long / Short Public Securities'
-      expect(result[2][1]).to include '127'
+      expect(result[2][1]).to include '60'
     end
 
     it 'shows percent of fund' do

@@ -13,12 +13,12 @@ RSpec.describe Hedgeserv::WinnersParser do
 
     it 'shows name, value and contribution to fund' do
       expect(result[:daily_winners][0][0]).to include 'Bitcoin'
-      expect(result[:daily_winners][0][1]).to include '80'
-      expect(result[:daily_winners][0][1]).to include '0.7%'
+      expect(result[:daily_winners][0][1]).to include '13'
+      expect(result[:daily_winners][0][1]).to include '0.1%'
     end
 
     it 'sorts' do
-      expect(result[:daily_losers][0][0]).to include 'Riot'
+      expect(result[:daily_losers][0][0]).to include 'MicroStrategy'
     end
 
     it 'groups data' do
