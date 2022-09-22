@@ -19,47 +19,45 @@ module Hedgeserv
     def run
       rows = CSV.parse csv_text
       rows.shift # skip the header
-      if rows.blank?
-        ['There are no positions reported.']
-      else
-        summary = rows.shift # skip the summary
-        @total_daily_pnl = summary[DAILY_PNL_COL].to_i / 1000.0
-        @total_mtd_pnl = summary[MTD_PNL_COL].to_i / 1000.0
-        @total_ytd_pnl = summary[YTD_PNL_COL].to_i / 1000.0
-        @total_daily_ror = summary[DAILY_TOTAL_ROR_COL].to_f * 100.0
-        @total_mtd_ror = summary[MTD_TOTAL_ROR_COL].to_f * 100.0
-        @total_ytd_ror = summary[YTD_TOTAL_ROR_COL].to_f * 100.0
+      return ['There are no positions reported.'] if rows.blank?
 
-        translations = [['Total',
-                         format_cell(@total_daily_pnl, @total_daily_ror),
-                         format_cell(@total_mtd_pnl, @total_mtd_ror),
-                         format_cell(@total_ytd_pnl, @total_ytd_ror)]]
+      summary = rows.shift # skip the summary
+      @total_daily_pnl = summary[DAILY_PNL_COL].to_i / 1000.0
+      @total_mtd_pnl = summary[MTD_PNL_COL].to_i / 1000.0
+      @total_ytd_pnl = summary[YTD_PNL_COL].to_i / 1000.0
+      @total_daily_ror = summary[DAILY_TOTAL_ROR_COL].to_f * 100.0
+      @total_mtd_ror = summary[MTD_TOTAL_ROR_COL].to_f * 100.0
+      @total_ytd_ror = summary[YTD_TOTAL_ROR_COL].to_f * 100.0
 
-        rows.reject! { |r| r[ISSUER_COL].include?('Fee') || r[ISSUER_COL] == 'Cash' } # ignore fees and cash
+      translations = [['Total',
+                       format_cell(@total_daily_pnl, @total_daily_ror),
+                       format_cell(@total_mtd_pnl, @total_mtd_ror),
+                       format_cell(@total_ytd_pnl, @total_ytd_ror)]]
 
-        @total_market_value = sum_pnl(rows, MARKET_VAL_COL)
+      rows.reject! { |r| r[ISSUER_COL].include?('Fee') || r[ISSUER_COL] == 'Cash' } # ignore fees and cash
 
-        Rails.logger.info "Found #{rows.count} positions"
+      @total_market_value = sum_pnl(rows, MARKET_VAL_COL)
 
-        rows.group_by { |r| r[STRATEGY_COL].try(:titleize) }.each do |strategy, positions|
-          daily_pnl = sum_pnl(positions, DAILY_PNL_COL)
-          daily_cont = (daily_pnl / @total_daily_pnl) * @total_daily_ror
-          mtd_pnl = sum_pnl(positions, MTD_PNL_COL)
-          mtd_cont = (mtd_pnl / @total_mtd_pnl) * @total_mtd_ror
-          ytd_pnl = sum_pnl(positions, YTD_PNL_COL)
-          ytd_cont = (ytd_pnl / @total_ytd_pnl) * @total_ytd_ror
+      Rails.logger.info "Found #{rows.count} positions"
 
-          market_value = sum_pnl(positions, MARKET_VAL_COL)
+      rows.group_by { |r| r[STRATEGY_COL].try(:titleize) }.each do |strategy, positions|
+        daily_pnl = sum_pnl(positions, DAILY_PNL_COL)
+        daily_cont = (daily_pnl / @total_daily_pnl) * @total_daily_ror
+        mtd_pnl = sum_pnl(positions, MTD_PNL_COL)
+        mtd_cont = (mtd_pnl / @total_mtd_pnl) * @total_mtd_ror
+        ytd_pnl = sum_pnl(positions, YTD_PNL_COL)
+        ytd_cont = (ytd_pnl / @total_ytd_pnl) * @total_ytd_ror
 
-          str = !strategy || strategy.strip.blank? ? '[Untagged Strategy]' : strategy
-          translations << ["#{str} - #{format_percent(100.0 * (market_value / @total_market_value.to_f))}",
-                           format_cell(daily_pnl, daily_cont),
-                           format_cell(mtd_pnl, mtd_cont),
-                           format_cell(ytd_pnl, ytd_cont)]
-        end
+        market_value = sum_pnl(positions, MARKET_VAL_COL)
 
-        translations
+        str = !strategy || strategy.strip.blank? ? '[Untagged Strategy]' : strategy
+        translations << ["#{str} - #{format_percent(100.0 * (market_value / @total_market_value.to_f))}",
+                         format_cell(daily_pnl, daily_cont),
+                         format_cell(mtd_pnl, mtd_cont),
+                         format_cell(ytd_pnl, ytd_cont)]
       end
+
+      translations
     end
 
     def format_cell(pnl, cont)
