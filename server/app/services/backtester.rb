@@ -228,7 +228,10 @@ class Backtester < BaseService
     old_positions = (0..(@num_ownable_assets - 1)).map do |i|
       positions[i][trade&.cursor]
     end
+    price_strings = (0..(@num_ownable_assets - 1)).map do |i|
+      @prices[i][trade&.cursor].to_s
+    end
     BacktestNotification.new(signal_flag: trade&.signal_flag, basket: @basket, timestamp: @starttimes[trade&.cursor], signal_val: @signal[trade&.cursor], assets: @asset_names,
-                             old_positions: old_positions, new_positions: @targets, sd: @in_sample_sd, mean: @in_sample_mean, multiplier: MULTIPLIER)
+                             prices: price_strings, old_positions: old_positions, new_positions: @targets, sd: @in_sample_sd, mean: @in_sample_mean, multiplier: MULTIPLIER)
   end
 end
