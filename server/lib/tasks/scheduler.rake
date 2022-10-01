@@ -36,6 +36,8 @@ task get_recent_data: :environment do
     Fetchers::CirculatingSupplyFetcher.run(token: t)
     Fetchers::FullyDilutedMarketCapFetcher.run(token: t)
   end
+
+  Fetchers::HashPriceAndVolumeFetcher.run
 end
 
 task backfill_github_data: :environment do
