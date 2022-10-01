@@ -25,6 +25,18 @@ RSpec.shared_context 'messari client' do
   end
 end
 
+RSpec.shared_context 'okcoin client' do
+  let(:okcoin_double) do
+    double('okcoin client',
+           price_and_volume:
+            [{ timestamp: Time.now.utc.iso8601, close: '0.0273', volume: '9118' }.with_indifferent_access])
+  end
+
+  before(:each) do
+    allow_any_instance_of(described_class).to receive(:okcoin_client).and_return(okcoin_double)
+  end
+end
+
 RSpec.shared_context 'santiment client' do
   let(:santiment_double) do
     double('santiment client',
@@ -62,7 +74,7 @@ end
 RSpec.shared_context 'coinbase client' do
   let(:coinbase_double) do
     double('coinbase client',
-      get_prices: [[Time.now.to_i,100,100,100,100,100]])
+           get_prices: [[Time.now.to_i, 100, 100, 100, 100, 100]])
   end
 
   before(:each) do
