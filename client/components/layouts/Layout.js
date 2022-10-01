@@ -105,14 +105,7 @@ export default function Layout({ children }) {
             <ListItemText primary="Avalanche" />
           </ListItem>
         </Link>
-        <Link href="/terra">
-          <ListItem button selected={router.pathname == '/terra'} key="Terra">
-            <ListItemIcon>
-              <TerraIcon />
-            </ListItemIcon>
-            <ListItemText primary="Terra" />
-          </ListItem>
-        </Link>
+
         <Link href="/cardano">
           <ListItem
             button

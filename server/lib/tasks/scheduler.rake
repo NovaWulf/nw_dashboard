@@ -1,5 +1,5 @@
 task get_recent_data: :environment do
-  tracked_tokens = %w[btc eth sol luna avax near ada]
+  tracked_tokens = %w[btc eth sol avax near ada]
   tracked_tokens.each do |t|
     Fetchers::EcosystemRepoFetcher.run(token: t)
     Fetchers::PriceDataFetcher.run(token: t)
