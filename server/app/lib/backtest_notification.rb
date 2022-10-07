@@ -1,14 +1,13 @@
 class BacktestNotification
   attr_reader :signal_flag, :basket, :signal_val, :assets, :prev_positions, :new_positions, :timestamp, :upper, :lower,
-              :multiplier, :old_positions
+              :multiplier
 
-  def initialize(signal_flag:, basket:, signal_val:, assets:, prices:, old_positions:, new_positions:, timestamp:, sd:, mean:, multiplier:)
+  def initialize(signal_flag:, basket:, signal_val:, assets:, prices:, new_positions:, timestamp:, sd:, mean:, multiplier:)
     @signal_flag = signal_flag
     @signal_val = signal_val
     @assets = assets
     @prices = prices
     @new_positions = new_positions
-    @old_positions = old_positions
     @timestamp = timestamp
     @upper = sd * multiplier
     @lower = - sd * multiplier
