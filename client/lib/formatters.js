@@ -13,6 +13,9 @@ export function nFormatter(num) {
   if (num >= 1000) {
     return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
   }
+  if (num <= 1) {
+    return num.toFixed(3);
+  }
   return num.toFixed(0);
 }
 
@@ -40,13 +43,12 @@ export function epochFormatterHighRes(time) {
   return dayjs(time * 1000).format('MMM DD');
 }
 
-
 export function dateFormatter(time) {
   return dayjs(time * 1000).format('MM/DD/YY');
 }
 
-export function dateTimeFormatter(time){
-  return dayjs(time * 1000).format('MM/DD/YY HH:mm:ss')
+export function dateTimeFormatter(time) {
+  return dayjs(time * 1000).format('MM/DD/YY HH:mm:ss');
 }
 
 export function percentFormatter(x) {

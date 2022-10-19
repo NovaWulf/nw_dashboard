@@ -17,6 +17,13 @@
   </tr>
 
 	<% if @trades.present? %>
+		<% if @approval_email %>
+			<tr>
+				<td class="content-block">
+					<%= mail_to "accounting@novawulf.io", "Approve Trades", subject: "Trade Approval", body: "#{@to_add} approves the following trades at the time this email is received:\n #{@trades.join("\n")}", class: "btn-primary"  %>
+				</td>
+			</tr>
+		<% end %>
 		<% @trades.map do |text_line| %>
 			<tr>
 				<td class="content-block">

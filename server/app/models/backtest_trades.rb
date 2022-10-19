@@ -13,6 +13,10 @@
 #  updated_at       :datetime         not null
 #  model_id         :string           not null
 #
+# Indexes
+#
+#  index_backtest_trades_on_cursor_and_model_id  (cursor,model_id) UNIQUE
+#
 
 class BacktestTrades < ApplicationRecord
   self.filter_attributes = []

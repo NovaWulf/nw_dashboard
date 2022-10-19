@@ -12,19 +12,16 @@ module Hedgeserv
 
       Rails.logger.info "Found #{rows.count} trades"
 
-      if rows.blank?
-        ['There were no trades booked today.']
-      else
+      return ['There were no trades booked today.'] if rows.blank?
 
-        translations = []
-        rows.each do |row|
-          @row = row
-          next if trade_type == 'EXP'
+      translations = []
+      rows.each do |row|
+        @row = row
+        next if trade_type == 'EXP'
 
-          translations << "• #{fundname} #{trade_type} #{quantity} #{instrument_type} of #{instrument} at #{trade_price} for a total of #{cost}"
-        end
-        translations
+        translations << "• #{fundname} #{trade_type} #{quantity} #{instrument_type} of #{instrument} at #{trade_price} for a total of #{cost}"
       end
+      translations
     end
 
     def fundname

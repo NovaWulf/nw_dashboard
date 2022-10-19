@@ -69,6 +69,13 @@ module Hedgeserv
     def email_notification(trade_text, positions_text, winners_text)
       NotificationMailer.with(subject: 'Daily Trades and P&L',
                               trades: trade_text, positions: positions_text, winners: winners_text, run_date: run_date).daily_trades.deliver_now
+
+      return if trade_text.blank? || trade_text[0].include?('There were no trades booked today')
+
+      NotificationMailer.with(subject: 'Approval Required: Daily Trades and P&L', to_address: 'mike@novawulf.io',
+                              trades: trade_text, positions: positions_text, winners: winners_text, run_date: run_date).daily_trades.deliver_now
+      NotificationMailer.with(subject: 'Approval Required: Daily Trades and P&L', to_address: 'jason@novawulf.io',
+                              trades: trade_text, positions: positions_text, winners: winners_text, run_date: run_date).daily_trades.deliver_now
     end
 
     def trade_parser
