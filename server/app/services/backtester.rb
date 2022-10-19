@@ -217,8 +217,9 @@ class Backtester < BaseService
       last_notif = get_notif_from_trade(most_recent_trade)
       notif_subject = last_notif.generate_subject
       notif_text = last_notif.generate_text
+      notif_url = last_notif.generate_url
       Rails.logger.info "sending arb email with text: #{notif_text}"
-      NotificationMailer.with(subject: notif_subject, text: notif_text).notification.deliver_now
+      NotificationMailer.with(subject: notif_subject, text: notif_text, url: notif_url).notification.deliver_now
       most_recent_trade.update(email_time: Time.now.to_i, email_sent: true)
     end
   end
