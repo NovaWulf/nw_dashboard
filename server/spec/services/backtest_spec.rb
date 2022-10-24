@@ -210,14 +210,12 @@ RSpec.describe Backtester do
   end
 
   it 'does send subsequent email when signal crosses 0' do
-    puts "count 2a: #{ModeledSignal.count}"
     ModeledSignal.create(
       starttime: Time.now.to_i + 60,
       model_id: 'id2',
       resolution: 60,
       value: -4
     )
-    puts "count 2b: #{ModeledSignal.count}"
 
     Candle.create(starttime: Time.now.to_i + 60,
                   pair: 'op-usd',

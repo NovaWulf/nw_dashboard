@@ -3,8 +3,6 @@ library(data.table)
 fitJesseModel = function(){
   print("does file ./public/metrics.csv exist in r?")
   print(file.exists("./public/metrics.csv"))
-  
-
   allDat = data.table(read.csv("./public/metrics.csv"))
   print(names(allDat))
   print(dim(allDat))

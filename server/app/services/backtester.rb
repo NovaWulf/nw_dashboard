@@ -217,8 +217,9 @@ class Backtester < BaseService
       last_notif = get_notif_from_trade(most_recent_trade)
       notif_subject = last_notif.generate_subject
       notif_text = last_notif.generate_text
+      notif_url = last_notif.generate_url
       Rails.logger.info "sending arb email with text: #{notif_text}"
-      NotificationMailer.with(subject: notif_subject, text: notif_text).notification.deliver_now
+      NotificationMailer.with(subject: notif_subject, text: notif_text, url: notif_url).notification.deliver_now
       most_recent_trade.update(email_time: Time.now.to_i, email_sent: true)
     end
   end
@@ -228,7 +229,8 @@ class Backtester < BaseService
     old_positions = (0..(@num_ownable_assets - 1)).map do |i|
       positions[i][trade&.cursor]
     end
+    price_strings = @prices.map { |p| p[trade&.cursor].to_s }
     BacktestNotification.new(signal_flag: trade&.signal_flag, basket: @basket, timestamp: @starttimes[trade&.cursor], signal_val: @signal[trade&.cursor], assets: @asset_names,
-                             old_positions: old_positions, new_positions: @targets, sd: @in_sample_sd, mean: @in_sample_mean, multiplier: MULTIPLIER)
+                             prices: price_strings, new_positions: @targets, sd: @in_sample_sd, mean: @in_sample_mean, multiplier: MULTIPLIER)
   end
 end
