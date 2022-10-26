@@ -1,7 +1,7 @@
 module Fetchers
   class HashPriceAndVolumeFetcher < BaseService
     def run
-      last_date = Metric.by_metric('price').by_token('hash').last&.timestamp
+      last_date = Metric.by_metric('price').by_token('hash').oldest_first.last&.timestamp
       if last_date && last_date >= Date.today
         Rails.logger.info "have recent #{metric_display_name} data, returning"
         return
@@ -9,7 +9,7 @@ module Fetchers
 
       start_time = last_date ? last_date + 1.day : nil
       Rails.logger.info "fetching #{metric_display_name}, start date: #{start_time}"
-      response = okcoin_client.price_and_volume(start_time: start_time)
+      response = okcoin_client.price_and_volume(start_time: start_time&.to_time)
 
       return unless response
 
