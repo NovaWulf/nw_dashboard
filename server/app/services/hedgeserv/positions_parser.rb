@@ -34,7 +34,7 @@ module Hedgeserv
                        format_cell(@total_mtd_pnl, @total_mtd_ror),
                        format_cell(@total_ytd_pnl, @total_ytd_ror)]]
 
-      rows.reject! { |r| r[ISSUER_COL].include?('Fee') || r[ISSUER_COL] == 'Cash' } # ignore fees and cash
+      rows.reject! { |r| (r[ISSUER_COL] || '').include?('Fee') || r[ISSUER_COL] == 'Cash' } # ignore fees and cash
 
       @total_market_value = sum_pnl(rows, MARKET_VAL_COL)
 
