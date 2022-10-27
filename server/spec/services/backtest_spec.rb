@@ -180,7 +180,7 @@ RSpec.describe Backtester do
       signal_flag: 1,
       prev_signal_flag: 0,
       cursor: 0,
-      starttime: t_minus_10,
+      starttime: t_minus_1 + 60,
       email_sent: true
     )
   end
@@ -225,7 +225,7 @@ RSpec.describe Backtester do
     }.by(0)
   end
 
-  it 'does send subsequent email when signal crosses 0' do
+  it 'does  send subsequent email when signal crosses 0 with out-of-sample first leg' do
     ModeledSignal.create(
       starttime: Time.now.to_i + 60,
       model_id: 'id2',
