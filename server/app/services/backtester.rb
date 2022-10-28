@@ -205,10 +205,9 @@ class Backtester < BaseService
   def email_notification
     previous_models = BacktestModel.where("basket= '#{@basket}' and version = #{@version} and sequence_number<=#{@seq_num}").pluck(:model_id)
     # get cursor
-    last_email_starttime = previous_models.map do |m|
-      trades = BacktestTrades.where(model_id: m).oldest_first
-      last_email_time = trades.where(email_sent: true).last&.starttime || 0
-    end.max
+    last_email_starttime = BacktestTrades.where(model_id: previous_models,
+                                                email_sent: true).oldest_first.last&.starttime
+
     trades = BacktestTrades.where(model_id: @model_id).oldest_first
     most_recent_trade = trades.where("starttime>#{last_email_starttime}").last
 
