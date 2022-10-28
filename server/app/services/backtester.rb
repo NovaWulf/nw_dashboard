@@ -211,10 +211,11 @@ class Backtester < BaseService
     end.max
     trades = BacktestTrades.where(model_id: @model_id).oldest_first
     most_recent_trade = trades.where("starttime>#{last_email_starttime}").last
-    second_most_recent_trade = trades.where("starttime=#{last_email_starttime}").last
+
     Rails.logger.info "last email was sent at timestep #{last_email_starttime}."
     # only send email if trade should have happened within the past day
     if most_recent_trade && most_recent_trade&.starttime > @model_endtime && most_recent_trade&.starttime > (Date.today - 5).to_time.to_i && Date.today.to_time.to_i - @model_endtime < 3600 * 24 * 30
+      second_most_recent_trade = trades.where("starttime<#{most_recent_trade&.starttime}").last
       if most_recent_trade&.signal_flag == 0 && second_most_recent_trade&.starttime <= @model_endtime
         Rails.logger.info 'This is the second leg of a trade that was opened in the in-sample region. DQ: Skipping execution'
       else
