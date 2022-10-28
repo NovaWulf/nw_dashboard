@@ -3,7 +3,7 @@ class NotificationMailer < ApplicationMailer
     @subject = params[:subject]
     @text = Array(params[:text])
     @url = params[:url]
-    to_address = ENV['NOTIFICATIONS_EMAIL'] || 'test@example.com'
+    to_address = params[:to_address] || ENV['NOTIFICATIONS_EMAIL'] || 'test@example.com'
     mail(to: to_address, subject: @subject)
   end
 
