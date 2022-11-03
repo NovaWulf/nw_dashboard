@@ -5,14 +5,17 @@ class Backtester < BaseService
               :asset_weights, :num_ownable_assets, :num_obs, :positions, :prices, :pnl, :targets, :version, :basket, :cursor, :starttimes,
               :notifications
 
-  def initialize(version:, basket:, seq_num:)
+  def initialize(version:, basket:, seq_num:, meta: true, since:"2022-10-10")
     @version = version
     @basket = basket
     @seq_num = seq_num
+    @meta = meta
+    @since = since
     @notifications = []
   end
 
   def run
+
     @cursor = 0
     @signal_flag = nil
     load_model(version, seq_num)
@@ -30,9 +33,34 @@ class Backtester < BaseService
     email_notification
   end
 
+  def run_meta
+    max_seq_num = BacktestModel.where("version=#{version} and basket='#{basket}'").oldest_sequence_number_first.last&.sequence_number
+    (0..max_seq_num)).map do |seq_num|
+      @cursor = 0
+      @signal_flag = nil
+      load_model(version, seq_num)
+      set_initial_positions
+
+      while true
+        target_positions
+        generate_orders
+        @cursor += 1 # time moves forward after setting target positions, before actually updating positions
+        break if @cursor == @num_obs
+
+        execute_trades
+        calculate_pnl
+      end
+    end
+    
+    email_notification
+  end
+
+
+
   private
 
-  def load_model(version, seq_num)
+  def load_model(version, seq_num, model_id)
+    
     if !seq_num
       @model_id = BacktestModel.where("version=#{version} and basket = '#{basket}'").oldest_sequence_number_first.last&.model_id
       @seq_num = BacktestModel.where("version=#{version} and basket='#{basket}'").oldest_sequence_number_first.last&.sequence_number
