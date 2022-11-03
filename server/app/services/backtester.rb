@@ -207,10 +207,12 @@ class Backtester < BaseService
     # get cursor
     last_email_starttime = BacktestTrades.where(model_id: previous_models,
                                                 email_sent: true).oldest_first.last&.starttime
-
     trades = BacktestTrades.where(model_id: @model_id).oldest_first
-    most_recent_trade = trades.where("starttime>#{last_email_starttime}").last
-
+    most_recent_trade = if last_email_starttime
+                          trades.where("starttime>#{last_email_starttime}").last
+                        else
+                          trades.last
+                        end
     Rails.logger.info "last email was sent at timestep #{last_email_starttime}."
     # only send email if trade should have happened within the past day
     return unless most_recent_trade
@@ -227,7 +229,7 @@ class Backtester < BaseService
         notif_url = last_notif.generate_url
         Rails.logger.info "sending arb email with text: #{notif_text}"
         NotificationMailer.with(subject: notif_subject, text: notif_text, url: notif_url,
-                                to_address: 'dev@novawulf.io').notification.deliver_now
+                                to_address: 'paulL@novawulf.io').notification.deliver_now
         most_recent_trade.update(email_time: Time.now.to_i, email_sent: true)
       end
     end
