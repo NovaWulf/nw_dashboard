@@ -214,6 +214,8 @@ class Backtester < BaseService
                           trades.last
                         end
     Rails.logger.info "last email was sent at timestep #{last_email_starttime}."
+
+    Rails.logger.info "basket: #{@basket}, most_recent_trade: #{most_recent_trade}, last email timestamp: #{last_email_starttime}"
     # only send email if trade should have happened within the past day
     return unless most_recent_trade
 
