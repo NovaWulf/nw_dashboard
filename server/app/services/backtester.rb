@@ -3,9 +3,9 @@ class Backtester < BaseService
   MAX_TRADE_SIZE_DOLLARS = 1000.0
   attr_reader :model_id, :resolution, :model_starttime, :model_endtime, :in_sample_mean, :in_sample_sd, :assets, :signal_flag, :seq_num,
               :asset_weights, :num_ownable_assets, :num_obs, :positions, :prices, :pnl, :targets, :version, :basket, :cursor, :starttimes,
-              :notifications
+              :notifications, :positions_rollup, :pnl_rollup, :pnl_last_trade, :time_last_trade
 
-  def initialize(version:, basket:, seq_num:, meta: true, since:"2022-10-10")
+  def initialize(version:, basket:, seq_num:, meta: true, since: '2022-10-10')
     @version = version
     @basket = basket
     @seq_num = seq_num
@@ -15,27 +15,7 @@ class Backtester < BaseService
   end
 
   def run
-
-    @cursor = 0
-    @signal_flag = nil
-    load_model(version, seq_num)
-    set_initial_positions
-
-    while true
-      target_positions
-      generate_orders
-      @cursor += 1 # time moves forward after setting target positions, before actually updating positions
-      break if @cursor == @num_obs
-
-      execute_trades
-      calculate_pnl
-    end
-    email_notification
-  end
-
-  def run_meta
-    max_seq_num = BacktestModel.where("version=#{version} and basket='#{basket}'").oldest_sequence_number_first.last&.sequence_number
-    (0..max_seq_num)).map do |seq_num|
+    if !@meta
       @cursor = 0
       @signal_flag = nil
       load_model(version, seq_num)
@@ -50,17 +30,41 @@ class Backtester < BaseService
         execute_trades
         calculate_pnl
       end
+    else
+      max_seq_num = BacktestModel.where("version=#{version} and basket='#{basket}'").oldest_sequence_number_first.last&.sequence_number
+      old_positions = Array.new(@num_ownable_assets)
+      old_position_drawdown = 0
+      old_position_age = 0
+      has_old_position = 0
+      @pnl_rollup = []
+      @positions_rollup = Array.new(@num_ownable_assets) { [] }
+      @starttimes_rollup = []
+      @pnl[0] = 0
+      (0..max_seq_num).map do |seq_num|
+        @cursor = 0
+        @signal_flag = nil
+        load_model(version, seq_num)
+        set_initial_positions
+
+        while true
+          target_positions
+          generate_orders
+          @cursor += 1 # time moves forward after setting target positions, before actually updating positions
+          break if @cursor == @num_obs
+
+          execute_trades
+          calculate_pnl
+
+        end
+      end
     end
-    
+
     email_notification
   end
 
-
-
   private
 
-  def load_model(version, seq_num, model_id)
-    
+  def load_model(version, seq_num)
     if !seq_num
       @model_id = BacktestModel.where("version=#{version} and basket = '#{basket}'").oldest_sequence_number_first.last&.model_id
       @seq_num = BacktestModel.where("version=#{version} and basket='#{basket}'").oldest_sequence_number_first.last&.sequence_number
@@ -92,12 +96,11 @@ class Backtester < BaseService
     signal_endtime = @starttimes.last
     @signal = @signal[start_ind..(@signal.length - 1)]
     @num_obs = @signal.length
-    @pnl = Array.new(@num_obs)
+    @pnl = []
     @targets = Array.new(@num_ownable_assets)
-    @pnl[0] = 0
-    @transactions = Array.new(@num_obs)
+    @pnl.append(0)
     @prices = Array.new(@num_ownable_assets) { Array.new(@num_obs) }
-    @positions = Array.new(@num_ownable_assets) { Array.new(@num_obs) }
+    @positions = Array.new(@num_ownable_assets) { [] }
     @prices =  PriceMerger.run(asset_names: @asset_names, start_time: signal_starttime,
                                end_time: signal_endtime).value[1]
   end
@@ -111,12 +114,16 @@ class Backtester < BaseService
     if @log_prices
       if signal_up(@cursor) && (old_signal_flag == 0 || !old_signal_flag)
         @signal_flag = 1
+        @pnl_last_trade = @pnl[@cursor]
+        @time_last_trade = @starttimes[@cursor]
         @targets = (0..(@num_ownable_assets - 1)).map do |i|
           #- asset_weight_signs[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
           - asset_weights[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
         end
       elsif signal_down(@cursor) && (old_signal_flag == 0 || !old_signal_flag)
         @signal_flag = -1
+        @pnl_last_trade = @pnl[@cursor]
+        @time_last_trade = @starttimes[@cursor]
         @targets = (0..(@num_ownable_assets - 1)).map do |i|
           # asset_weight_signs[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
           asset_weights[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
@@ -165,15 +172,16 @@ class Backtester < BaseService
     @orders = deltas
   end
 
+  # NOTE: that execute_trades is happening at t+1 relative to generate_orders
   def execute_trades
     for i in 0..(@num_ownable_assets - 1)
-      @positions[i][@cursor] = @positions[i][@cursor - 1] + @orders[i]
+      @positions[i].append(@positions[i][@cursor - 1] + @orders[i])
       @orders[i] = 0
     end
   end
 
   def calculate_pnl
-    @pnl[@cursor] = 0
+    this_pnl = 0
     in_sample_flag = @starttimes[@cursor] <= @model_endtime
 
     for i in 0..(@num_ownable_assets - 1)
@@ -189,11 +197,11 @@ class Backtester < BaseService
           )
         end
       end
-      @pnl[@cursor] += @positions[i][@cursor] * (@prices[i][@cursor] - @prices[i][@cursor - 1])
+      this_pnl += @positions[i][@cursor] * (@prices[i][@cursor] - @prices[i][@cursor - 1])
     end
-    @pnl[@cursor] /= MAX_TRADE_SIZE_DOLLARS # calculate profit as a percentage of capital required
-    @pnl[@cursor] += @pnl[@cursor - 1]
-
+    this_pnl /= MAX_TRADE_SIZE_DOLLARS # calculate profit as a percentage of capital required
+    this_pnl += @pnl[@cursor - 1]
+    @pnl.append(this_pnl)
     if @cursor % 100 == 1
       r_count = ModeledSignal.where("model_id='#{@model_id}-b' and starttime=#{@starttimes[@cursor]}").count
       if r_count == 0
@@ -201,7 +209,7 @@ class Backtester < BaseService
           starttime: @starttimes[@cursor],
           model_id: @model_id + '-b',
           resolution: @resolution,
-          value: @pnl[@cursor],
+          value: this_pnl,
           in_sample: in_sample_flag
         )
       end

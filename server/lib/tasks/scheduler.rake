@@ -92,7 +92,7 @@ task rerun_backtest: :environment do
     Rails.logger.info "number of records in modeled signal: #{ModeledSignal.where("model_id like '%#{ENV['model']}%'").count}"
     ArbitrageCalculator.run(version: version, silent: true, basket: basket, seq_num: seq_num)
   end
-  Backtester.run(version: version, basket: basket, seq_num: seq_num)
+  Backtester.run(version: version, basket: basket, seq_num: seq_num, meta: false)
 end
 
 task try_update_models: :environment do
