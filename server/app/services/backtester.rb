@@ -205,8 +205,12 @@ class Backtester < BaseService
   def email_notification
     previous_models = BacktestModel.where("basket= '#{@basket}' and version = #{@version} and sequence_number<=#{@seq_num}").pluck(:model_id)
     # get cursor
-    last_email_starttime = BacktestTrades.where(model_id: previous_models,
-                                                email_sent: true).oldest_first.last&.starttime
+
+    last_email_starttime = previous_models.map do |m|
+      trades = BacktestTrades.where(model_id: m).oldest_first
+      last_email_time = trades.where(email_sent: true).last&.starttime || 0
+    end.max
+
     trades = BacktestTrades.where(model_id: @model_id).oldest_first
     most_recent_trade = if last_email_starttime
                           trades.where("starttime>#{last_email_starttime}").last
@@ -214,7 +218,6 @@ class Backtester < BaseService
                           trades.last
                         end
     Rails.logger.info "last email was sent at timestep #{last_email_starttime}."
-
     Rails.logger.info "basket: #{@basket}, most_recent_trade: #{most_recent_trade}, last email timestamp: #{last_email_starttime}"
     # only send email if trade should have happened within the past day
     return unless most_recent_trade
