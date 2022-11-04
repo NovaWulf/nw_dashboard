@@ -3,7 +3,7 @@ class Backtester < BaseService
   MAX_TRADE_SIZE_DOLLARS = 1000.0
   attr_reader :model_id, :resolution, :model_starttime, :model_endtime, :in_sample_mean, :in_sample_sd, :assets, :signal_flag, :seq_num,
               :asset_weights, :num_ownable_assets, :num_obs, :positions, :prices, :pnl, :targets, :version, :basket, :cursor, :starttimes,
-              :notifications, :positions_rollup, :pnl_rollup, :pnl_last_trade, :time_last_trade
+              :notifications, :starttimes_rollup, :prices_rollup, :pnl_last_trade, :time_last_trade, :meta_cursor, :model_name
 
   def initialize(version:, basket:, seq_num:, meta: true, since: '2022-10-10')
     @version = version
@@ -17,14 +17,16 @@ class Backtester < BaseService
   def run
     if !@meta
       @cursor = 0
+      @meta_cursor = 0
       @signal_flag = nil
       load_model(version, seq_num)
+      @model_name = model_id
       set_initial_positions
-
       while true
         target_positions
         generate_orders
         @cursor += 1 # time moves forward after setting target positions, before actually updating positions
+        @meta_cursor += 1
         break if @cursor == @num_obs
 
         execute_trades
@@ -36,20 +38,26 @@ class Backtester < BaseService
       old_position_drawdown = 0
       old_position_age = 0
       has_old_position = 0
-      @pnl_rollup = []
-      @positions_rollup = Array.new(@num_ownable_assets) { [] }
+      @prices_rollup = Array.new(@num_ownable_assets) { [] }
       @starttimes_rollup = []
       @pnl[0] = 0
+      @meta_cursor = 0
       (0..max_seq_num).map do |seq_num|
         @cursor = 0
         @signal_flag = nil
         load_model(version, seq_num)
+        @model_name = "v#{version}-meta"
+        for i in 0..(@num_ownable_assets - 1)
+          @prices_rollup[i][@prices_rollup[i].length..(@prices[i].length - 1)] = @prices[i]
+        end
+        @starttimes_rollup[@starttimes_rollup.length..(@starttimes.length - 1)] = @starttimes
         set_initial_positions
 
         while true
           target_positions
           generate_orders
           @cursor += 1 # time moves forward after setting target positions, before actually updating positions
+          @meta_cursor += 1
           break if @cursor == @num_obs
 
           execute_trades
@@ -114,7 +122,7 @@ class Backtester < BaseService
     if @log_prices
       if signal_up(@cursor) && (old_signal_flag == 0 || !old_signal_flag)
         @signal_flag = 1
-        @pnl_last_trade = @pnl[@cursor]
+        @pnl_last_trade = @pnl[@meta_cursor]
         @time_last_trade = @starttimes[@cursor]
         @targets = (0..(@num_ownable_assets - 1)).map do |i|
           #- asset_weight_signs[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
@@ -122,7 +130,7 @@ class Backtester < BaseService
         end
       elsif signal_down(@cursor) && (old_signal_flag == 0 || !old_signal_flag)
         @signal_flag = -1
-        @pnl_last_trade = @pnl[@cursor]
+        @pnl_last_trade = @pnl[@meta_cursor]
         @time_last_trade = @starttimes[@cursor]
         @targets = (0..(@num_ownable_assets - 1)).map do |i|
           # asset_weight_signs[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
@@ -137,7 +145,7 @@ class Backtester < BaseService
         end
       else
         @targets = (0..(@num_ownable_assets - 1)).map do |i|
-          @positions[i][@cursor]
+          @positions[i][@meta_cursor]
         end
       end
       if old_signal_flag && @signal_flag != old_signal_flag
@@ -158,7 +166,7 @@ class Backtester < BaseService
         elsif signal_down(@cursor)
           @asset_weights[i] * multiplier
         else
-          @positions[i][@cursor]
+          @positions[i][@meta_cursor]
         end
       end
     end
@@ -167,7 +175,7 @@ class Backtester < BaseService
   def generate_orders
     deltas = Array.new(@num_ownable_assets)
     for i in 0..(@num_ownable_assets - 1)
-      deltas[i] = @targets[i] - @positions[i][@cursor]
+      deltas[i] = @targets[i] - @positions[i][@meta_cursor]
     end
     @orders = deltas
   end
@@ -175,7 +183,7 @@ class Backtester < BaseService
   # NOTE: that execute_trades is happening at t+1 relative to generate_orders
   def execute_trades
     for i in 0..(@num_ownable_assets - 1)
-      @positions[i].append(@positions[i][@cursor - 1] + @orders[i])
+      @positions[i].append(@positions[i][@meta_cursor - 1] + @orders[i])
       @orders[i] = 0
     end
   end
@@ -190,24 +198,24 @@ class Backtester < BaseService
         if r_count == 0
           ModeledSignal.create(
             starttime: @starttimes[@cursor],
-            model_id: @model_id + '-' + @asset_names[i],
+            model_id: @model_name + '-' + @asset_names[i],
             resolution: @resolution,
             value: @targets[i] * prices[i][@cursor - 1] / MAX_TRADE_SIZE_DOLLARS,
             in_sample: in_sample_flag
           )
         end
       end
-      this_pnl += @positions[i][@cursor] * (@prices[i][@cursor] - @prices[i][@cursor - 1])
+      this_pnl += @positions[i][@meta_cursor] * (@prices[i][@cursor] - @prices[i][@cursor - 1])
     end
     this_pnl /= MAX_TRADE_SIZE_DOLLARS # calculate profit as a percentage of capital required
-    this_pnl += @pnl[@cursor - 1]
+    this_pnl += @pnl[@meta_cursor - 1]
     @pnl.append(this_pnl)
     if @cursor % 100 == 1
       r_count = ModeledSignal.where("model_id='#{@model_id}-b' and starttime=#{@starttimes[@cursor]}").count
       if r_count == 0
         ModeledSignal.create(
           starttime: @starttimes[@cursor],
-          model_id: @model_id + '-b',
+          model_id: @model_name + '-b',
           resolution: @resolution,
           value: this_pnl,
           in_sample: in_sample_flag
@@ -219,7 +227,7 @@ class Backtester < BaseService
   def set_initial_positions
     return unless @cursor == 0
 
-    @num_ownable_assets.times { |i| @positions[i][@cursor] = 0 }
+    @num_ownable_assets.times { |i| @positions[i][@meta_cursor] = 0 }
   end
 
   def signal_up(index)
@@ -246,7 +254,6 @@ class Backtester < BaseService
 
     trades = BacktestTrades.where(model_id: @model_id).oldest_first
     most_recent_trade = trades.where("starttime>#{last_email_starttime}").last
-
     Rails.logger.info "last email was sent at timestep #{last_email_starttime}."
     # only send email if trade should have happened within the past day
     return unless most_recent_trade

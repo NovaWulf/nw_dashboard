@@ -186,17 +186,17 @@ RSpec.describe Backtester do
   end
 
   it 'pnl calculation is accurate for price-level model, does not send email when price remains high' do
-    expect { subject.run(version: 0, basket: 'OP_ETH', seq_num: nil) }.to change {
-                                                                            ModeledSignal.where("model_id = 'id1-b'").count
-                                                                          }.by(1)
+    expect { subject.run(version: 0, basket: 'OP_ETH', seq_num: nil, meta: false) }.to change {
+                                                                                         ModeledSignal.where("model_id = 'id1-b'").count
+                                                                                       }.by(1)
     m = ModeledSignal.last
     expect(m.value.round(2)).to eql pnl_expected.round(2)
   end
 
   it 'pnl calculation is accurate for log-price model' do
-    expect { subject.run(version: 1, basket: 'OP_ETH', seq_num: nil) }.to change {
-                                                                            ModeledSignal.where("model_id = 'id2-b'").count
-                                                                          }.by(1)
+    expect { subject.run(version: 1, basket: 'OP_ETH', seq_num: nil, meta: false) }.to change {
+                                                                                         ModeledSignal.where("model_id = 'id2-b'").count
+                                                                                       }.by(1)
     m = ModeledSignal.last
     expect(m.value.round(1)).to eql pnl_expected_log.round(2)
   end
@@ -220,7 +220,7 @@ RSpec.describe Backtester do
                   resolution: 60,
                   low: 0, high: 0, open: 0, close: 0, volume: 0)
 
-    expect { subject.run(version: 1, basket: 'OP_ETH', seq_num: nil) }.to change {
+    expect { subject.run(version: 1, basket: 'OP_ETH', seq_num: nil, meta: false) }.to change {
       ActionMailer::Base.deliveries.count
     }.by(0)
   end
@@ -244,7 +244,7 @@ RSpec.describe Backtester do
                   resolution: 60,
                   low: 0, high: 0, open: 0, close: 0, volume: 0)
 
-    expect { subject.run(version: 1, basket: 'OP_ETH', seq_num: nil) }.to change {
+    expect { subject.run(version: 1, basket: 'OP_ETH', seq_num: nil, meta: false) }.to change {
       ActionMailer::Base.deliveries.count
     }.by(1)
   end
