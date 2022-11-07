@@ -4,6 +4,7 @@ class NotificationMailer < ApplicationMailer
     @text = Array(params[:text])
     @url = params[:url]
     to_address = params[:to_address] || ENV['NOTIFICATIONS_EMAIL'] || 'test@example.com'
+    Rails.logger.info "sending new notification. params[:to_address]: #{params[:to_address]}, ENV['NOTIFICATIONS_EMAIL']: #{ENV['NOTIFICATIONS_EMAIL']}, final to address: #{to_address}"
     mail(to: to_address, subject: @subject)
   end
 
