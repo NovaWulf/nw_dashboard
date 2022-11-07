@@ -17,6 +17,7 @@ class Backtester < BaseService
     @signal_flag = nil
     load_model(version, seq_num)
     set_initial_positions
+
     while true
       target_positions
       generate_orders
@@ -204,23 +205,38 @@ class Backtester < BaseService
   def email_notification
     previous_models = BacktestModel.where("basket= '#{@basket}' and version = #{@version} and sequence_number<=#{@seq_num}").pluck(:model_id)
     # get cursor
+
     last_email_starttime = previous_models.map do |m|
       trades = BacktestTrades.where(model_id: m).oldest_first
       last_email_time = trades.where(email_sent: true).last&.starttime || 0
     end.max
+
     trades = BacktestTrades.where(model_id: @model_id).oldest_first
-    most_recent_trade = trades.where("starttime>#{last_email_starttime}").last
+    most_recent_trade = if last_email_starttime
+                          trades.where("starttime>#{last_email_starttime}").last
+                        else
+                          trades.last
+                        end
     Rails.logger.info "last email was sent at timestep #{last_email_starttime}."
+    Rails.logger.info "basket: #{@basket}, most_recent_trade: #{most_recent_trade}, last email timestamp: #{last_email_starttime}"
     # only send email if trade should have happened within the past day
-    if most_recent_trade && most_recent_trade&.starttime > @model_endtime && most_recent_trade&.starttime > (Date.today - 5).to_time.to_i && Date.today.to_time.to_i - @model_endtime < 3600 * 24 * 30
-      Rails.logger.info 'Sending new Email.'
-      last_notif = get_notif_from_trade(most_recent_trade)
-      notif_subject = last_notif.generate_subject
-      notif_text = last_notif.generate_text
-      notif_url = last_notif.generate_url
-      Rails.logger.info "sending arb email with text: #{notif_text}"
-      NotificationMailer.with(subject: notif_subject, text: notif_text, url: notif_url).notification.deliver_now
-      most_recent_trade.update(email_time: Time.now.to_i, email_sent: true)
+    return unless most_recent_trade
+
+    if most_recent_trade.starttime > @model_endtime && most_recent_trade.starttime > (Date.today - 5).to_time.to_i && Date.today.to_time.to_i - @model_endtime < 3600 * 24 * 30
+      second_most_recent_trade = trades.where("starttime<#{most_recent_trade.starttime}").last
+      if most_recent_trade.signal_flag == 0 && second_most_recent_trade&.starttime <= @model_endtime
+        Rails.logger.info 'This is the second leg of a trade that was opened in the in-sample region. DQ: Skipping execution'
+      else
+        Rails.logger.info 'Sending new Email.'
+        last_notif = get_notif_from_trade(most_recent_trade)
+        notif_subject = last_notif.generate_subject
+        notif_text = last_notif.generate_text
+        notif_url = last_notif.generate_url
+        Rails.logger.info "sending arb email with text: #{notif_text}"
+        NotificationMailer.with(subject: notif_subject, text: notif_text, url: notif_url,
+                                to_address: 'dev@novawulf.io').notification.deliver_now
+        most_recent_trade.update(email_time: Time.now.to_i, email_sent: true)
+      end
     end
   end
 

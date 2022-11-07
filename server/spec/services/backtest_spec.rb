@@ -21,7 +21,7 @@ RSpec.describe Backtester do
   # and candles, model from 1 timestep ago
   before(:each) do
     t_minus_1 = Time.now.to_i - 60
-    t_minus_10 = Time.now.to_i - 60
+    t_minus_10 = Time.now.to_i - 600
     Candle.create(starttime: t_minus_1,
                   pair: 'eth-usd',
                   exchange: 'Coinbase',
@@ -77,7 +77,7 @@ RSpec.describe Backtester do
       basket: 'OP_ETH'
     )
     ModeledSignal.create(
-      starttime: t_minus_1,
+      starttime: t_minus_10,
       model_id: 'id1',
       resolution: 60,
       value: 5
@@ -128,7 +128,7 @@ RSpec.describe Backtester do
     )
 
     ModeledSignal.create(
-      starttime: t_minus_1,
+      starttime: t_minus_10,
       model_id: 'id2',
       resolution: 60,
       value: 5
@@ -166,6 +166,22 @@ RSpec.describe Backtester do
       model_id: 'id2',
       resolution: 60,
       value: 4
+    )
+    BacktestTrades.create(
+      model_id: 'id1',
+      signal_flag: 1,
+      prev_signal_flag: 0,
+      cursor: 0,
+      starttime: t_minus_10,
+      email_sent: true
+    )
+    BacktestTrades.create(
+      model_id: 'id2',
+      signal_flag: 1,
+      prev_signal_flag: 0,
+      cursor: 0,
+      starttime: t_minus_1 + 60,
+      email_sent: true
     )
   end
 
@@ -209,7 +225,7 @@ RSpec.describe Backtester do
     }.by(0)
   end
 
-  it 'does send subsequent email when signal crosses 0' do
+  it 'does  send subsequent email when signal crosses 0 with out-of-sample first leg' do
     ModeledSignal.create(
       starttime: Time.now.to_i + 60,
       model_id: 'id2',
