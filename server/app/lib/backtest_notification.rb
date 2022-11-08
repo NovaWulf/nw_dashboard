@@ -16,7 +16,7 @@ class BacktestNotification
   end
 
   def generate_subject
-    "Statistical Arbitrage Indicator Alert for pair #{@basket}"
+    "#{ENV['DEPLOYMENT_NAME']}: Statistical Arbitrage Indicator Alert for pair #{@basket}"
   end
 
   def generate_url
