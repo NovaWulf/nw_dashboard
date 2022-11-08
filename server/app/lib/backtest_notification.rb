@@ -16,7 +16,11 @@ class BacktestNotification
   end
 
   def generate_subject
-    "#{ENV['DEPLOYMENT_NAME']}: Statistical Arbitrage Indicator Alert for pair #{@basket}"
+    if ENV['DEPLOYMENT_NAME'] != 'production'
+      "#{ENV['DEPLOYMENT_NAME']}: Statistical Arbitrage Indicator Alert for pair #{@basket}"
+    else
+      "Statistical Arbitrage Indicator Alert for pair #{@basket}"
+    end
   end
 
   def generate_url
