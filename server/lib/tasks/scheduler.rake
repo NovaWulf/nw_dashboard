@@ -75,6 +75,20 @@ task update_arb_signal: :environment do
   end
 end
 
+task run_meta_backtest: :environment do
+  tracked_pairs = %w[eth-usd op-usd btc-usd uni-usd snx-usd crv-usd]
+  tracked_pairs.each do |p|
+    Fetchers::CoinbaseFetcher.run(resolution: 60, pair: p)
+  end
+  baskets = %w[BTC_ETH]
+  baskets.each do |b|
+    mu = ModelUpdate.new(basket: b)
+    mu.seed
+    ArbitrageCalculator.run(version: 3, silent: true, basket: b, seq_num: nil)
+    Backtester.run(version: 3, basket: b, seq_num: nil, meta: true)
+  end
+end
+
 task rerun_backtest: :environment do
   model_to_replace = BacktestModel.where(model_id: ENV['model']).last
   version = model_to_replace&.version

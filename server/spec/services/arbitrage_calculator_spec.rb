@@ -14,8 +14,8 @@ RSpec.describe ArbitrageCalculator do
   end
 
   let(:arb_signal_expected) do
-    op_weight * op_candle +
-      eth_weight * eth_candle +
+    op_weight * Math.log(op_candle) +
+      eth_weight * Math.log(eth_candle) +
       const_weight
   end
 
@@ -26,13 +26,13 @@ RSpec.describe ArbitrageCalculator do
                   pair: 'op-usd',
                   exchange: 'Coinbase',
                   resolution: 60,
-                  low: 2, high: 2, open: 2, close: 2, volume: 2)
+                  low: Math.exp(2), high: Math.exp(2), open: Math.exp(2), close: Math.exp(2), volume: Math.exp(2))
 
     Candle.create(starttime: Time.now.to_i - 60,
                   pair: 'eth-usd',
                   exchange: 'Coinbase',
                   resolution: 60,
-                  low: 1, high: 1, open: 1, close: 1, volume: 1)
+                  low: Math.exp(1), high: Math.exp(1), open: Math.exp(1), close: Math.exp(1), volume: Math.exp(1))
 
     CointegrationModelWeight.create(
       uuid: 'id1',
@@ -67,7 +67,8 @@ RSpec.describe ArbitrageCalculator do
       model_starttime: 1_600_000_000,
       model_endtime: 1_700_000_000,
       in_sample_mean: 0,
-      in_sample_sd: 100
+      in_sample_sd: 100,
+      log_prices: true
     )
 
     BacktestModel.create(
@@ -104,7 +105,7 @@ RSpec.describe ArbitrageCalculator do
         pair: 'op-usd',
         exchange: 'Coinbase',
         resolution: 60,
-        low: 100, high: 100, open: 100, close: 100, volume: 100
+        low: Math.exp(100), high: Math.exp(100), open: Math.exp(100), close: Math.exp(100), volume: Math.exp(100)
       )
     end
     let!(:eth_candle_new) do
@@ -113,7 +114,7 @@ RSpec.describe ArbitrageCalculator do
         pair: 'eth-usd',
         exchange: 'Coinbase',
         resolution: 60,
-        low: 90, high: 90, open: 90, close: 90, volume: 90
+        low: Math.exp(90), high: Math.exp(90), open: Math.exp(90), close: Math.exp(90), volume: Math.exp(90)
       )
     end
     it 'does not send email' do
@@ -127,7 +128,7 @@ RSpec.describe ArbitrageCalculator do
         pair: 'op-usd',
         exchange: 'Coinbase',
         resolution: 60,
-        low: 101, high: 101, open: 101, close: 101, volume: 101
+        low: Math.exp(101), high: Math.exp(101), open: Math.exp(101), close: Math.exp(101), volume: Math.exp(101)
       )
     end
     let!(:eth_candle_create_new2) do
@@ -136,7 +137,7 @@ RSpec.describe ArbitrageCalculator do
         pair: 'eth-usd',
         exchange: 'Coinbase',
         resolution: 60,
-        low: 300, high: 300, open: 300, close: 300, volume: 300
+        low: Math.exp(300), high: Math.exp(300), open: Math.exp(300), close: Math.exp(300), volume: Math.exp(300)
       )
     end
     it 'does send email' do

@@ -11,9 +11,6 @@ RSpec.describe Backtester do
     CointegrationModelWeight.where("uuid = '#{latest_model}' and asset_name = 'eth-usd'").first.weight
   end
 
-  let(:pnl_expected) do
-    - op_weight * (op_candle_second - op_candle_first) - eth_weight * (eth_candle_second - eth_candle_first)
-  end
   let(:pnl_expected_log) do
     - (op_weight / op_candle_first) * (op_candle_second - op_candle_first) - (eth_weight / eth_candle_first) * (eth_candle_second - eth_candle_first)
   end
@@ -21,7 +18,9 @@ RSpec.describe Backtester do
   # and candles, model from 1 timestep ago
   before(:each) do
     t_minus_1 = Time.now.to_i - 60
+    t_minus_5 = Time.now.to_i - 300
     t_minus_10 = Time.now.to_i - 600
+    t_minus_20 = Time.now.to_i - 1200
     Candle.create(starttime: t_minus_1,
                   pair: 'eth-usd',
                   exchange: 'Coinbase',
@@ -34,24 +33,6 @@ RSpec.describe Backtester do
                   resolution: 60,
                   low: 3, high: 3, open: 3, close: 3, volume: 3)
 
-    CointegrationModelWeight.create(
-      uuid: 'id1',
-      timestamp: t_minus_10,
-      asset_name: 'eth-usd',
-      weight: 1
-    )
-    CointegrationModelWeight.create(
-      uuid: 'id1',
-      timestamp: t_minus_10,
-      asset_name: 'op-usd',
-      weight: -1
-    )
-    CointegrationModelWeight.create(
-      uuid: 'id1',
-      timestamp: t_minus_10,
-      asset_name: 'det',
-      weight: 0
-    )
     CointegrationModel.create(
       uuid: 'id1',
       timestamp: t_minus_10,
@@ -63,11 +44,11 @@ RSpec.describe Backtester do
       test_stat: 9,
       top_eig: 0.0008,
       resolution: 60,
-      model_starttime: t_minus_10,
-      model_endtime: t_minus_1,
+      model_starttime: t_minus_20,
+      model_endtime: t_minus_5,
       in_sample_mean: 0,
       in_sample_sd: 3,
-      log_prices: false
+      log_prices: true
     )
     BacktestModel.create(
       version: 0,
@@ -183,14 +164,6 @@ RSpec.describe Backtester do
       starttime: t_minus_1 + 60,
       email_sent: true
     )
-  end
-
-  it 'pnl calculation is accurate for price-level model, does not send email when price remains high' do
-    expect { subject.run(version: 0, basket: 'OP_ETH', seq_num: nil, meta: false) }.to change {
-                                                                                         ModeledSignal.where("model_id = 'id1-b'").count
-                                                                                       }.by(1)
-    m = ModeledSignal.last
-    expect(m.value.round(2)).to eql pnl_expected.round(2)
   end
 
   it 'pnl calculation is accurate for log-price model' do

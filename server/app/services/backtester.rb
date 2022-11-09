@@ -34,13 +34,12 @@ class Backtester < BaseService
       end
     else
       max_seq_num = BacktestModel.where("version=#{version} and basket='#{basket}'").oldest_sequence_number_first.last&.sequence_number
-      old_positions = Array.new(@num_ownable_assets)
+      old_positions = Array.new(2)
       old_position_drawdown = 0
       old_position_age = 0
       has_old_position = 0
-      @prices_rollup = Array.new(@num_ownable_assets) { [] }
+      @prices_rollup = Array.new(2) { [] }
       @starttimes_rollup = []
-      @pnl[0] = 0
       @meta_cursor = 0
       (0..max_seq_num).map do |seq_num|
         @cursor = 0
@@ -79,7 +78,6 @@ class Backtester < BaseService
     else
       @model_id = BacktestModel.where(version: version, basket: basket, sequence_number: seq_num).last&.model_id
     end
-
     Rails.logger.info "backtesting model #{@model_id} with sequence number #{seq_num}"
     model = CointegrationModel.where("uuid = '#{@model_id}'").last
     @log_prices = model&.log_prices
@@ -116,58 +114,41 @@ class Backtester < BaseService
   def target_positions
     # In price model, eigenvectors represent weight in shares,
     # whereas in log-price model, eigenvectors are in $
-    asset_weight_signs = @asset_weights.map { |a| a >= 0 ? 1.0 : -1.0 }
 
     old_signal_flag = @signal_flag
-    if @log_prices
-      if signal_up(@cursor) && (old_signal_flag == 0 || !old_signal_flag)
-        @signal_flag = 1
-        @pnl_last_trade = @pnl[@meta_cursor]
-        @time_last_trade = @starttimes[@cursor]
-        @targets = (0..(@num_ownable_assets - 1)).map do |i|
-          #- asset_weight_signs[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
-          - asset_weights[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
-        end
-      elsif signal_down(@cursor) && (old_signal_flag == 0 || !old_signal_flag)
-        @signal_flag = -1
-        @pnl_last_trade = @pnl[@meta_cursor]
-        @time_last_trade = @starttimes[@cursor]
-        @targets = (0..(@num_ownable_assets - 1)).map do |i|
-          # asset_weight_signs[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
-          asset_weights[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
-        end
-      elsif @cursor > 0 &&
-            ((signal_pos(@cursor) && (old_signal_flag == -1 || !old_signal_flag)) ||
-             (signal_neg(@cursor) && (old_signal_flag == 1 || !old_signal_flag)))
-        @signal_flag = 0
-        @targets = (0..(@num_ownable_assets - 1)).map do |_i|
-          0
-        end
-      else
-        @targets = (0..(@num_ownable_assets - 1)).map do |i|
-          @positions[i][@meta_cursor]
-        end
+    if signal_up(@cursor) && (old_signal_flag == 0 || !old_signal_flag)
+      @signal_flag = 1
+      @pnl_last_trade = @pnl[@meta_cursor]
+      @time_last_trade = @starttimes[@cursor]
+      @targets = (0..(@num_ownable_assets - 1)).map do |i|
+        #- asset_weight_signs[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
+        - asset_weights[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
       end
-      if old_signal_flag && @signal_flag != old_signal_flag
-        r_count = BacktestTrades.where(model_id: @model_id, cursor: @cursor).count
-        if r_count == 0
-          BacktestTrades.create(model_id: @model_id, signal_flag: @signal_flag, prev_signal_flag: old_signal_flag,
-                                cursor: @cursor, starttime: @starttimes[@cursor])
-        end
+    elsif signal_down(@cursor) && (old_signal_flag == 0 || !old_signal_flag)
+      @signal_flag = -1
+      @pnl_last_trade = @pnl[@meta_cursor]
+      @time_last_trade = @starttimes[@cursor]
+      @targets = (0..(@num_ownable_assets - 1)).map do |i|
+        # asset_weight_signs[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
+        asset_weights[i] * MAX_TRADE_SIZE_DOLLARS / prices[i][@cursor]
+      end
+    elsif @cursor > 0 &&
+          ((signal_pos(@cursor) && (old_signal_flag == -1 || !old_signal_flag)) ||
+            (signal_neg(@cursor) && (old_signal_flag == 1 || !old_signal_flag)))
+      @signal_flag = 0
+      @targets = (0..(@num_ownable_assets - 1)).map do |_i|
+        0
       end
     else
-      n_shares_first_asset = MAX_TRADE_SIZE_DOLLARS / prices[0][@cursor]
-      multiplier = n_shares_first_asset / @asset_weights[0]
-      # NOTE: first asset weight should always be 0 using the urca package
-      # but I'm writing it out here explicitly for clarity
       @targets = (0..(@num_ownable_assets - 1)).map do |i|
-        if signal_up(@cursor)
-          - @asset_weights[i] * multiplier
-        elsif signal_down(@cursor)
-          @asset_weights[i] * multiplier
-        else
-          @positions[i][@meta_cursor]
-        end
+        @positions[i][@meta_cursor]
+      end
+    end
+    if old_signal_flag && @signal_flag != old_signal_flag
+      r_count = BacktestTrades.where(model_id: @model_id, cursor: @cursor).count
+      if r_count == 0
+        BacktestTrades.create(model_id: @model_id, signal_flag: @signal_flag, prev_signal_flag: old_signal_flag,
+                              cursor: @cursor, starttime: @starttimes[@cursor])
       end
     end
   end
