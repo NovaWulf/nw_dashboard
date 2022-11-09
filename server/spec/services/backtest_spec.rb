@@ -124,7 +124,7 @@ RSpec.describe Backtester do
     )
 
     ModeledSignal.create(
-      starttime: t_minus_10,
+      starttime: t_minus_1,
       model_id: 'id2',
       resolution: 60,
       value: 5

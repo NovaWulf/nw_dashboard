@@ -28,7 +28,6 @@ class PriceMerger < BaseService
     records_array = ActiveRecord::Base.connection.execute(sql)
     Rails.logger.info "number of records after merge (outer join): #{records_array.count}"
     starttimes = records_array.pluck('starttime')
-    debugger
     Rails.logger.info "length of starttimes: #{starttimes.length}"
     Rails.logger.info "last start time: #{starttimes[starttimes.length - 1]}"
     return nil if start_time && starttimes[starttimes.length - 1] < start_time

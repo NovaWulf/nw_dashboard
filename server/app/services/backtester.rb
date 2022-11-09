@@ -122,19 +122,24 @@ class Backtester < BaseService
     end
     @signal = modeled_signal.map { |x| x[0] }
     @starttimes = modeled_signal.map { |x| x[1] }
-    start_ind = @starttimes.index(@model_starttime)
-    signal_starttime = @starttimes[start_ind]
-    signal_endtime = @starttimes.last
-    @signal = @signal[start_ind..(@signal.length - 1)]
+    if @starttimes[0] < @model_starttime
+      start_ind = @starttimes.index(@model_starttime)
+      signal_starttime = @starttimes[start_ind]
+      signal_endtime = @starttimes.last
+      @signal = @signal[start_ind..(@signal.length - 1)]
+    else
+      signal_starttime = @starttimes[0]
+      signal_endtime = @starttimes[@starttimes.length - 1]
+    end
+
     @num_obs = @signal.length
     @pnl = []
     @targets = Array.new(@num_ownable_assets)
     @pnl.append(0)
     @prices = Array.new(@num_ownable_assets) { Array.new(@num_obs) }
     @positions = Array.new(@num_ownable_assets) { [] }
-    debugger
-    @prices =  PriceMerger.run(asset_names: @asset_names, start_time: signal_starttime,
-                               end_time: signal_endtime).value[1]
+    @prices = PriceMerger.run(asset_names: @asset_names, start_time: signal_starttime,
+                              end_time: signal_endtime).value[1]
   end
 
   def target_positions
