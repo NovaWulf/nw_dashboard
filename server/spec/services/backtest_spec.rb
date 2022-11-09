@@ -1,9 +1,7 @@
 RSpec.describe Backtester do
   subject { described_class }
-  let(:op_candle_first) { Candle.by_pair('op-usd').first&.close }
-  let(:eth_candle_first) { Candle.by_pair('eth-usd').first&.close }
-  let(:op_candle_second) { Candle.by_pair('op-usd').last&.close }
-  let(:eth_candle_second) { Candle.by_pair('eth-usd').last&.close }
+  let(:op_candles) { Candle.by_pair('op-usd').pluck(:close) }
+  let(:eth_candles) { Candle.by_pair('eth-usd').pluck(:close) }
   let(:latest_model) { CointegrationModel.newest_first.first&.uuid }
   let(:log_prices) { CointegrationModel.newest_first.first&.log_prices }
   let(:op_weight) { CointegrationModelWeight.where("uuid = '#{latest_model}' and asset_name = 'op-usd'").first.weight }
@@ -12,15 +10,31 @@ RSpec.describe Backtester do
   end
 
   let(:pnl_expected_log) do
-    - (op_weight / op_candle_first) * (op_candle_second - op_candle_first) - (eth_weight / eth_candle_first) * (eth_candle_second - eth_candle_first)
+    - (op_weight / op_candles[1]) * (op_candles[2] - op_candles[1]) - (eth_weight / eth_candles[1]) * (eth_candles[2] - eth_candles[1])
   end
+
+  # let(:meta_pnl_expected_log) do
+  #   - (op_weight / op_candles[1]) * (op_candle_second - op_candles[1]) - (eth_weight / eth_candle_first) * (eth_candle_second - eth_candle_first)
+  # end
   # suppose we have a signal from 2 time steps ago,
   # and candles, model from 1 timestep ago
   before(:each) do
     t_minus_1 = Time.now.to_i - 60
+    t_minus_2 = Time.now.to_i - 120
+    t_minus_4 = Time.now.to_i - 240
     t_minus_5 = Time.now.to_i - 300
     t_minus_10 = Time.now.to_i - 600
     t_minus_20 = Time.now.to_i - 1200
+    Candle.create(starttime: t_minus_4,
+                  pair: 'eth-usd',
+                  exchange: 'Coinbase',
+                  resolution: 60,
+                  low: 1, high: 1, open: 1, close: 1, volume: 1)
+    Candle.create(starttime: t_minus_4,
+                  pair: 'op-usd',
+                  exchange: 'Coinbase',
+                  resolution: 60,
+                  low: 3, high: 3, open: 3, close: 3, volume: 3)
     Candle.create(starttime: t_minus_1,
                   pair: 'eth-usd',
                   exchange: 'Coinbase',
@@ -35,7 +49,7 @@ RSpec.describe Backtester do
 
     CointegrationModel.create(
       uuid: 'id1',
-      timestamp: t_minus_10,
+      timestamp: t_minus_5,
       ecdet: 'const',
       spec: 'transitory',
       cv_10_pct: 6,
@@ -50,6 +64,7 @@ RSpec.describe Backtester do
       in_sample_sd: 3,
       log_prices: true
     )
+
     BacktestModel.create(
       version: 0,
       model_id: 'id1',
@@ -84,7 +99,7 @@ RSpec.describe Backtester do
 
     CointegrationModel.create(
       uuid: 'id2',
-      timestamp: t_minus_10,
+      timestamp: t_minus_1,
       ecdet: 'const',
       spec: 'transitory',
       cv_10_pct: 6,
@@ -103,8 +118,8 @@ RSpec.describe Backtester do
     BacktestModel.create(
       version: 1,
       model_id: 'id2',
-      sequence_number: 0,
-      name: 'seed_model',
+      sequence_number: 1,
+      name: 'model update',
       basket: 'OP_ETH'
     )
 
@@ -198,7 +213,7 @@ RSpec.describe Backtester do
     }.by(0)
   end
 
-  it 'does  send subsequent email when signal crosses 0 with out-of-sample first leg' do
+  it 'does send subsequent email when signal crosses 0 with out-of-sample first leg' do
     ModeledSignal.create(
       starttime: Time.now.to_i + 60,
       model_id: 'id2',
@@ -221,4 +236,12 @@ RSpec.describe Backtester do
       ActionMailer::Base.deliveries.count
     }.by(1)
   end
+
+  # it 'meta strategy has correct pnl' do
+  #   expect { subject.run(version: 1, basket: 'OP_ETH', seq_num: nil, meta: true) }.to change {
+  #     ModeledSignal.where("model_id = 'v1-meta'").count
+  #   }.by(1)
+  #   m = ModeledSignal.last
+  #   expect(m.value.round(1)).to eql meta_pnl_expected_log.round(2)
+  # end
 end

@@ -38,13 +38,17 @@ class Backtester < BaseService
       old_position_drawdown = 0
       old_position_age = 0
       has_old_position = 0
+
       @prices_rollup = Array.new(2) { [] }
       @starttimes_rollup = []
       @meta_cursor = 0
       (0..max_seq_num).map do |seq_num|
         @cursor = 0
         @signal_flag = nil
-        load_model(version, seq_num)
+        @next_model_endtime = nil
+        early_trunc_endtime = get_next_model_endtime(version, seq_num + 1) if seq_num < max_seq_num
+        load_model(version, seq_num, early_trunc_endtime, true)
+
         @model_name = "v#{version}-meta"
         for i in 0..(@num_ownable_assets - 1)
           @prices_rollup[i][@prices_rollup[i].length..(@prices[i].length - 1)] = @prices[i]
@@ -71,7 +75,14 @@ class Backtester < BaseService
 
   private
 
-  def load_model(version, seq_num)
+  def get_model_endtime(version, seq_num)
+    @model_id = BacktestModel.where(version: version, basket: basket, sequence_number: seq_num).last&.model_id
+    Rails.logger.info "backtesting model #{@model_id} with sequence number #{seq_num}"
+    model = CointegrationModel.where("uuid = '#{@model_id}'").last
+    model.model_endtime
+  end
+
+  def load_model(version, seq_num, early_trunc_endtime = nil, oos_only = false)
     if !seq_num
       @model_id = BacktestModel.where("version=#{version} and basket = '#{basket}'").oldest_sequence_number_first.last&.model_id
       @seq_num = BacktestModel.where("version=#{version} and basket='#{basket}'").oldest_sequence_number_first.last&.sequence_number
@@ -94,7 +105,21 @@ class Backtester < BaseService
     @asset_names.delete_at(det_index)
     @asset_weights.delete_at(det_index)
     @num_ownable_assets = @asset_names.length
-    modeled_signal = ModeledSignal.where("model_id = '#{@model_id}'").oldest_first.pluck(:value, :starttime)
+    if !early_trunc_endtime && oos_only == false
+      modeled_signal = ModeledSignal.where("model_id = '#{@model_id}'").oldest_first.pluck(:value, :starttime)
+    elsif early_trunc_endtime && oos_only == false
+      modeled_signal = ModeledSignal.where("model_id = '#{@model_id}' and starttime<=#{early_trunc_endtime}").oldest_first.pluck(
+        :value, :starttime
+      )
+    elsif !early_trunc_endtime && oos_only == true
+      modeled_signal = ModeledSignal.where("model_id = '#{@model_id}' and starttime>#{@model_endtime}").oldest_first.pluck(
+        :value, :starttime
+      )
+    else
+      modeled_signal = ModeledSignal.where("model_id = '#{@model_id}' and starttime<=#{early_trunc_endtime} and starttime>#{@model_endtime}").oldest_first.pluck(
+        :value, :starttime
+      )
+    end
     @signal = modeled_signal.map { |x| x[0] }
     @starttimes = modeled_signal.map { |x| x[1] }
     start_ind = @starttimes.index(@model_starttime)
@@ -107,6 +132,7 @@ class Backtester < BaseService
     @pnl.append(0)
     @prices = Array.new(@num_ownable_assets) { Array.new(@num_obs) }
     @positions = Array.new(@num_ownable_assets) { [] }
+    debugger
     @prices =  PriceMerger.run(asset_names: @asset_names, start_time: signal_starttime,
                                end_time: signal_endtime).value[1]
   end
