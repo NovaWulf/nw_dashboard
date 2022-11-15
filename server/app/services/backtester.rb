@@ -38,22 +38,26 @@ class Backtester < BaseService
       old_position_drawdown = 0
       old_position_age = 0
       has_old_position = 0
-
+      @positions = Array.new(2) { [] }
+      @pnl=[]
+      @pnl.append(0)
       @prices_rollup = Array.new(2) { [] }
       @starttimes_rollup = []
+      @pnl_rollup 
       @meta_cursor = 0
       (0..max_seq_num).map do |seq_num|
         @cursor = 0
         @signal_flag = nil
         @next_model_endtime = nil
-        early_trunc_endtime = get_next_model_endtime(version, seq_num + 1) if seq_num < max_seq_num
+        early_trunc_endtime = get_model_endtime(version, seq_num + 1) if seq_num < max_seq_num
         load_model(version, seq_num, early_trunc_endtime, true)
-
         @model_name = "v#{version}-meta"
+        # In the next 4 lines, were just appending in a batch here -- this could just as well be implemented with 
+        # an extra append statement inside internal functions, and could also be made much more space efficient
         for i in 0..(@num_ownable_assets - 1)
-          @prices_rollup[i][@prices_rollup[i].length..(@prices[i].length - 1)] = @prices[i]
+          @prices_rollup[i][@prices_rollup[i].length..(@prices_rollup[i].length+@prices[i].length - 1)] = @prices[i]
         end
-        @starttimes_rollup[@starttimes_rollup.length..(@starttimes.length - 1)] = @starttimes
+        @starttimes_rollup[@starttimes_rollup.length..(@starttimes_rollup.length+@starttimes.length - 1)] = @starttimes
         set_initial_positions
 
         while true
@@ -65,8 +69,10 @@ class Backtester < BaseService
 
           execute_trades
           calculate_pnl
-
         end
+        # we have to pull back the meta-cursor because it gets run n+1 more times compared to calculate_pnl
+        @meta_cursor-=1
+
       end
     end
 
@@ -88,6 +94,7 @@ class Backtester < BaseService
       @seq_num = BacktestModel.where("version=#{version} and basket='#{basket}'").oldest_sequence_number_first.last&.sequence_number
     else
       @model_id = BacktestModel.where(version: version, basket: basket, sequence_number: seq_num).last&.model_id
+      @seq_num=seq_num
     end
     Rails.logger.info "backtesting model #{@model_id} with sequence number #{seq_num}"
     model = CointegrationModel.where("uuid = '#{@model_id}'").last
@@ -102,6 +109,7 @@ class Backtester < BaseService
     @asset_names = assets.map { |x| x[0] }
     @asset_weights = assets.map { |x| x[1] }
     det_index = @asset_names.index('det')
+
     @asset_names.delete_at(det_index)
     @asset_weights.delete_at(det_index)
     @num_ownable_assets = @asset_names.length
@@ -133,11 +141,19 @@ class Backtester < BaseService
     end
 
     @num_obs = @signal.length
-    @pnl = []
+
+    # re-initialize positions and pnl only if we're not in meta strategy
+    # otherwise pnl and positions are initialize once outside the main loop
+    if !@meta
+      @pnl = []
+      @pnl.append(0)
+      @positions = Array.new(@num_ownable_assets) { [] }
+    end
+    
+    
     @targets = Array.new(@num_ownable_assets)
-    @pnl.append(0)
     @prices = Array.new(@num_ownable_assets) { Array.new(@num_obs) }
-    @positions = Array.new(@num_ownable_assets) { [] }
+
     @prices = PriceMerger.run(asset_names: @asset_names, start_time: signal_starttime,
                               end_time: signal_endtime).value[1]
   end
