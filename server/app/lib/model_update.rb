@@ -56,9 +56,19 @@ class ModelUpdate < BaseService
     end
   end
 
+  def is_num?(str)
+    !!Integer(str)
+  rescue ArgumentError, TypeError
+    false
+  end
+
   def update_model(version:, max_weeks_back:, min_weeks_back:, interval_mins:, as_of_date: nil)
     CsvWriter.run(table: 'candles', assets: asset_names)
-    as_of_time = DateTime.strptime(as_of_date, '%Y-%m-%d').to_i unless as_of_date.nil?
+    if !is_num?(as_of_date)
+      as_of_time = DateTime.strptime(as_of_date, '%Y-%m-%d').to_i unless as_of_date.nil?
+    else
+      as_of_time = Integer(as_of_date)
+    end
     ArbitrageCalculator.run(version: version, silent: true, seq_num: nil, basket: @basket)
     Backtester.run(version: version, seq_num: nil, basket: @basket)
     last_candle_time = as_of_time || Candle.oldest_first.last&.starttime

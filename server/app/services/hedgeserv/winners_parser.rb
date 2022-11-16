@@ -33,8 +33,7 @@ module Hedgeserv
         @total_ytd_ror = summary[YTD_TOTAL_ROR_COL].to_f * 100.0
 
         results = {}
-
-        rows.reject! { |r| r[ISSUER_COL].include?('Fee') || r[ISSUER_COL] == 'Cash' } # ignore fees and cash
+        rows.reject! { |r| (r[ISSUER_COL] || '').include?('Fee') || r[ISSUER_COL] == 'Cash' } # ignore fees and cash
 
         Rails.logger.info "Found #{rows.count} positions"
 
