@@ -13,6 +13,8 @@ module Types
       argument :basket, String
     end
 
+    
+
     field :dual_candle_charts, [[Types::CandleType]], null: false do
       argument :version, Integer
       argument :sequence_number, Integer, required: false
@@ -25,9 +27,19 @@ module Types
       argument :basket, String
     end
 
+    field :meta_backtest_model, [Types::ModeledSignalType], null: false do
+      argument :version, Integer
+      argument :basket, String
+    end
+
     field :backtest_positions, [[Types::ModeledSignalType]], null: false do
       argument :version, Integer
       argument :sequence_number, Integer, required: false
+      argument :basket, String
+    end
+
+    field :meta_backtest_positions, [[Types::ModeledSignalType]], null: false do
+      argument :version, Integer
       argument :basket, String
     end
 
@@ -52,6 +64,12 @@ module Types
       argument :sequence_number, Integer, required: false
       argument :basket, String
     end
+
+    field :get_meta_breakpoints, [Types::CointegrationModelType], null: false do
+      argument :version, Integer
+      argument :basket, String
+    end
+
     field :cointegration_model_weights, [Types::CointegrationModelWeightType], null: false do
       argument :version, Integer
       argument :sequence_number, Integer, required: false
@@ -183,6 +201,10 @@ module Types
                                                   sequence_number: sequence_number).value
     end
 
+    def get_meta_breakpoints(version:, basket:)
+      Displayers::MetaBreakpointDisplayer.run(version: version, basket: basket).value
+    end
+
     def cointegration_model_weights(version:, basket:, sequence_number: nil)
       Displayers::CointegrationModelWeightDisplayer.run(version: version, basket: basket,
                                                         sequence_number: sequence_number).value
@@ -208,8 +230,16 @@ module Types
       Displayers::BacktestDisplayer.run(version: version, basket: basket, sequence_number: sequence_number).value
     end
 
+    def meta_backtest_model(version:, basket:, sequence_number: nil)
+      Displayers::MetaBacktestDisplayer.run(version: version, basket: basket).value
+    end
+
     def backtest_positions(version:, basket:, sequence_number: nil)
       Displayers::PositionsDisplayer.run(version: version, basket: basket, sequence_number: sequence_number).value
+    end
+
+    def meta_backtest_positions(version:, basket:)
+      Displayers::MetaPositionsDisplayer.run(version: version, basket: basket).value
     end
 
     def smart_contract_contracts(token:)

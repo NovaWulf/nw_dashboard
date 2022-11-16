@@ -51,7 +51,7 @@ class Backtester < BaseService
         @next_model_endtime = nil
         early_trunc_endtime = get_model_endtime(version, seq_num + 1) if seq_num < max_seq_num
         load_model(version, seq_num, early_trunc_endtime, true)
-        @model_name = "v#{version}-meta"
+        @model_name = "v#{version}-#{basket}-meta"
         # In the next 4 lines, were just appending in a batch here -- this could just as well be implemented with 
         # an extra append statement inside internal functions, and could also be made much more space efficient
         for i in 0..(@num_ownable_assets - 1)
@@ -70,7 +70,7 @@ class Backtester < BaseService
           execute_trades
           calculate_pnl
         end
-        # we have to pull back the meta-cursor because it gets run n+1 more times compared to calculate_pnl
+        # we have to pull back the meta-cursor because it gets run +1 more times compared to calculate_pnl
         @meta_cursor-=1
 
       end
