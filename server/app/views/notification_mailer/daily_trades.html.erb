@@ -21,6 +21,7 @@
 			<tr>
 				<td class="content-block">
 					<%= mail_to "accounting@novawulf.io", "Approve Trades", subject: "Trade Approval", body: "#{@to_add} approves the following trades at the time this email is received:\n #{@trades.join("\n")}", class: "btn-primary"  %>
+					<%= mail_to "accounting@novawulf.io", "Reject Trades", subject: "Trade Rejection", body: "#{@to_add} rejects the following trades at the time this email is received:\n #{@trades.join("\n")}", class: "btn-danger"  %>
 				</td>
 			</tr>
 		<% end %>
