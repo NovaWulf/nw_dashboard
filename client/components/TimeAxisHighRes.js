@@ -5,7 +5,7 @@ export default function TimeAxisHighRes() {
 
   const startDate = new Date();
 
-  startDate.setMonth((startDate.getMonth() + 9) % 12);
+  startDate.setMonth((startDate.getMonth() - 3) % 12);
 
   return (
     <XAxis
